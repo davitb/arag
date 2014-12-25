@@ -2,34 +2,26 @@
 #include "AragServer.h"
 #include "SelfTest.h"
 #include "AragClient.h"
+#include "linenoise.h"
 
 using namespace std;
 using namespace cache_server;
 
-void printVector(const vector<string>& vec)
-{
-    for_each (vec.begin(), vec.end(), [](string s) {
-        cout << s << endl;
-    });
-}
-
-void selfTest()
-{
-    SelfTest test;
-    test.testAll();
-}
-
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    if (argc < 2)
     {
-        std::cerr << "Usage: [server] | [client]" << std::endl;
+        std::cerr << "Usage: [server] | [client [hostname{localhost}]] | [test]" << std::endl;
         return 1;
     }
     
     if (string(argv[1]) == "client") {
         
-        AragClient client("localhost");
+        string host = "localhost";
+        if (argc == 3) {
+            host = string(argv[2]);
+        }
+        AragClient client(host);
         client.connectWithCommandLineLoop();
         
         return 1;
@@ -39,6 +31,14 @@ int main(int argc, char* argv[])
         CacheServer::instance().startServer();
         return 1;
     }
+
+    if (string(argv[1]) == "test") {
+        SelfTest test;
+        test.testAll();
+        return 1;
+    }
+
+    std::cerr << "Usage: [server] | [client]" << std::endl;
     
     return 0;
 }

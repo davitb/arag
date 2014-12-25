@@ -16,6 +16,16 @@ static const char* CMD_EXTERNAL_EXIT = "exit";
 static const char* CMD_INTERNAL_CLEANUP = "internal::cleanup";
 static const char* CMD_INTERNAL_PREFIX = "internal::";
 
+static std::vector<std::string> sSupportedCommands = {
+    "GET",
+    "SET",
+    "GETSET",
+    "GETRANGE",
+    "INCR",
+    "MGET",
+    "APPEND"    
+};
+
 class Command
 {
 public:
