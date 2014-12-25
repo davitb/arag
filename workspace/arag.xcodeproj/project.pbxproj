@@ -1,0 +1,308 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		172DA3A61A4C89DC00AD6767 /* AragClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA39B1A4C89DC00AD6767 /* AragClient.cpp */; };
+		172DA3A71A4C89DC00AD6767 /* aragMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA39D1A4C89DC00AD6767 /* aragMain.cpp */; };
+		172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA39E1A4C89DC00AD6767 /* AragServer.cpp */; };
+		172DA3A91A4C89DC00AD6767 /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A01A4C89DC00AD6767 /* Commands.cpp */; };
+		172DA3AA1A4C89DC00AD6767 /* CSMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A21A4C89DC00AD6767 /* CSMap.cpp */; };
+		172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */; };
+		172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		172DA38E1A4C89B000AD6767 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		172DA3901A4C89B000AD6767 /* arag */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = arag; sourceTree = BUILT_PRODUCTS_DIR; };
+		172DA39B1A4C89DC00AD6767 /* AragClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AragClient.cpp; path = ../src/AragClient.cpp; sourceTree = SOURCE_ROOT; };
+		172DA39C1A4C89DC00AD6767 /* AragClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AragClient.h; path = ../src/AragClient.h; sourceTree = SOURCE_ROOT; };
+		172DA39D1A4C89DC00AD6767 /* aragMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = aragMain.cpp; path = ../src/aragMain.cpp; sourceTree = SOURCE_ROOT; };
+		172DA39E1A4C89DC00AD6767 /* AragServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AragServer.cpp; path = ../src/AragServer.cpp; sourceTree = SOURCE_ROOT; };
+		172DA39F1A4C89DC00AD6767 /* AragServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AragServer.h; path = ../src/AragServer.h; sourceTree = SOURCE_ROOT; };
+		172DA3A01A4C89DC00AD6767 /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Commands.cpp; path = ../src/Commands.cpp; sourceTree = SOURCE_ROOT; };
+		172DA3A11A4C89DC00AD6767 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Commands.h; path = ../src/Commands.h; sourceTree = SOURCE_ROOT; };
+		172DA3A21A4C89DC00AD6767 /* CSMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CSMap.cpp; path = ../src/CSMap.cpp; sourceTree = SOURCE_ROOT; };
+		172DA3A31A4C89DC00AD6767 /* CSMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSMap.h; path = ../src/CSMap.h; sourceTree = SOURCE_ROOT; };
+		172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RequestProcessor.cpp; path = ../src/RequestProcessor.cpp; sourceTree = SOURCE_ROOT; };
+		172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RequestProcessor.h; path = ../src/RequestProcessor.h; sourceTree = SOURCE_ROOT; };
+		172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SelfTest.cpp; path = ../test/SelfTest.cpp; sourceTree = SOURCE_ROOT; };
+		172DA3AE1A4C89E900AD6767 /* SelfTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SelfTest.h; path = ../test/SelfTest.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		172DA38D1A4C89B000AD6767 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		172DA3871A4C89B000AD6767 = {
+			isa = PBXGroup;
+			children = (
+				172DA3921A4C89B000AD6767 /* arag */,
+				172DA3911A4C89B000AD6767 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		172DA3911A4C89B000AD6767 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				172DA3901A4C89B000AD6767 /* arag */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		172DA3921A4C89B000AD6767 /* arag */ = {
+			isa = PBXGroup;
+			children = (
+				172DA3AC1A4C89E900AD6767 /* test */,
+				172DA39A1A4C89DC00AD6767 /* src */,
+			);
+			path = arag;
+			sourceTree = "<group>";
+		};
+		172DA39A1A4C89DC00AD6767 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				172DA39B1A4C89DC00AD6767 /* AragClient.cpp */,
+				172DA39C1A4C89DC00AD6767 /* AragClient.h */,
+				172DA39D1A4C89DC00AD6767 /* aragMain.cpp */,
+				172DA39E1A4C89DC00AD6767 /* AragServer.cpp */,
+				172DA39F1A4C89DC00AD6767 /* AragServer.h */,
+				172DA3A01A4C89DC00AD6767 /* Commands.cpp */,
+				172DA3A11A4C89DC00AD6767 /* Commands.h */,
+				172DA3A21A4C89DC00AD6767 /* CSMap.cpp */,
+				172DA3A31A4C89DC00AD6767 /* CSMap.h */,
+				172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */,
+				172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */,
+			);
+			name = src;
+			path = ../src;
+			sourceTree = SOURCE_ROOT;
+		};
+		172DA3AC1A4C89E900AD6767 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */,
+				172DA3AE1A4C89E900AD6767 /* SelfTest.h */,
+			);
+			name = test;
+			path = ../test;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		172DA38F1A4C89B000AD6767 /* arag */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 172DA3971A4C89B000AD6767 /* Build configuration list for PBXNativeTarget "arag" */;
+			buildPhases = (
+				172DA38C1A4C89B000AD6767 /* Sources */,
+				172DA38D1A4C89B000AD6767 /* Frameworks */,
+				172DA38E1A4C89B000AD6767 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = arag;
+			productName = arag;
+			productReference = 172DA3901A4C89B000AD6767 /* arag */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		172DA3881A4C89B000AD6767 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = Home;
+				TargetAttributes = {
+					172DA38F1A4C89B000AD6767 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+				};
+			};
+			buildConfigurationList = 172DA38B1A4C89B000AD6767 /* Build configuration list for PBXProject "arag" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 172DA3871A4C89B000AD6767;
+			productRefGroup = 172DA3911A4C89B000AD6767 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				172DA38F1A4C89B000AD6767 /* arag */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		172DA38C1A4C89B000AD6767 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */,
+				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
+				172DA3A61A4C89DC00AD6767 /* AragClient.cpp in Sources */,
+				172DA3AA1A4C89DC00AD6767 /* CSMap.cpp in Sources */,
+				172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */,
+				172DA3A71A4C89DC00AD6767 /* aragMain.cpp in Sources */,
+				172DA3A91A4C89DC00AD6767 /* Commands.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		172DA3951A4C89B000AD6767 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		172DA3961A4C89B000AD6767 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		172DA3981A4C89B000AD6767 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = ASIO_STANDALONE;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../external/asio-1.10.2/include",
+					../src,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		172DA3991A4C89B000AD6767 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = ASIO_STANDALONE;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../external/asio-1.10.2/include",
+					../src,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		172DA38B1A4C89B000AD6767 /* Build configuration list for PBXProject "arag" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				172DA3951A4C89B000AD6767 /* Debug */,
+				172DA3961A4C89B000AD6767 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		172DA3971A4C89B000AD6767 /* Build configuration list for PBXNativeTarget "arag" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				172DA3981A4C89B000AD6767 /* Debug */,
+				172DA3991A4C89B000AD6767 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 172DA3881A4C89B000AD6767 /* Project object */;
+}
