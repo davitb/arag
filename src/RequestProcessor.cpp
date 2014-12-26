@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Commands.h"
 #include "RequestProcessor.h"
+#include "RedisProtocol.h"
 
 using namespace std;
 using namespace cache_server;
@@ -93,7 +94,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
             cout << "exception occured: " << e.what() << endl;
             
             if (req.cb != nullptr) {
-                req.cb("error");
+                req.cb(cache_server::ERR_GENERIC);
             }
         }
         

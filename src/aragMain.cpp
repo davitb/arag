@@ -19,28 +19,9 @@ void printVec(const vector<string>& toks)
 
 int main(int argc, char* argv[])
 {
-    {
-//        string str = "*2\r\n$4\r\nLLEN\r\n$6\r\nmylist\r\n";
-//        str = "*3\r\n$3\r\nSET\r\n+k1\r\n+123\r\n";
-//        printVec(RedisProtocol::parse(str));
-//        return 1;
-    }
-    
     if (argc < 2)
     {
-        std::cerr << "Usage: [server] | [client [hostname{localhost}]] | [test]" << std::endl;
-        return 1;
-    }
-    
-    if (string(argv[1]) == "client") {
-        
-        string host = "localhost";
-        if (argc == 3) {
-            host = string(argv[2]);
-        }
-        AragClient client(host);
-        client.connectWithCommandLineLoop();
-        
+        std::cerr << "Usage: [server] | [test]" << std::endl;
         return 1;
     }
     
@@ -55,7 +36,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::cerr << "Usage: [server] | [client]" << std::endl;
+    std::cerr << "Usage: [server] | [test]" << std::endl;
     
     return 0;
 }

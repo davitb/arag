@@ -5,6 +5,24 @@
 using namespace std;
 using namespace cache_server;
 
+int extractExpirationNum(const vector<string>& tokens, int minArgsNum, int maxArgsNum)
+{
+    size_t cmdNum = tokens.size();
+    
+    if (cmdNum != maxArgsNum) {
+        throw invalid_argument("Invalid args");
+    }
+    
+    string expType = tokens[3];
+    string expVal = tokens[4];
+    
+    if (expType != "EX") {
+        throw invalid_argument("Invalid args");
+    }
+    
+    return RedisProtocol::convertToInt(expVal);
+}
+
 shared_ptr<Command> Command::createCommand(string cmdline)
 {
     vector<string> tokens = RedisProtocol::parse(cmdline);
@@ -84,24 +102,8 @@ string SetCommand::execute(CSMap& map)
 
         string key = mTokens[1];
         string val = mTokens[2];
-        string expType = "";
-        string expVal = "";
-        int intVal = 0;
-
-        if (cmdNum > Consts::MIN_ARG_NUM) {
-            if (cmdNum != Consts::MAX_ARG_NUM) {
-                throw invalid_argument("Invalid args");
-            }
-            expType = mTokens[3];
-            expVal = mTokens[4];
-
-            if (expType != "EX") {
-                throw invalid_argument("Invalid args");
-            }
-
-            intVal = RedisProtocol::convertToInt(expVal);
-        }
-
+        int intVal = extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM);
+        
         map.set(key, val, intVal);
 
         return RedisProtocol::serializeNonArray("OK",
@@ -144,24 +146,7 @@ string GetSetCommand::execute(CSMap& map)
         
         string key = mTokens[1];
         string val = mTokens[2];
-        string expType = "";
-        string expVal = "";
-        int intVal = 0;
-        
-        if (cmdNum > Consts::MIN_ARG_NUM) {
-            if (cmdNum != Consts::MAX_ARG_NUM) {
-                throw invalid_argument("Invalid args");
-            }
-            
-            expType = mTokens[3];
-            expVal = mTokens[4];
-
-            if (expType != "EX") {
-                throw invalid_argument("Invalid args");
-            }
-            
-            intVal = RedisProtocol::convertToInt(expVal);
-        }
+        int intVal = extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM);
         
         return RedisProtocol::serializeNonArray(map.getset(key, val, intVal),
                                                 RedisProtocol::DataType::BULK_STRING);
@@ -184,24 +169,7 @@ string AppendCommand::execute(CSMap& map)
         
         string key = mTokens[1];
         string val = mTokens[2];
-        string expType = "";
-        string expVal = "";
-        int intVal = 0;
-        
-        if (cmdNum > Consts::MIN_ARG_NUM) {
-            if (cmdNum != Consts::MAX_ARG_NUM) {
-                throw invalid_argument("Invalid args");
-            }
-            
-            expType = mTokens[3];
-            expVal = mTokens[4];
-
-            if (expType != "EX") {
-                throw invalid_argument("Invalid args");
-            }
-            
-            intVal = RedisProtocol::convertToInt(expVal);
-        }
+        int intVal = extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM);
         
         return RedisProtocol::serializeNonArray(to_string(map.append(key, val, intVal)),
                                                 RedisProtocol::DataType::INTEGER);

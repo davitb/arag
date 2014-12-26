@@ -9,7 +9,8 @@ namespace cache_server
 {
 static std::string CRLF = "\r\n";
 static std::string NULL_BULK_STRING = "$-1\r\n";
-
+static std::string ERR_GENERIC = "-ERR unknown error\r\n";
+    
 class RedisProtocol
 {
 public:
