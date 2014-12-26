@@ -28,7 +28,7 @@ public:
     
     int incr(std::string key);
     
-    std::vector<std::string> mget(std::vector<std::string> keys);
+    std::vector<std::pair<std::string, bool>> mget(const std::vector<std::string>& keys);
     
     int getCounter() const;
     

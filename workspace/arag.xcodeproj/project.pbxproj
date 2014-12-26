@@ -15,6 +15,7 @@
 		172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */; };
 		172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */; };
 		17A13AB81A4CA4C4000B0EA6 /* linenoise.c in Sources */ = {isa = PBXBuildFile; fileRef = 17A13AB31A4CA4C4000B0EA6 /* linenoise.c */; };
+		17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +47,8 @@
 		172DA3AE1A4C89E900AD6767 /* SelfTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SelfTest.h; path = ../test/SelfTest.h; sourceTree = SOURCE_ROOT; };
 		17A13AB31A4CA4C4000B0EA6 /* linenoise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = linenoise.c; path = ../external/linenoise/linenoise.c; sourceTree = SOURCE_ROOT; };
 		17A13AB41A4CA4C4000B0EA6 /* linenoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linenoise.h; sourceTree = "<group>"; };
+		17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RedisProtocol.cpp; sourceTree = "<group>"; };
+		17A13AD31A4CF79E000B0EA6 /* RedisProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RedisProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +102,8 @@
 				172DA3A31A4C89DC00AD6767 /* CSMap.h */,
 				172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */,
 				172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */,
+				17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */,
+				17A13AD31A4CF79E000B0EA6 /* RedisProtocol.h */,
 			);
 			name = src;
 			path = ../src;
@@ -184,6 +189,7 @@
 				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
 				172DA3A61A4C89DC00AD6767 /* AragClient.cpp in Sources */,
 				172DA3AA1A4C89DC00AD6767 /* CSMap.cpp in Sources */,
+				17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */,
 				172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */,
 				172DA3A71A4C89DC00AD6767 /* aragMain.cpp in Sources */,
 				17A13AB81A4CA4C4000B0EA6 /* linenoise.c in Sources */,

@@ -16,7 +16,7 @@
 namespace cache_server
 {
 
-static const int PORT_NUM = 2013;
+static const int PORT_NUM = 6379;
 static const int MAX_REQUEST_LEN = 512;
     
 class Session : public std::enable_shared_from_this<Session>

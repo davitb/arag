@@ -44,9 +44,14 @@ void CacheServer::startServer()
 {
     mProcessor.startThreads();
     
-    doAccept();
+    try {
+        doAccept();
     
-    CacheServer::ioServiceInstance().run();
+        CacheServer::ioServiceInstance().run();
+    }
+    catch (std::exception& e) {
+        cout << "ERROR: " << e.what() << endl;
+    }
 }
 
 void CacheServer::stopServer()
@@ -88,7 +93,6 @@ void Session::doRead()
             string cmdLine(mBuffer.begin(), length);
             
             RequestProcessor::Request req(cmdLine, RequestProcessor::RequestType::EXTERNAL, [this, self](string result) {
-                cout << "Result: " << result << endl;
                 
                 doWrite(result);
             });
@@ -107,7 +111,7 @@ void Session::doWrite(string str)
     try {
         asio::async_write(mSocket, asio::buffer(str.c_str(), str.length()), [this, self](std::error_code ec, std::size_t len) {
             if (ec) {
-                cout << "write failed: " << system_error(ec).what() << endl;
+                cout << "response: " << system_error(ec).what() << endl;
             }
             doRead();
         });

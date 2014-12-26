@@ -52,12 +52,12 @@ string CSMap::get(std::string key)
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
     if (iter == map.end()) {
-        return ""; // WRONG_KEY
+        throw invalid_argument("Wrong Key"); // WRONG_KEY
     }
     
     Item& item = iter->second;
     if (isExpired(item.timestamp, item.expSecs)) {
-        return "";
+        throw invalid_argument("Key expired"); // WRONG_KEY
     }
     return iter->second.strVal;
 }
@@ -67,7 +67,7 @@ int CSMap::append(std::string key, std::string value, int expSecs)
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
     if (iter == map.end()) {
-        return set(key, value, expSecs);
+        return set(key, "", expSecs);
     }
     iter->second.strVal += value;
     return (int)iter->second.strVal.length();
@@ -111,30 +111,36 @@ string CSMap::getRange(std::string key, int start, int end)
 
 int CSMap::incr(string key)
 {
-    string val = get(key);
     int intVal = 0;
     
     try {
+        string val = get(key);
+        
         size_t idx = 0;
         intVal = std::stoi(val, &idx);
         if (idx != val.length()) {
             throw;
         }
+
+        intVal++;
     }
     catch (invalid_argument& e) {
-        throw;
     }
-    
-    intVal++;
+
     set(key, to_string(intVal));
     return intVal;
 }
 
-vector<string> CSMap::mget(vector<string> keys)
+vector<pair<string, bool>> CSMap::mget(const vector<string>& keys)
 {
-    vector<string> vals;
+    vector<pair<string, bool>> vals;
     for (string key: keys) {
-        vals.push_back(get(key));
+        try {
+            vals.push_back(make_pair(get(key), false));
+        }
+        catch (std::exception& e) {
+            vals.push_back(make_pair("", true));
+        }
     }
     
     return vals;

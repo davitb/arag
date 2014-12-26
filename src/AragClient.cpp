@@ -30,7 +30,7 @@ void AragClient::commandLineLoop(tcp::socket& sock, function<void(tcp::socket&, 
     // No multiline support
     linenoiseSetMultiLine(0);
     
-    linenoiseHistorySetMaxLen(10);
+    linenoiseHistorySetMaxLen(30);
     
     /* Set the completion callback. This will be called every time the
      * user uses the <tab> key. */
@@ -74,7 +74,7 @@ void AragClient::connectWithCommandLineLoop()
 {
     try
     {
-        cout << "connecting to " + mHostName << endl;
+        cout << "connecting to " + mHostName  + ":" + to_string(cache_server::PORT_NUM) << endl;
         asio::io_service io_service;
         
         tcp::resolver resolver(io_service);
@@ -84,7 +84,7 @@ void AragClient::connectWithCommandLineLoop()
         tcp::socket socket(io_service);
         asio::connect(socket, endpoint_iterator);
 
-        cout << "---connected---" << endl;
+        cout << "---connected to " + mHostName + "---" << endl;
         
         commandLineLoop(socket, [] (tcp::socket& socket, string cmd) {
             asio::error_code error;
@@ -108,6 +108,6 @@ void AragClient::connectWithCommandLineLoop()
     }
     catch (std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
     }
 }

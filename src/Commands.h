@@ -35,18 +35,10 @@ public:
     std::string getCommandName() const;
     
     static std::shared_ptr<Command> createCommand(std::string cmdline);
-    
+
 protected:
     
-    static int convertToInt(std::string val);
-    
-    static std::vector<std::string> parse(std::string cmdLine);
-    
-    static void insertNewWords(std::vector<std::string>& tokens, std::string line);
-    
     void setTokens(const std::vector<std::string>& tokens);
-    
-    std::string stringsToString(const std::vector<std::string>& vec);
     
     friend class SelfTest;
     

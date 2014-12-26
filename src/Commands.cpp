@@ -1,72 +1,13 @@
 #include <sstream>
 #include "Commands.h"
+#include "RedisProtocol.h"
 
 using namespace std;
 using namespace cache_server;
 
-int Command::convertToInt(std::string val)
-{
-    try {
-        size_t idx = 0;
-        int intVal = std::stoi(val, &idx);
-        if (idx != val.length()) {
-            throw invalid_argument("Must be a number");
-        }
-        
-        return intVal;
-    }
-    catch (invalid_argument& e) {
-    }
-    
-    throw invalid_argument("Must be a number");
-}
-
-void Command::insertNewWords(vector<string>& tokens, string line)
-{
-    istringstream iss(line);
-    
-    copy(istream_iterator<string>(iss),
-         istream_iterator<string>(),
-         back_inserter(tokens));
-}
-
-vector<string> Command::parse(std::string line)
-{
-    vector<string> tokens;
-    size_t start = 0;
-    size_t end = 0;
-    
-    while (true) {
-        end = line.find("\"", end);
-        if (end == string::npos) {
-            insertNewWords(tokens, line.substr(start));
-            break;
-        }
-        if (end != 0) {
-            insertNewWords(tokens, line.substr(start, end - start - 1));
-        }
-        start = end;
-        end = line.find("\"", end + 1);
-        if (end == string::npos) {
-            throw invalid_argument("Invalid command");
-        }
-        tokens.push_back(line.substr(start + 1, end - start - 1));
-        start = ++end;
-        if (end == line.length()) {
-            break;
-        }
-    }
-    
-    if (tokens.size() == 0) {
-        throw invalid_argument("Invalid command");
-    }
-    
-    return tokens;
-}
-
 shared_ptr<Command> Command::createCommand(string cmdline)
 {
-    vector<string> tokens = parse(cmdline);
+    vector<string> tokens = RedisProtocol::parse(cmdline);
     Command* pCmd = nullptr;
     
     if (tokens.size() == 0) {
@@ -112,15 +53,6 @@ shared_ptr<Command> Command::createCommand(string cmdline)
     return shared_ptr<Command>(pCmd);
 }
 
-string Command::stringsToString(const vector<string>& vec)
-{
-    string out;
-    for (string str : vec) {
-        out += str + "\n";
-    }
-    return out;
-}
-
 //-------------------------------------------------------------------------
 
 void Command::setTokens(const std::vector<std::string> &tokens)
@@ -145,30 +77,39 @@ string SetCommand::execute(CSMap& map)
     vector<string> out;
     size_t cmdNum = mTokens.size();
     
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
-    }
-    
-    string key = mTokens[1];
-    string val = mTokens[2];
-    string expType = "";
-    string expVal = "";
-    int intVal = 0;
-    
-    if (cmdNum == Consts::MAX_ARG_NUM) {
-        expType = mTokens[3];
-        expVal = mTokens[4];
-
-        if (expType != "EX") {
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
             throw invalid_argument("Invalid args");
         }
 
-        intVal = convertToInt(expVal);
+        string key = mTokens[1];
+        string val = mTokens[2];
+        string expType = "";
+        string expVal = "";
+        int intVal = 0;
+
+        if (cmdNum > Consts::MIN_ARG_NUM) {
+            if (cmdNum != Consts::MAX_ARG_NUM) {
+                throw invalid_argument("Invalid args");
+            }
+            expType = mTokens[3];
+            expVal = mTokens[4];
+
+            if (expType != "EX") {
+                throw invalid_argument("Invalid args");
+            }
+
+            intVal = RedisProtocol::convertToInt(expVal);
+        }
+
+        map.set(key, val, intVal);
+
+        return RedisProtocol::serializeNonArray("OK",
+                                        RedisProtocol::DataType::SIMPLE_STRING);
     }
-    
-    map.set(key, val, intVal);
-    
-    return to_string(map.get(mTokens[1]).length());
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -177,11 +118,17 @@ string GetCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
     
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        return RedisProtocol::serializeNonArray(map.get(mTokens[1]),
+                                                RedisProtocol::DataType::BULK_STRING);
     }
-    
-    return map.get(mTokens[1]);
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -189,29 +136,39 @@ string GetCommand::execute(CSMap& map)
 string GetSetCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
-    
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
-    }
-    
-    string key = mTokens[1];
-    string val = mTokens[2];
-    string expType = "";
-    string expVal = "";
-    int intVal = 0;
-    
-    if (cmdNum == Consts::MAX_ARG_NUM) {
-        expType = mTokens[3];
-        expVal = mTokens[4];
 
-        if (expType != "EX") {
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
             throw invalid_argument("Invalid args");
         }
         
-        intVal = convertToInt(expVal);
+        string key = mTokens[1];
+        string val = mTokens[2];
+        string expType = "";
+        string expVal = "";
+        int intVal = 0;
+        
+        if (cmdNum > Consts::MIN_ARG_NUM) {
+            if (cmdNum != Consts::MAX_ARG_NUM) {
+                throw invalid_argument("Invalid args");
+            }
+            
+            expType = mTokens[3];
+            expVal = mTokens[4];
+
+            if (expType != "EX") {
+                throw invalid_argument("Invalid args");
+            }
+            
+            intVal = RedisProtocol::convertToInt(expVal);
+        }
+        
+        return RedisProtocol::serializeNonArray(map.getset(key, val, intVal),
+                                                RedisProtocol::DataType::BULK_STRING);
     }
-    
-    return map.getset(key, val, intVal);
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -219,29 +176,39 @@ string GetSetCommand::execute(CSMap& map)
 string AppendCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
-    
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
-    }
-    
-    string key = mTokens[1];
-    string val = mTokens[2];
-    string expType = "";
-    string expVal = "";
-    int intVal = 0;
-    
-    if (cmdNum == Consts::MAX_ARG_NUM) {
-        expType = mTokens[3];
-        expVal = mTokens[4];
 
-        if (expType != "EX") {
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
             throw invalid_argument("Invalid args");
         }
         
-        intVal = convertToInt(expVal);
+        string key = mTokens[1];
+        string val = mTokens[2];
+        string expType = "";
+        string expVal = "";
+        int intVal = 0;
+        
+        if (cmdNum > Consts::MIN_ARG_NUM) {
+            if (cmdNum != Consts::MAX_ARG_NUM) {
+                throw invalid_argument("Invalid args");
+            }
+            
+            expType = mTokens[3];
+            expVal = mTokens[4];
+
+            if (expType != "EX") {
+                throw invalid_argument("Invalid args");
+            }
+            
+            intVal = RedisProtocol::convertToInt(expVal);
+        }
+        
+        return RedisProtocol::serializeNonArray(to_string(map.append(key, val, intVal)),
+                                                RedisProtocol::DataType::INTEGER);
     }
-    
-    return to_string(map.append(key, val, intVal));
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -250,13 +217,20 @@ string IncrCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
     
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
+    try {
+    
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1];
+        
+        return RedisProtocol::serializeNonArray(to_string(map.incr(key)),
+                                                RedisProtocol::DataType::INTEGER);
     }
-    
-    string key = mTokens[1];
-    
-    return to_string(map.incr(key));
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -264,16 +238,24 @@ string IncrCommand::execute(CSMap& map)
 string GetRangeCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
-    
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
+
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1];
+        string start = mTokens[2];
+        string end = mTokens[3];
+        
+        return RedisProtocol::serializeNonArray(map.getRange(key,
+                                                             RedisProtocol::convertToInt(start),
+                                                             RedisProtocol::convertToInt(end)),
+                                                RedisProtocol::DataType::BULK_STRING);
     }
-    
-    string key = mTokens[1];
-    string start = mTokens[2];
-    string end = mTokens[3];
-    
-    return map.getRange(key, convertToInt(start), convertToInt(end));
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -281,12 +263,17 @@ string GetRangeCommand::execute(CSMap& map)
 string MGetCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
-    
-    if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-        throw invalid_argument("Invalid args");
+
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+
+        vector<string> keys(mTokens.begin() + 1, mTokens.end());
+
+        return RedisProtocol::serializeArray(map.mget(keys));
     }
-
-    vector<string> keys(mTokens.begin() + 1, mTokens.end());
-
-    return stringsToString(map.mget(keys));
+    catch (std::exception& e) {
+        return cache_server::NULL_BULK_STRING;
+    }
 }
