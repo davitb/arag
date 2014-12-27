@@ -2,6 +2,7 @@
 #include "Commands.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
+#include <climits>
 
 using namespace std;
 using namespace arag;
@@ -70,6 +71,14 @@ shared_ptr<Command> Command::createCommand(string cmdline)
     if (tokens[0].first == "MGET") {
         pCmd = new MGetCommand();
     }
+    else
+    if (tokens[0].first == "BITCOUNT") {
+        pCmd = new BitCountCommand();
+    }
+    else
+    if (tokens[0].first == "BITOP") {
+        pCmd = new BitOpCommand();
+    }
     else {
         throw invalid_argument("Invalid Command");
     }
@@ -94,6 +103,13 @@ string Command::getCommandName() const
     return mTokens[0].first;
 }
 
+
+//----------------------------------------------------------------------------
+
+InternalCommand::InternalCommand(std::string name)
+{
+    mTokens.push_back(std::make_pair(name, 0));
+}
 
 //-------------------------------------------------------------------------
 
@@ -257,8 +273,71 @@ string MGetCommand::execute(CSMap& map)
     }
 }
 
-//----------------------------------------------------------------------------
-InternalCommand::InternalCommand(std::string name)
+//-------------------------------------------------------------------------
+
+string BitCountCommand::execute(CSMap& map)
 {
-    mTokens.push_back(std::make_pair(name, 0));
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int start = 0;
+        int end = INT_MAX;
+
+        if (cmdNum != Consts::MIN_ARG_NUM) {
+            if (cmdNum != Consts::MAX_ARG_NUM) {
+                throw invalid_argument("Invalid args");
+            }
+            
+            start = Utils::convertToInt(mTokens[2].first);
+            end = Utils::convertToInt(mTokens[3].first);
+        }
+
+        string str = map.getRange(key, start, end);
+        
+        int total = 0;
+        for (char ch : str) {
+            total += Utils::countSetBits(ch);
+        }
+        
+        return RedisProtocol::serializeNonArray(to_string(total), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string BitOpCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string op = mTokens[1].first;
+        string destKey = mTokens[2].first;
+        vector<string> keys(mTokens.size() - 3);
+        
+        for (int i = 3; i < mTokens.size(); ++i) {
+            keys[i - 3] = mTokens[i].first;
+        }
+        
+        vector<pair<string, int>> vals = map.mget(keys);
+        
+        string val = Utils::performBitOperation(op, vals);
+        map.set(destKey, val);
+        
+        return RedisProtocol::serializeNonArray(to_string(val.length()), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
 }

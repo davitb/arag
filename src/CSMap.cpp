@@ -99,11 +99,7 @@ string CSMap::getRange(std::string key, int start, int end)
         end = len - abs(end);
     }
     
-    string str;
-    if (start == end) {
-        return "";
-    }
-    if (start < end) {
+    if (start <= end) {
         return val.substr(start, end - start + 1);
     }
     

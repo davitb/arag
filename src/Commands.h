@@ -26,7 +26,9 @@ static std::vector<std::string> sSupportedCommands = {
     "GETRANGE",
     "INCR",
     "MGET",
-    "APPEND"    
+    "APPEND",
+    "BITCOUNT",
+    "BITOP"
 };
 
 /*
@@ -160,6 +162,34 @@ private:
     enum Consts
     {
         MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = INT_MAX
+    };
+};
+
+class BitCountCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 4
+    };
+};
+
+class BitOpCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
         MAX_ARG_NUM = INT_MAX
     };
 };

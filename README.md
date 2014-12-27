@@ -1,1 +1,1 @@
-arag is a "redis" like server completely written in C++ 11. 
+arag is a "redis" compatible server completely written in C++ 11. 
