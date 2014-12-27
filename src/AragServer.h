@@ -13,24 +13,31 @@
 #include "RequestProcessor.h"
 #include "SelfTest.h"
 
-namespace cache_server
+namespace arag
 {
 
 static const int PORT_NUM = 6379;
 static const int MAX_REQUEST_LEN = 512;
     
+/*
+    Represents a socket session. 
+    When an application connects to arag - an object of this class is created.
+ */
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
     
     Session(asio::ip::tcp::socket socket, RequestProcessor& rp);
-    
+
+    // Start to listen for commands
     void start();
     
 private:
     
+    // Read next command
     void doRead();
     
+    // Write response to socket
     void doWrite(std::string);
     
 private:
@@ -39,23 +46,25 @@ private:
     std::reference_wrapper<RequestProcessor> mRP;
 };
 
-class CacheServer
+/*
+    Arag server implementation. All it does is starts to listening to
+    appropriate Redis port and accepts connections.
+*/
+class Arag
 {
 public:
     
-    static CacheServer& instance();
+    static Arag& instance();
 
-    void runCommand(std::string cmdLine, std::function<void(std::string)> cb);
-    
     void startServer();
     
     void stopServer();
 
 private:
     
-    CacheServer();
+    Arag();
     
-    ~CacheServer();
+    ~Arag();
     
     void doAccept();
 
@@ -67,6 +76,6 @@ private:
     asio::ip::tcp::socket mSocket;
 };
     
-}; // cache_server
+}; // arag
 
 #endif /* defined(__CacheServer__CacheServer__) */

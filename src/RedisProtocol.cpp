@@ -3,9 +3,10 @@
 #include "Utils.h"
 
 using namespace std;
-using namespace cache_server;
-using namespace cache_server::redis_const;
+using namespace arag;
+using namespace arag::redis_const;
 
+// Convert data type symbol into DataType
 RedisProtocol::DataType getDataType(char ch)
 {
     switch (ch)
@@ -29,6 +30,7 @@ RedisProtocol::DataType getDataType(char ch)
     throw invalid_argument("RedisProtocol::serialize: Unknown type");
 }
 
+// Parse str, extract string value from it and return its dataType and end position
 string parseData(const string& str, size_t pos, size_t& newPos, RedisProtocol::DataType& type)
 {
     char ch = str[pos];
@@ -37,12 +39,14 @@ string parseData(const string& str, size_t pos, size_t& newPos, RedisProtocol::D
     size_t ind = pos;
     int num = -1;
     
+    // If it's a BULK_STRING - extract the number of bytes
     if (ch == '$') {
         size_t ind = str.find(CRLF, pos);
         if (ind == std::string::npos) {
             throw invalid_argument("parseArray: invalid array");
         }
         
+        // We will extract number of bytes but will ignore it for now
         num = Utils::convertToInt(str.substr(pos, ind - pos));
         
         ind += CRLF.length(); // skip CRLF
@@ -68,26 +72,28 @@ vector<pair<string, int>> RedisProtocol::parse(const std::string& request)
 {
     size_t len = request.length();
     
-    // Example of an array
-    // "+davit\r\n"
+    // Example of Redis formatted stings
+    // "+test\r\n"
     // "$3\r\nfoo\r\n"
     // "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
     
+    // We expect request to always be ARRAY (start with '*')
     if (request[0] != '*' || len < 4) {
         throw invalid_argument("parseArray: invalid array");
     }
     
     size_t ind = 0;
     DataType type;
-    string data = parseData(request, 0, ind, type);
 
     // Get number of elements in ARRAY
+    string data = parseData(request, 0, ind, type);
     int num = Utils::convertToInt(data);
     
     vector<pair<string, int>> tokens(num);
 
     for (int i = 0; i < num; ++i) {
         size_t newPos = 0;
+        // Extract next value
         data = parseData(request, ind, newPos, type);
         if (newPos > len) {
             throw invalid_argument("RedisProtocol::parse: Invalid string");

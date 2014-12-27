@@ -4,8 +4,8 @@
 #include "Utils.h"
 
 using namespace std;
-using namespace cache_server;
-using namespace cache_server::command_const;
+using namespace arag;
+using namespace arag::command_const;
 
 int extractExpirationNum(const vector<pair<string, int>>& tokens, int minArgsNum, int maxArgsNum)
 {

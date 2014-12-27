@@ -7,7 +7,7 @@
 
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 
 CSMap::Item::Item()
 {

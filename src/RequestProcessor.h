@@ -9,31 +9,42 @@
 #include "Commands.h"
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 
-namespace cache_server
+namespace arag
 {
 
+/*
+    This class is responsible for processing Redis requests.
+    It maintains a thread pool and tries to distribute the load amongs them.
+ */
 class RequestProcessor
 {
 public:
 
     enum
     {
+        // Default number of threads
         THREAD_COUNT = 2,
-        TRIGGER_CLEANUP_LIMIT = 20
+        // The number of added elements after which cleanup will be triggered
+        TRIGGER_CLEANUP_LIMIT = 2000
     };
     
+    // There can be two types of operations.
     enum RequestType
     {
         INTERNAL,
         EXTERNAL
     };
     
+    // Internal operations will return intent.
     enum ResultType
     {
+        // Skip further execution
         SKIP,
+        // Stop the thread
         STOP,
+        // Continue with execution
         CONTINUE
     };
     
@@ -59,6 +70,9 @@ public:
     
 private:
     
+    /*
+        This is the state maintained by each thread.
+     */
     class ProcessingUnit
     {
     public:
@@ -68,8 +82,9 @@ private:
         std::condition_variable cond;
     };
     
+    // Thread function
     void processingThread(ProcessingUnit& punit);
-    
+
     void enqueueRequest(ProcessingUnit& punit, Request req);
     
     void enqueueCleanup();
@@ -87,7 +102,9 @@ public:
     void enqueueRequest(Request req);
     
 private:
+    // Threads (processing units)
     std::vector<ProcessingUnit> mPunits;
+    // Arag Map. This variable holds all the customer data
     CSMap mData;
     int mThreadCount;
     int mTriggerCleanupLimit;

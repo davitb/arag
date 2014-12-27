@@ -2,7 +2,7 @@
 #include "Utils.h"
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 
 void Utils::printVector(const std::vector<std::string>& vec)
 {

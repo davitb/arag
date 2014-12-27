@@ -4,7 +4,7 @@
 #include "RedisProtocol.h"
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 
 int main(int argc, char* argv[])
 {
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
         }
         
         if (string(argv[1]) == "server") {
-            CacheServer::instance().startServer();
+            Arag::instance().startServer();
             return 1;
         }
 

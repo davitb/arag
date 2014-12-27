@@ -7,9 +7,13 @@
 #include <mutex>
 #include "SelfTest.h"
 
-namespace cache_server
+namespace arag
 {
 
+/*
+    Implements all low level data structures and commands.
+    Refer to http://redis.io/commands for more information.
+ */
 class CSMap
 {
 public:

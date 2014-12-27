@@ -9,7 +9,7 @@
 #include "Utils.h"
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 
 string runCommandsAndGetLatestResult(CSMap& map, const vector<string>& cmds)
 {

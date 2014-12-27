@@ -1,7 +1,7 @@
 #ifndef __CacheServer__SelfTest__
 #define __CacheServer__SelfTest__
 
-namespace cache_server
+namespace arag
 {
 
 class SelfTest
@@ -19,6 +19,6 @@ public:
     void testAll();
 };
 
-}; // cache_server
+}; // arag
 
 #endif /* defined(__CacheServer__SelfTest__) */

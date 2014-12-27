@@ -6,7 +6,7 @@
 #include "RedisProtocol.h"
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 
 RequestProcessor::RequestProcessor(int threadCount)
 {
@@ -61,6 +61,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
     while (true) {
         unique_lock<mutex> lock(punit.lock);
         
+        // Wait for the conditional variable
         punit.cond.wait(lock, [&punit] { return !punit.que.empty(); });
         
         Request req = punit.que.front();
@@ -72,8 +73,10 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         lock.unlock();
         
         try {
+            // Create appropriate command
             shared_ptr<Command> cmd(Command::createCommand(req.cmdLine));
             
+            // Check if this is an internal operation and execute it
             if (req.type == RequestType::INTERNAL) {
                 ResultType rt = processInternalCommand(cmd->getCommandName());
                 if (rt == ResultType::STOP) {
@@ -84,8 +87,10 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
                 }
             }
             
+            // Execute the command
             string res = cmd->execute(mData);
             
+            // Call the callback to write the response to socket
             if (req.cb != nullptr) {
                 req.cb(res);
             }
@@ -111,16 +116,16 @@ RequestProcessor::ResultType RequestProcessor::processInternalCommand(std::strin
         return ResultType::STOP;
     }
     else
-        if (cmd == command_const::CMD_INTERNAL_CLEANUP) {
-            cout << "Trigerring cleanup" << endl;
-            try {
-                mData.cleanup();
-            }
-            catch (exception& e) {
-                cout << "exception occured: " << e.what() << endl;
-            }
-            return ResultType::SKIP;
+    if (cmd == command_const::CMD_INTERNAL_CLEANUP) {
+        cout << "Trigerring cleanup" << endl;
+        try {
+            mData.cleanup();
         }
+        catch (exception& e) {
+            cout << "exception occured: " << e.what() << endl;
+        }
+        return ResultType::SKIP;
+    }
     
     return ResultType::CONTINUE;
 }

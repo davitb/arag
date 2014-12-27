@@ -8,7 +8,7 @@
 #include "CSMap.h"
 #include "SelfTest.h"
 
-namespace cache_server
+namespace arag
 {
 
 namespace command_const
@@ -29,6 +29,9 @@ static std::vector<std::string> sSupportedCommands = {
     "APPEND"    
 };
 
+/*
+    Base class for all commands.
+ */
 class Command
 {
 public:

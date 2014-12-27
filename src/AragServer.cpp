@@ -10,57 +10,54 @@
 #include "Commands.h"
 
 using namespace std;
-using namespace cache_server;
+using namespace arag;
 using asio::ip::tcp;
 
-CacheServer::CacheServer()
-: mAcceptor(CacheServer::ioServiceInstance(), tcp::endpoint(tcp::v4(), PORT_NUM)), mSocket(CacheServer::ioServiceInstance())
+Arag::Arag()
+: mAcceptor(Arag::ioServiceInstance(), tcp::endpoint(tcp::v4(), PORT_NUM)), mSocket(Arag::ioServiceInstance())
 {
 }
 
-CacheServer::~CacheServer()
+Arag::~Arag()
 {
 }
 
-CacheServer& CacheServer::instance()
+Arag& Arag::instance()
 {
-    static CacheServer cs;
+    static Arag cs;
     return cs;
 }
 
-asio::io_service& CacheServer::ioServiceInstance()
+asio::io_service& Arag::ioServiceInstance()
 {
     static asio::io_service ios;
     return ios;
 }
 
-void CacheServer::runCommand(std::string cmdLine, std::function<void(std::string)> cb)
-{
-    RequestProcessor::Request req(cmdLine, RequestProcessor::RequestType::EXTERNAL, cb);
-    mProcessor.enqueueRequest(req);
-}
-
-void CacheServer::startServer()
+void Arag::startServer()
 {
     mProcessor.startThreads();
     
     try {
+        // Start listening for connections
         doAccept();
     
-        CacheServer::ioServiceInstance().run();
+        // Run the I/O service. This is a blocking call.
+        Arag::ioServiceInstance().run();
     }
     catch (std::exception& e) {
         cout << "ERROR: " << e.what() << endl;
     }
 }
 
-void CacheServer::stopServer()
+void Arag::stopServer()
 {
     mProcessor.stopThreads();
 }
 
-void CacheServer::doAccept()
+void Arag::doAccept()
 {
+    // Accept new connections and start a session when it's established
     mAcceptor.async_accept(mSocket, [this](std::error_code ec) {
         if (!ec) {
             std::make_shared<Session>(std::move(mSocket), mProcessor)->start();
@@ -86,17 +83,23 @@ void Session::doRead()
 {
     auto self(shared_from_this());
     
-    // async read
+    // Async read
     mSocket.async_read_some(asio::buffer(mBuffer), [this, self] (std::error_code ec, std::size_t length) {
         if (!ec) {
-            // enqueue
+
             string cmdLine(mBuffer.begin(), length);
             
-            RequestProcessor::Request req(cmdLine, RequestProcessor::RequestType::EXTERNAL, [this, self](string result) {
-                
+            // This function will be called after response is ready.
+            function<void(string)> responseCallback = [this, self](string result) {
+                // Write the result string to socket
                 doWrite(result);
-            });
+            };
             
+            RequestProcessor::Request req(cmdLine,
+                                          RequestProcessor::RequestType::EXTERNAL,
+                                          responseCallback);
+            
+            // Enqueue the request to Request Processor
             mRP.get().enqueueRequest(req);
         }
     });
@@ -109,12 +112,17 @@ void Session::doWrite(string str)
     cout << "write result: " << str << endl;
 
     try {
-        asio::async_write(mSocket, asio::buffer(str.c_str(), str.length()), [this, self](std::error_code ec, std::size_t len) {
-            if (ec) {
-                cout << "response: " << system_error(ec).what() << endl;
-            }
-            doRead();
-        });
+        // This callback function will be called when async write is done
+        function<void(std::error_code, std::size_t)> writeFunction =
+            [this, self](std::error_code ec, std::size_t len) {
+                if (ec) {
+                    cout << "response: " << system_error(ec).what() << endl;
+                }
+                // Start to listen for the next command
+                doRead();
+        };
+        
+        asio::async_write(mSocket, asio::buffer(str.c_str(), str.length()), writeFunction);
     }
     catch (std::exception& e) {
         cout << e.what() << endl;
