@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include "Commands.h"
 #include "RedisProtocol.h"
@@ -78,6 +79,18 @@ shared_ptr<Command> Command::createCommand(string cmdline)
     else
     if (tokens[0].first == "BITOP") {
         pCmd = new BitOpCommand();
+    }
+    else
+    if (tokens[0].first == "BITPOS") {
+        pCmd = new BitPosCommand();
+    }
+    else
+    if (tokens[0].first == "GETBIT") {
+        pCmd = new GetBitCommand();
+    }
+    else
+    if (tokens[0].first == "SETBIT") {
+        pCmd = new SetBitCommand();
     }
     else {
         throw invalid_argument("Invalid Command");
@@ -336,6 +349,132 @@ string BitOpCommand::execute(CSMap& map)
         map.set(destKey, val);
         
         return RedisProtocol::serializeNonArray(to_string(val.length()), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string BitPosCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int bit = Utils::convertToInt(mTokens[2].first);
+        if (bit != 0 && bit != 1) {
+            throw invalid_argument("Invalid args");
+        }
+
+        int start = 0;
+        int end = INT_MAX;
+        
+        if (cmdNum != Consts::MIN_ARG_NUM) {
+            
+            start = Utils::convertToInt(mTokens[3].first);
+            
+            if (cmdNum == Consts::MAX_ARG_NUM) {
+                end = Utils::convertToInt(mTokens[4].first);
+            }
+        }
+        
+        string val = map.getRange(key, start, end);
+        
+        int pos = Utils::getBitPos(val, bit, (cmdNum > Consts::MIN_ARG_NUM));
+        
+        // Note that bit positions are returned always as absolute values starting
+        // from bit zero even when start and end are used to specify a range.
+        if (pos != -1) {
+            pos += (start * 8);
+        }
+        
+        return RedisProtocol::serializeNonArray(to_string(pos), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string GetBitCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int offset = Utils::convertToInt(mTokens[2].first);
+        if (offset < 0 || offset >= SetBitCommand::Consts::MAX_OFFSET) {
+            throw invalid_argument("Invalid args");
+        }
+
+        string val = "";
+        try {
+            val = map.get(key);
+        }
+        catch (...) {}
+
+        int pos = Utils::getBit(val, offset);
+        
+        return RedisProtocol::serializeNonArray(to_string(pos), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string SetBitCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        int originalBit = 0;
+        string key = mTokens[1].first;
+        int offset = Utils::convertToInt(mTokens[2].first);
+        if (offset < 0 || offset >= Consts::MAX_OFFSET) {
+            throw invalid_argument("Invalid args");
+        }
+        int bitValue = Utils::convertToInt(mTokens[3].first);
+        if (bitValue != 0 && bitValue != 1) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string val = "";
+        try {
+            val = map.get(key);
+            originalBit = Utils::getBit(val, offset);
+        }
+        catch (...) {
+            int bytesNum = offset / 8 + 1;
+            val.reserve(bytesNum);
+            for (int i = 0; i < bytesNum; ++i) {
+                val += '\x00';
+            }
+            std:cout << "val.length: " << val.length() << endl;
+            originalBit = 0;
+        }
+        
+        Utils::setBit(val, offset, bitValue);
+        
+        map.set(key, val);
+        
+        return RedisProtocol::serializeNonArray(to_string(originalBit), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;

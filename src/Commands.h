@@ -28,7 +28,10 @@ static std::vector<std::string> sSupportedCommands = {
     "MGET",
     "APPEND",
     "BITCOUNT",
-    "BITOP"
+    "BITOP",
+    "BITPOS",
+    "GETBIT",
+    "SETBIT"
 };
 
 /*
@@ -191,6 +194,48 @@ private:
     {
         MIN_ARG_NUM = 4,
         MAX_ARG_NUM = INT_MAX
+    };
+};
+    
+class BitPosCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 5
+    };
+};
+
+class GetBitCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 3
+    };
+};
+
+class SetBitCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 4,
+        MAX_OFFSET = INT_MAX
     };
 };
     

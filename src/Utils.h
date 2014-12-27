@@ -23,6 +23,12 @@ public:
     static std::string performBitOperation(const std::string& op,
                                            const std::string& key1,
                                            const std::string& key2);
+    
+    static int getBitPos(const std::string& str, int setBit, bool lookInRange);
+    
+    static int getBit(const std::string& str, int offset);
+    
+    static void setBit(std::string& str, int offset, int bit);
 };
 
 };

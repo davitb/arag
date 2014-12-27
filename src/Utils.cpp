@@ -2,6 +2,7 @@
 #include <sstream>
 #include "Utils.h"
 #include "RedisProtocol.h"
+#include <bitset>
 
 using namespace std;
 using namespace arag;
@@ -99,4 +100,57 @@ string Utils::performBitOperation(const string& op, const vector<pair<string, in
     }
     
     return final;
+}
+
+int Utils::getBitPos(const std::string& str, int setBit, bool lookInRange)
+{
+    if (setBit == 1 && str == "") {
+        return -1;
+    }
+
+    if (setBit == 0 && str == "") {
+        return 0;
+    }
+    
+    for (int i = 0; i < str.length(); ++i) {
+        bitset<8> bits(str[i]);
+        
+        cout << bits << endl;
+        for (int j = 0; j < 8; ++j) {
+            if (bits[7 - j] == setBit) {
+                return i * 8 + j;
+            }
+        }
+    }
+
+    if (!lookInRange && setBit == 0) {
+        return (int)str.length() * 8;
+    }
+
+    return -1;
+}
+
+int Utils::getBit(const std::string& str, int offset)
+{
+    if (str.length() == 0 || offset >= (str.length() * 8)) {
+        return 0;
+    }
+
+    char ch = str[offset / 8];
+    int pos = 8 - offset % 8;
+    
+    return !!(ch & (1 << pos));
+}
+
+void Utils::setBit(std::string& str, int offset, int bit)
+{
+    char& ch = str[offset / 8];
+    int pos = 8 - offset % 8;
+    
+    if (bit == 1) {
+        ch |= (1 << pos);
+    }
+    else {
+        ch &= ~(1 << pos);
+    }
 }
