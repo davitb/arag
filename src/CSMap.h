@@ -9,7 +9,7 @@
 
 namespace cache_server
 {
-    
+
 class CSMap
 {
 public:
@@ -28,7 +28,7 @@ public:
     
     int incr(std::string key);
     
-    std::vector<std::pair<std::string, bool>> mget(const std::vector<std::string>& keys);
+    std::vector<std::pair<std::string, int>> mget(const std::vector<std::string>& keys);
     
     int getCounter() const;
     

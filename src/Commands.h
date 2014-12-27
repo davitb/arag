@@ -11,10 +11,13 @@
 namespace cache_server
 {
 
-static const char* CMD_INTERNAL_STOP = "internal::stop";
-static const char* CMD_EXTERNAL_EXIT = "exit";
-static const char* CMD_INTERNAL_CLEANUP = "internal::cleanup";
-static const char* CMD_INTERNAL_PREFIX = "internal::";
+namespace command_const
+{
+    static const std::string CMD_INTERNAL_STOP = "internal::stop";
+    static const std::string CMD_EXTERNAL_EXIT = "exit";
+    static const std::string CMD_INTERNAL_CLEANUP = "internal::cleanup";
+    static const std::string CMD_INTERNAL_PREFIX = "internal::";
+};
 
 static std::vector<std::string> sSupportedCommands = {
     "GET",
@@ -38,17 +41,20 @@ public:
 
 protected:
     
-    void setTokens(const std::vector<std::string>& tokens);
+    void setTokens(const std::vector<std::pair<std::string, int>>& tokens);
     
     friend class SelfTest;
     
 protected:
-    std::vector<std::string> mTokens;
+    std::vector<std::pair<std::string, int>> mTokens;
 };
 
 class InternalCommand: public Command
 {
 public:
+    
+    InternalCommand(std::string name);
+    
     
     virtual std::string execute(CSMap& map)
     {

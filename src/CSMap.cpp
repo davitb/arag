@@ -2,6 +2,7 @@
 #include <ctime>
 #include <stdlib.h>
 #include "CSMap.h"
+#include "RedisProtocol.h"
 #include <iostream>
 
 
@@ -131,15 +132,15 @@ int CSMap::incr(string key)
     return intVal;
 }
 
-vector<pair<string, bool>> CSMap::mget(const vector<string>& keys)
+vector<pair<string, int>> CSMap::mget(const vector<string>& keys)
 {
-    vector<pair<string, bool>> vals;
+    vector<pair<string, int>> vals;
     for (string key: keys) {
         try {
-            vals.push_back(make_pair(get(key), false));
+            vals.push_back(make_pair(get(key), (int)RedisProtocol::DataType::BULK_STRING));
         }
         catch (std::exception& e) {
-            vals.push_back(make_pair("", true));
+            vals.push_back(make_pair("", (int)RedisProtocol::DataType::NILL));
         }
     }
     

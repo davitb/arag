@@ -13,12 +13,17 @@ using namespace cache_server;
 
 namespace cache_server
 {
-static const int THREAD_COUNT = 2;
-static const int TRIGGER_CLEANUP_LIMIT = 20;
 
 class RequestProcessor
 {
 public:
+
+    enum
+    {
+        THREAD_COUNT = 2,
+        TRIGGER_CLEANUP_LIMIT = 20
+    };
+    
     enum RequestType
     {
         INTERNAL,

@@ -1,9 +1,10 @@
 #include <iostream>
 #include "RedisProtocol.h"
-#include "Commands.h"
+#include "Utils.h"
 
 using namespace std;
 using namespace cache_server;
+using namespace cache_server::redis_const;
 
 RedisProtocol::DataType getDataType(char ch)
 {
@@ -17,36 +18,24 @@ RedisProtocol::DataType getDataType(char ch)
             
         case ':':
             return RedisProtocol::DataType::INTEGER;
+
+        case '-':
+            return RedisProtocol::DataType::ERROR;
+            
+        case '*':
+            return RedisProtocol::DataType::ARRAY;
     }
     
     throw invalid_argument("RedisProtocol::serialize: Unknown type");
 }
 
-int RedisProtocol::convertToInt(std::string val)
-{
-    try {
-        size_t idx = 0;
-        int intVal = std::stoi(val, &idx);
-        if (idx != val.length()) {
-            throw invalid_argument("Must be a number");
-        }
-        
-        return intVal;
-    }
-    catch (invalid_argument& e) {
-    }
-    
-    throw invalid_argument("Must be a number");
-}
-
-
-
-string parseData(const string& str, size_t pos, size_t& newPos)
+string parseData(const string& str, size_t pos, size_t& newPos, RedisProtocol::DataType& type)
 {
     char ch = str[pos];
 
     pos += 1; // skip data type symbol ('$', ':', ...)
     size_t ind = pos;
+    int num = -1;
     
     if (ch == '$') {
         size_t ind = str.find(CRLF, pos);
@@ -54,7 +43,7 @@ string parseData(const string& str, size_t pos, size_t& newPos)
             throw invalid_argument("parseArray: invalid array");
         }
         
-        //num = RedisProtocol::convertToInt(str.substr(pos, ind - pos));
+        num = Utils::convertToInt(str.substr(pos, ind - pos));
         
         ind += CRLF.length(); // skip CRLF
         pos = ind;
@@ -65,11 +54,17 @@ string parseData(const string& str, size_t pos, size_t& newPos)
         throw invalid_argument("parseArray: invalid array");
     }
 
+    // Make sure that bulk array indicated the right size
+    if (num != -1 && num != ind - pos) {
+        throw invalid_argument("parseArray: invalid array");
+    }
+    
+    type = getDataType(ch);
     newPos = ind + CRLF.length(); // skip CRLF
     return str.substr(pos, ind - pos);
 }
 
-vector<string> RedisProtocol::parse(const std::string& request)
+vector<pair<string, int>> RedisProtocol::parse(const std::string& request)
 {
     size_t len = request.length();
     
@@ -83,21 +78,26 @@ vector<string> RedisProtocol::parse(const std::string& request)
     }
     
     size_t ind = 0;
-    string data = parseData(request, 0, ind);
+    DataType type;
+    string data = parseData(request, 0, ind, type);
 
     // Get number of elements in ARRAY
-    int num = convertToInt(data);
+    int num = Utils::convertToInt(data);
     
-    vector<string> tokens(num);
+    vector<pair<string, int>> tokens(num);
 
     for (int i = 0; i < num; ++i) {
         size_t newPos = 0;
-        data = parseData(request, ind, newPos);
+        data = parseData(request, ind, newPos, type);
         if (newPos > len) {
             throw invalid_argument("RedisProtocol::parse: Invalid string");
         }
-        tokens[i] = data;
+        tokens[i] = make_pair(data, type);
         ind = newPos;
+    }
+    
+    if (ind != len) {
+        throw invalid_argument("RedisProtocol::parse: Invalid string");
     }
     
     return tokens;
@@ -125,6 +125,10 @@ string RedisProtocol::serializeNonArray(const string& response, const DataType t
         case ERROR:
             out = "-" + response + "\r\n";
             break;
+
+        case NILL:
+            out = NULL_BULK_STRING;
+            break;
             
         default:
             throw invalid_argument("RedisProtocol::serialize: Unknown type");
@@ -133,22 +137,13 @@ string RedisProtocol::serializeNonArray(const string& response, const DataType t
     return out;
 }
 
-string RedisProtocol::serializeArray(const vector<pair<string, bool>>& response)
+string RedisProtocol::serializeArray(const vector<pair<string, int>>& response)
 {
     string out;
     
-    if (response.size() == 0) {
-        throw invalid_argument("RedisProtocol::serialize: Invalid response");
-    }
-    
     out = "*" + to_string(response.size()) + CRLF;
     for (auto resp : response) {
-        if (resp.second) {
-            out += NULL_BULK_STRING;
-        }
-        else {
-            out += "$" + to_string(resp.first.length()) + CRLF + resp.first + CRLF;
-        }
+        out += serializeNonArray(resp.first, (DataType)resp.second);
     }
     
     return out;

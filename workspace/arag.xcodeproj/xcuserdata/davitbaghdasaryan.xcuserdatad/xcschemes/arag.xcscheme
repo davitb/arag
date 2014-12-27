@@ -59,12 +59,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "client"
-            isEnabled = "NO">
+            argument = "test"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "server"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

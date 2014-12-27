@@ -7,9 +7,13 @@
 
 namespace cache_server
 {
-static std::string CRLF = "\r\n";
-static std::string NULL_BULK_STRING = "$-1\r\n";
-static std::string ERR_GENERIC = "-ERR unknown error\r\n";
+
+namespace redis_const
+{
+    static std::string CRLF = "\r\n";
+    static std::string NULL_BULK_STRING = "$-1\r\n";
+    static std::string ERR_GENERIC = "-ERR unknown error\r\n";
+};
     
 class RedisProtocol
 {
@@ -21,16 +25,15 @@ public:
         ERROR,
         INTEGER,
         BULK_STRING,
-        ARRAY
+        ARRAY,
+        NILL
     };
-    
-    static int convertToInt(std::string val);
-    
-    static std::vector<std::string> parse(const std::string& request);
+  
+    static std::vector<std::pair<std::string, int>> parse(const std::string& request);
     
     static std::string serializeNonArray(const std::string& response, const DataType type);
     
-    static std::string serializeArray(const std::vector<std::pair<std::string, bool>>& response);
+    static std::string serializeArray(const std::vector<std::pair<std::string, int>>& response);
 };
 
 };

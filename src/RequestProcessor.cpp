@@ -30,7 +30,7 @@ void RequestProcessor::stopThreads()
     cout << "Stopping all threads" << endl;
     
     for (int i = 0; i < mPunits.size(); ++i) {
-        RequestProcessor::Request req(CMD_INTERNAL_STOP, RequestType::INTERNAL);
+        RequestProcessor::Request req(command_const::CMD_INTERNAL_STOP, RequestType::INTERNAL);
         enqueueRequest(mPunits[i], req);
         mPunits[i].thd.join();
     }
@@ -94,7 +94,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
             cout << "exception occured: " << e.what() << endl;
             
             if (req.cb != nullptr) {
-                req.cb(cache_server::ERR_GENERIC);
+                req.cb(redis_const::ERR_GENERIC);
             }
         }
         
@@ -106,12 +106,12 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
 
 RequestProcessor::ResultType RequestProcessor::processInternalCommand(std::string cmd)
 {
-    if (cmd == CMD_INTERNAL_STOP || cmd == CMD_EXTERNAL_EXIT) {
+    if (cmd == command_const::CMD_INTERNAL_STOP || cmd == command_const::CMD_EXTERNAL_EXIT) {
         cout << "Stopping the thread" << endl;
         return ResultType::STOP;
     }
     else
-        if (cmd == CMD_INTERNAL_CLEANUP) {
+        if (cmd == command_const::CMD_INTERNAL_CLEANUP) {
             cout << "Trigerring cleanup" << endl;
             try {
                 mData.cleanup();
@@ -127,7 +127,7 @@ RequestProcessor::ResultType RequestProcessor::processInternalCommand(std::strin
 
 void RequestProcessor::enqueueCleanup()
 {
-    Request req(CMD_INTERNAL_CLEANUP, RequestType::INTERNAL);
+    Request req(command_const::CMD_INTERNAL_CLEANUP, RequestType::INTERNAL);
     enqueueRequest(req);
 }
 
