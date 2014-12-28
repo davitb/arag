@@ -18,19 +18,38 @@ class CSMap
 {
 public:
     
+    enum ExpirationType
+    {
+        SEC,
+        MSEC
+    };
+
+    enum SetKeyPolicy
+    {
+        CREATE_IF_DOESNT_EXIST,
+        ONLY_IF_ALREADY_EXISTS,
+        ONLY_IF_DOESNT_ALREADY_EXISTS
+    };
+    
     CSMap();
     
-    int set(std::string key, std::string value, int expSecs = 0);
+    int set(std::string key,
+            std::string value,
+            ExpirationType expType = SEC,
+            int exp = 0,
+            SetKeyPolicy policy = CREATE_IF_DOESNT_EXIST);
     
     std::string get(std::string key);
     
-    std::string getset(std::string key, std::string value, int expSecs = 0);
+    std::string getset(std::string key, std::string value);
     
-    int append(std::string key, std::string value, int expSecs = 0);
+    int append(std::string key, std::string value);
     
     std::string getRange(std::string key, int start, int end);
     
     int incrBy(std::string key, int by);
+
+    std::string incrBy(std::string key, double by);
     
     std::vector<std::pair<std::string, int>> mget(const std::vector<std::string>& keys);
     
@@ -42,20 +61,16 @@ public:
     
 private:
     
-    bool isExpired(int timestamp, int expSecs);
-    
-private:
-    
     class Item
     {
     public:
         std::string strVal;
-        int intVal;
         int timestamp;
-        int expSecs;
+        int exp;
+        ExpirationType expType;
 
         Item();
-        Item(std::string val, int exp);
+        Item(std::string val, ExpirationType expType, int exp);
     };
     
     friend class SelfTest;

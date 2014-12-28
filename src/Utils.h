@@ -15,6 +15,8 @@ public:
     
     static int convertToInt(std::string val);
 
+    static double convertToDouble(std::string val);
+    
     static int countSetBits(unsigned char n);
     
     static std::string performBitOperation(const std::string& op,

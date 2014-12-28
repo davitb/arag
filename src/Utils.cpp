@@ -33,6 +33,23 @@ int Utils::convertToInt(std::string val)
     throw invalid_argument("Must be a number");
 }
 
+double Utils::convertToDouble(std::string val)
+{
+    try {
+        size_t idx = 0;
+        double dval = std::stof(val, &idx);
+        if (idx != val.length()) {
+            throw invalid_argument("Must be a double number");
+        }
+        
+        return dval;
+    }
+    catch (invalid_argument& e) {
+    }
+    
+    throw invalid_argument("Must be double number");
+}
+
 int Utils::countSetBits(unsigned char n)
 {
     unsigned int count = 0;

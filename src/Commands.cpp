@@ -10,27 +10,30 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
-int extractExpirationNum(const vector<pair<string, int>>& tokens, int minArgsNum, int maxArgsNum)
+void extractExpirationNum(const vector<pair<string, int>>& tokens,
+                         int minArgsNum,
+                         int maxArgsNum,
+                         CSMap::ExpirationType* pExpType,
+                         int* pExp)
 {
     size_t cmdNum = tokens.size();
     
     if (cmdNum != minArgsNum) {
     
-        if (cmdNum != maxArgsNum) {
+        if (cmdNum != maxArgsNum || (pExp == nullptr || pExpType == nullptr)) {
             throw invalid_argument("Invalid args");
         }
         
         string expType = tokens[3].first;
         string expVal = tokens[4].first;
         
-        if (expType != "EX") {
+        if (expType != "EX" || expType != "PX") {
             throw invalid_argument("Invalid args");
         }
         
-        return Utils::convertToInt(expVal);
+        *pExpType = expType == "EX" ? CSMap::ExpirationType::SEC : CSMap::ExpirationType::MSEC;
+        *pExp = Utils::convertToInt(expVal);
     }
-    
-    return 0;
 }
 
 shared_ptr<Command> Command::createCommand(string cmdline)
@@ -79,7 +82,11 @@ shared_ptr<Command> Command::createCommand(string cmdline)
     }
     else
     if (tokens[0].first == "MSET") {
-        pCmd = new MSetCommand();
+        pCmd = new MSetCommand(false);
+    }
+    else
+    if (tokens[0].first == "MSETNX") {
+        pCmd = new MSetCommand(true);
     }
     else
     if (tokens[0].first == "BITCOUNT") {
@@ -108,6 +115,10 @@ shared_ptr<Command> Command::createCommand(string cmdline)
     else
     if (tokens[0].first == "INCRBY") {
         pCmd = new IncrByCommand();
+    }
+    else
+    if (tokens[0].first == "INCRBYFLOAT") {
+        pCmd = new IncrByFloatCommand();
     }
     else
     if (tokens[0].first == "DECR") {
@@ -163,12 +174,24 @@ string SetCommand::execute(CSMap& map)
 
         string key = mTokens[1].first;
         string val = mTokens[2].first;
-        int intVal = extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM);
         
-        map.set(key, val, intVal);
+        // Extract expiration time
+        int exp = 0;
+        CSMap::ExpirationType expType = CSMap::ExpirationType::SEC;
+        extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM, &expType, &exp);
+        
+        CSMap::SetKeyPolicy policy = CSMap::SetKeyPolicy::CREATE_IF_DOESNT_EXIST;
+        // Extract NX/XX if it's provided
+        if (cmdNum == Consts::MAX_ARG_NUM) {
+            policy = CSMap::SetKeyPolicy::ONLY_IF_DOESNT_ALREADY_EXISTS;
+            if (mTokens[4].first == "XX") {
+                policy = CSMap::SetKeyPolicy::ONLY_IF_ALREADY_EXISTS;
+            }
+        }
+        
+        map.set(key, val, expType, exp, policy);
 
-        return RedisProtocol::serializeNonArray("OK",
-                                        RedisProtocol::DataType::SIMPLE_STRING);
+        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -207,9 +230,8 @@ string GetSetCommand::execute(CSMap& map)
         
         string key = mTokens[1].first;
         string val = mTokens[2].first;
-        int intVal = extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM);
         
-        return RedisProtocol::serializeNonArray(map.getset(key, val, intVal),
+        return RedisProtocol::serializeNonArray(map.getset(key, val),
                                                 RedisProtocol::DataType::BULK_STRING);
     }
     catch (std::exception& e) {
@@ -230,9 +252,8 @@ string AppendCommand::execute(CSMap& map)
         
         string key = mTokens[1].first;
         string val = mTokens[2].first;
-        int intVal = extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM);
-        
-        return RedisProtocol::serializeNonArray(to_string(map.append(key, val, intVal)),
+
+        return RedisProtocol::serializeNonArray(to_string(map.append(key, val)),
                                                 RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -279,6 +300,28 @@ string IncrByCommand::execute(CSMap& map)
         
         return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, by)),
                                                 RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string IncrByFloatCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        double by = Utils::convertToDouble(mTokens[2].first);
+        
+        return RedisProtocol::serializeNonArray(map.incrBy(key, by), RedisProtocol::DataType::BULK_STRING);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -451,16 +494,35 @@ string MSetCommand::execute(CSMap& map)
         if (size % 2 != 1) {
             throw invalid_argument("Invalid args");
         }
+
+        // If this is a MSETNX command - make sure that all given keys exist
+        if (mNX) {
+            for (int i = 1; i < size; i += 2) {
+                try {
+                    map.get(mTokens[i].first);
+                    // There is a key that does exist - fail
+                    return RedisProtocol::serializeNonArray("0", RedisProtocol::DataType::INTEGER);
+                }
+                catch (...) {
+                }
+            }
+        }
         
         for (int i = 1; i < size; i += 2) {
             map.set(mTokens[i].first, mTokens[i + 1].first);
         }
         
+        // Need to return different values and types depending on command type (MSET or MSETNX)
+        if (mNX) {
+            return RedisProtocol::serializeNonArray("1", RedisProtocol::DataType::INTEGER);
+        }
+
         return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
     }
+    
+    return RedisProtocol::serializeNonArray("Error: Invalid argument", RedisProtocol::DataType::ERROR);
 }
 
 //-------------------------------------------------------------------------

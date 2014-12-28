@@ -28,8 +28,10 @@ static std::vector<std::string> sSupportedCommands = {
     "DECR",
     "DECRBY",
     "INCRBY",
+    "INCRBYFLOAT",
     "MGET",
     "MSET",
+    "MSETNX",
     "APPEND",
     "BITCOUNT",
     "BITOP",
@@ -85,7 +87,7 @@ private:
     enum Consts
     {
         MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
+        MAX_ARG_NUM = 6
     };
 };
 
@@ -193,6 +195,8 @@ class MSetCommand: public Command
 {
 public:
     
+    MSetCommand(bool msetNX) { mNX = msetNX; };
+    
     virtual std::string execute(CSMap& map);
     
 private:
@@ -201,8 +205,11 @@ private:
         MIN_ARG_NUM = 3,
         MAX_ARG_NUM = INT_MAX
     };
-};
     
+private:
+    bool mNX;
+};
+
 class BitCountCommand: public Command
 {
 public:
@@ -301,6 +308,20 @@ private:
     };
 };
 
+class IncrByFloatCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 3
+    };
+};
+    
 class DecrCommand: public Command
 {
 public:
