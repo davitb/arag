@@ -25,13 +25,18 @@ static std::vector<std::string> sSupportedCommands = {
     "GETSET",
     "GETRANGE",
     "INCR",
+    "DECR",
+    "DECRBY",
+    "INCRBY",
     "MGET",
+    "MSET",
     "APPEND",
     "BITCOUNT",
     "BITOP",
     "BITPOS",
     "GETBIT",
-    "SETBIT"
+    "SETBIT",
+    "STRLEN"
 };
 
 /*
@@ -127,6 +132,21 @@ private:
     };
 };
 
+class SetRangeCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 4,
+        MAX_VALUE = 512 * 1024 * 1024
+    };
+};
+    
 class GetSetCommand: public Command
 {
 public:
@@ -169,6 +189,20 @@ private:
     };
 };
 
+class MSetCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = INT_MAX
+    };
+};
+    
 class BitCountCommand: public Command
 {
 public:
@@ -238,6 +272,63 @@ public:
         MAX_OFFSET = INT_MAX
     };
 };
+
+class StrlenCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 2
+    };
+};
+
+class IncrByCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 3
+    };
+};
+
+class DecrCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 2
+    };
+};
+
+class DecrByCommand: public Command
+{
+public:
+    
+    virtual std::string execute(CSMap& map);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 3
+    };
+};
+    
     
 };
 

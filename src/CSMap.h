@@ -30,7 +30,7 @@ public:
     
     std::string getRange(std::string key, int start, int end);
     
-    int incr(std::string key);
+    int incrBy(std::string key, int by);
     
     std::vector<std::pair<std::string, int>> mget(const std::vector<std::string>& keys);
     

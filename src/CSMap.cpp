@@ -106,7 +106,7 @@ string CSMap::getRange(std::string key, int start, int end)
     return val.substr(start, len - start) + val.substr(0, end);
 }
 
-int CSMap::incr(string key)
+int CSMap::incrBy(string key, int by)
 {
     int intVal = 0;
     
@@ -119,7 +119,7 @@ int CSMap::incr(string key)
             throw;
         }
 
-        intVal++;
+        intVal += by;
     }
     catch (invalid_argument& e) {
     }

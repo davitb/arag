@@ -4,6 +4,7 @@
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <climits>
+#include <algorithm>
 
 using namespace std;
 using namespace arag;
@@ -69,8 +70,16 @@ shared_ptr<Command> Command::createCommand(string cmdline)
         pCmd = new GetRangeCommand();
     }
     else
+    if (tokens[0].first == "SETRANGE") {
+        pCmd = new SetRangeCommand();
+    }
+    else
     if (tokens[0].first == "MGET") {
         pCmd = new MGetCommand();
+    }
+    else
+    if (tokens[0].first == "MSET") {
+        pCmd = new MSetCommand();
     }
     else
     if (tokens[0].first == "BITCOUNT") {
@@ -91,6 +100,22 @@ shared_ptr<Command> Command::createCommand(string cmdline)
     else
     if (tokens[0].first == "SETBIT") {
         pCmd = new SetBitCommand();
+    }
+    else
+    if (tokens[0].first == "STRLEN") {
+        pCmd = new StrlenCommand();
+    }
+    else
+    if (tokens[0].first == "INCRBY") {
+        pCmd = new IncrByCommand();
+    }
+    else
+    if (tokens[0].first == "DECR") {
+        pCmd = new DecrCommand();
+    }
+    else
+    if (tokens[0].first == "DECRBY") {
+        pCmd = new DecrByCommand();
     }
     else {
         throw invalid_argument("Invalid Command");
@@ -229,7 +254,75 @@ string IncrCommand::execute(CSMap& map)
         
         string key = mTokens[1].first;
         
-        return RedisProtocol::serializeNonArray(to_string(map.incr(key)),
+        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, 1)),
+                                                RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string IncrByCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int by = Utils::convertToInt(mTokens[2].first);
+        
+        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, by)),
+                                                RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string DecrCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        
+        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, -1)),
+                                                RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string DecrByCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int by = Utils::convertToInt(mTokens[2].first);
+        
+        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, by * -1)),
                                                 RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -264,6 +357,62 @@ string GetRangeCommand::execute(CSMap& map)
 
 //-------------------------------------------------------------------------
 
+string SetRangeCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int offset = Utils::convertToInt(mTokens[2].first);
+        if (offset < 0) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string value = mTokens[3].first;
+        int valueLen = (int)value.length();
+        
+        string oldVal = "";
+        size_t finalLen = offset + valueLen;
+        
+        try {
+            oldVal = map.get(key);
+            
+            int oldValLen = (int)oldVal.length();
+            
+            finalLen = max(oldValLen, offset + valueLen);
+            
+            if (oldValLen < offset) {
+                for (size_t i = 0; i < offset - oldValLen; ++i) {
+                    oldVal += '\x00';
+                }
+            }
+        }
+        catch (...) {
+            oldVal.reserve(offset + valueLen);
+            for (size_t i = 0; i < offset + valueLen; ++i) {
+                oldVal += '\x00';
+            }
+        }
+        
+        for (size_t i = 0; i < valueLen; ++i) {
+            oldVal[offset + i] = value[i];
+        }
+        
+        map.set(key, oldVal);
+        
+        return RedisProtocol::serializeNonArray(to_string(finalLen), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
 string MGetCommand::execute(CSMap& map)
 {
     size_t cmdNum = mTokens.size();
@@ -280,6 +429,34 @@ string MGetCommand::execute(CSMap& map)
         }
         
         return RedisProtocol::serializeArray(map.mget(keys));
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string MSetCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+
+        size_t size = mTokens.size();
+        
+        if (size % 2 != 1) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        for (int i = 1; i < size; i += 2) {
+            map.set(mTokens[i].first, mTokens[i + 1].first);
+        }
+        
+        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -475,6 +652,36 @@ string SetBitCommand::execute(CSMap& map)
         map.set(key, val);
         
         return RedisProtocol::serializeNonArray(to_string(originalBit), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string StrlenCommand::execute(CSMap& map)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        
+        size_t len = 0;
+        
+        string val = "";
+        try {
+            len = map.get(key).length();
+        }
+        catch (...) {
+            len = 0;
+        }
+        
+        return RedisProtocol::serializeNonArray(to_string(len), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
