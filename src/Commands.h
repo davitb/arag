@@ -56,7 +56,23 @@ static std::vector<std::string> sSupportedCommands = {
     "HMSET",
     "HSCAN",
     "HSETNX",
-    "HVALS"
+    "HVALS",
+    
+    // List commands
+    "RPUSH",
+    "RPUSHX",
+    "LPUSH",
+    "LPUSHX",
+    "LLEN",
+    "LPOP",
+    "RPOP",
+    "LRANGE",
+    "LSET",
+    "LINSERT",
+    "LINDEX",
+    "LREM",
+    "LTRIM",
+    "RPOPPLUSH"
 };
 
 /*
@@ -70,7 +86,7 @@ public:
     
     std::string getCommandName() const;
     
-    static std::shared_ptr<Command> createCommand(std::string cmdline);
+    static Command& getCommand(const std::string& cmdline);
 
 protected:
     

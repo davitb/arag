@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "StringCmds.h"
 #include "HashCmds.h"
+#include "ListCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
 
@@ -10,159 +11,88 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
-shared_ptr<Command> Command::createCommand(string cmdline)
+static Command* getCommandByName(const string& cmdName)
 {
+    static unordered_map<string, shared_ptr<Command>> sNameToCommand;
+    
+    if (sNameToCommand.empty()) {
+        // Internal Commands
+        sNameToCommand[CMD_INTERNAL_STOP] = shared_ptr<Command>(new InternalCommand(CMD_INTERNAL_STOP));
+        sNameToCommand[CMD_INTERNAL_CLEANUP] = shared_ptr<Command>(new InternalCommand(CMD_INTERNAL_CLEANUP));
+        
+        // String Commands
+        sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());
+        sNameToCommand["GET"] = shared_ptr<Command>(new GetCommand());
+        sNameToCommand["GETSET"] = shared_ptr<Command>(new GetSetCommand());
+        sNameToCommand["APPEND"] = shared_ptr<Command>(new AppendCommand());
+        sNameToCommand["INCR"] = shared_ptr<Command>(new IncrCommand());
+        sNameToCommand["GETRANGE"] = shared_ptr<Command>(new GetRangeCommand());
+        sNameToCommand["SETRANGE"] = shared_ptr<Command>(new SetRangeCommand());
+        sNameToCommand["MGET"] = shared_ptr<Command>(new MGetCommand());
+        sNameToCommand["MSET"] = shared_ptr<Command>(new MSetCommand(false));
+        sNameToCommand["MSETNX"] = shared_ptr<Command>(new MSetCommand(true));
+        sNameToCommand["BITCOUNT"] = shared_ptr<Command>(new BitCountCommand());
+        sNameToCommand["BITOP"] = shared_ptr<Command>(new BitOpCommand());
+        sNameToCommand["BITPOS"] = shared_ptr<Command>(new BitPosCommand());
+        sNameToCommand["GETBIT"] = shared_ptr<Command>(new GetBitCommand());
+        sNameToCommand["SETBIT"] = shared_ptr<Command>(new SetBitCommand());
+        sNameToCommand["STRLEN"] = shared_ptr<Command>(new StrlenCommand());
+        sNameToCommand["INCRBY"] = shared_ptr<Command>(new IncrByCommand());
+        sNameToCommand["INCRBYFLOAT"] = shared_ptr<Command>(new IncrByFloatCommand());
+        sNameToCommand["DECR"] = shared_ptr<Command>(new DecrCommand());
+        sNameToCommand["DECRBY"] = shared_ptr<Command>(new DecrByCommand());
+        
+        // Hash Commands
+        sNameToCommand["HSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::CmdType::SET));
+        sNameToCommand["HSETNX"] = shared_ptr<Command>(new HSetCommand(HSetCommand::CmdType::SETNX));
+        sNameToCommand["HMSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::CmdType::MSET));
+        sNameToCommand["HGET"] = shared_ptr<Command>(new HGetCommand());
+        sNameToCommand["HEXISTS"] = shared_ptr<Command>(new HExistsCommand());
+        sNameToCommand["HDEL"] = shared_ptr<Command>(new HDelCommand());
+        sNameToCommand["HGETALL"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::GETALL));
+        sNameToCommand["HKEYS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::KEYS));
+        sNameToCommand["HVALS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::VALS));
+        sNameToCommand["HMGET"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::MGET));
+        sNameToCommand["HLEN"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::LEN));
+        sNameToCommand["HINCRBY"] = shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::CmdType::INCRBY));
+        sNameToCommand["HINCRBYFLOAT"] =
+            shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::CmdType::INCRBYFLOAT));
+        
+        // List Commands
+        sNameToCommand["RPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::RPUSH));
+        sNameToCommand["RPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::RPUSHX));
+        sNameToCommand["LPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::LPUSH));
+        sNameToCommand["LPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::LPUSHX));
+    }
+    
+    if (sNameToCommand.find(cmdName) == sNameToCommand.end()) {
+        throw invalid_argument("Invalid command");
+    }
+    
+    return sNameToCommand[cmdName].get();
+}
+
+Command& Command::getCommand(const string& cmdline)
+{
+    // Skip parsing if this is an internal command
     if (cmdline.substr(0, CMD_INTERNAL_PREFIX.length()) == CMD_INTERNAL_PREFIX) {
-        return shared_ptr<Command>(new InternalCommand(cmdline));
+        return *getCommandByName(cmdline);
     }
     
     vector<pair<string, int>> tokens = RedisProtocol::parse(cmdline);
-    Command* pCmd = nullptr;
     
     if (tokens.size() == 0) {
         throw invalid_argument("Invalid Command");
     }
     
-    // String commands
-    if (tokens[0].first == "SET") {
-        pCmd = new SetCommand();
-    }
-    else
-    if (tokens[0].first == "GET") {
-    pCmd = new GetCommand();
-    }
-    else
-    if (tokens[0].first == "GETSET") {
-    pCmd = new GetSetCommand();
-    }
-    else
-    if (tokens[0].first == "APPEND") {
-    pCmd = new AppendCommand();
-    }
-    else
-    if (tokens[0].first == "INCR") {
-    pCmd = new IncrCommand();
-    }
-    else
-    if (tokens[0].first == "GETRANGE") {
-    pCmd = new GetRangeCommand();
-    }
-    else
-    if (tokens[0].first == "SETRANGE") {
-    pCmd = new SetRangeCommand();
-    }
-    else
-    if (tokens[0].first == "MGET") {
-    pCmd = new MGetCommand();
-    }
-    else
-    if (tokens[0].first == "MSET") {
-    pCmd = new MSetCommand(false);
-    }
-    else
-    if (tokens[0].first == "MSETNX") {
-    pCmd = new MSetCommand(true);
-    }
-    else
-    if (tokens[0].first == "BITCOUNT") {
-    pCmd = new BitCountCommand();
-    }
-    else
-    if (tokens[0].first == "BITOP") {
-    pCmd = new BitOpCommand();
-    }
-    else
-    if (tokens[0].first == "BITPOS") {
-    pCmd = new BitPosCommand();
-    }
-    else
-    if (tokens[0].first == "GETBIT") {
-    pCmd = new GetBitCommand();
-    }
-    else
-    if (tokens[0].first == "SETBIT") {
-    pCmd = new SetBitCommand();
-    }
-    else
-    if (tokens[0].first == "STRLEN") {
-    pCmd = new StrlenCommand();
-    }
-    else
-    if (tokens[0].first == "INCRBY") {
-    pCmd = new IncrByCommand();
-    }
-    else
-    if (tokens[0].first == "INCRBYFLOAT") {
-    pCmd = new IncrByFloatCommand();
-    }
-    else
-    if (tokens[0].first == "DECR") {
-    pCmd = new DecrCommand();
-    }
-    else
-    if (tokens[0].first == "DECRBY") {
-        pCmd = new DecrByCommand();
-    }
-
-    // Hash Commands
-    else
-    if (tokens[0].first == "HSET") {
-        pCmd = new HSetCommand(HSetCommand::CmdType::SET);
-    }
-    else
-    if (tokens[0].first == "HSETNX") {
-        pCmd = new HSetCommand(HSetCommand::CmdType::SETNX);
-    }
-    else
-    if (tokens[0].first == "HMSET") {
-        pCmd = new HSetCommand(HSetCommand::CmdType::MSET);
-    }
-    else
-    if (tokens[0].first == "HGET") {
-        pCmd = new HGetCommand();
-    }
-    else
-    if (tokens[0].first == "HEXISTS") {
-        pCmd = new HExistsCommand();
-    }
-    else
-    if (tokens[0].first == "HDEL") {
-        pCmd = new HDelCommand();
-    }
-    else
-    if (tokens[0].first == "HGETALL") {
-        pCmd = new HGetAllCommand(HGetAllCommand::CmdType::GETALL);
-    }
-    else
-    if (tokens[0].first == "HKEYS") {
-        pCmd = new HGetAllCommand(HGetAllCommand::CmdType::KEYS);
-    }
-    else
-    if (tokens[0].first == "HVALS") {
-        pCmd = new HGetAllCommand(HGetAllCommand::CmdType::VALS);
-    }
-    else
-    if (tokens[0].first == "HMGET") {
-        pCmd = new HGetAllCommand(HGetAllCommand::CmdType::MGET);
-    }
-    else
-    if (tokens[0].first == "HLEN") {
-        pCmd = new HGetAllCommand(HGetAllCommand::CmdType::LEN);
-    }
-    else
-    if (tokens[0].first == "HINCRBY") {
-        pCmd = new HIncrByCommand(HIncrByCommand::CmdType::INCRBY);
-    }
-    else
-    if (tokens[0].first == "HINCRBYFLOAT") {
-        pCmd = new HIncrByCommand(HIncrByCommand::CmdType::INCRBYFLOAT);
-    }
-    else {
+    Command* pCmd = getCommandByName(tokens[0].first);
+    if (pCmd == nullptr) {
         throw invalid_argument("Invalid Command");
     }
     
     pCmd->setTokens(tokens);
-    return shared_ptr<Command>(pCmd);
+    
+    return *pCmd;
 }
 
 //-------------------------------------------------------------------------

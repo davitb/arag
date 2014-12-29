@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include "StringMap.h"
+#include "ListMap.h"
 
 namespace arag
 {
@@ -16,6 +17,8 @@ public:
     StringMap& getFromHashMap(const std::string& key);
     
     StringMap& getStringMap();
+
+    ListMap& getListMap();
     
     int getCounter() const;
     
@@ -24,6 +27,7 @@ public:
 private:
     
     StringMap mStringMap;
+    ListMap mListMap;
     HashMap mHashMap;
     int mCounter;
 };

@@ -75,11 +75,11 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         
         try {
             // Create appropriate command
-            shared_ptr<Command> cmd(Command::createCommand(req.cmdLine));
+            Command& cmd = Command::getCommand(req.cmdLine);
             
             // Check if this is an internal operation and execute it
             if (req.type == RequestType::INTERNAL) {
-                ResultType rt = processInternalCommand(cmd->getCommandName());
+                ResultType rt = processInternalCommand(cmd.getCommandName());
                 if (rt == ResultType::STOP) {
                     break;
                 }
@@ -89,7 +89,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
             }
             
             // Execute the command
-            string res = cmd->execute(mData);
+            string res = cmd.execute(mData);
             
             // Call the callback to write the response to socket
             if (req.cb != nullptr) {

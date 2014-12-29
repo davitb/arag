@@ -14,12 +14,12 @@ using namespace arag;
 string runCommandsAndGetLatestResult(InMemoryData& data, const vector<string>& cmds)
 {
     for (int i = 0; i < cmds.size() - 1; ++i) {
-        shared_ptr<Command> pCmd(Command::createCommand(cmds[i]));
-        pCmd->execute(data);
+        Command& cmd = Command::getCommand(cmds[i]);
+        cmd.execute(data);
     }
-    shared_ptr<Command> pCmd(Command::createCommand(cmds[cmds.size() - 1]));
+    Command& cmd = Command::getCommand(cmds[cmds.size() - 1]);
     
-    return pCmd->execute(data);
+    return cmd.execute(data);
 }
 
 vector<string> constructCommands(const vector<vector<string>>& cmds)
