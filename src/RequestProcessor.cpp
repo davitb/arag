@@ -2,6 +2,7 @@
 #include <random>
 #include <iostream>
 #include "Commands.h"
+#include "StringMap.h"
 #include "RequestProcessor.h"
 #include "RedisProtocol.h"
 

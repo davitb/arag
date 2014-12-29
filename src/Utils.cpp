@@ -37,7 +37,8 @@ double Utils::convertToDouble(std::string val)
 {
     try {
         size_t idx = 0;
-        double dval = std::stof(val, &idx);
+        cout << val << endl;
+        double dval = std::stod(val, &idx);
         if (idx != val.length()) {
             throw invalid_argument("Must be a double number");
         }
@@ -170,4 +171,21 @@ void Utils::setBit(std::string& str, int offset, int bit)
     else {
         ch &= ~(1 << pos);
     }
+}
+
+std::string Utils::dbl2str(double d)
+{
+    size_t len = std::snprintf(0, 0, "%.10f", d);
+    std::string s(len+1, 0);
+    // technically non-portable, see below
+    std::snprintf(&s[0], len+1, "%.10f", d);
+    // remove nul terminator
+    s.pop_back();
+    // remove trailing zeros
+    s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+    // remove trailing point
+    if(s.back() == '.') {
+        s.pop_back();
+    }
+    return s;
 }

@@ -9,12 +9,15 @@
 /* Begin PBXBuildFile section */
 		1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1702B4461A4DFD8700E6093C /* Utils.cpp */; };
 		172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA39E1A4C89DC00AD6767 /* AragServer.cpp */; };
-		172DA3A91A4C89DC00AD6767 /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A01A4C89DC00AD6767 /* Commands.cpp */; };
-		172DA3AA1A4C89DC00AD6767 /* CSMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A21A4C89DC00AD6767 /* CSMap.cpp */; };
 		172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */; };
 		172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */; };
 		173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 173DCB9B1A4E688F00762A1B /* arag.cpp */; };
 		17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */; };
+		17ED91331A50E6930035DFE6 /* StringCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91321A50E6930035DFE6 /* StringCmds.cpp */; };
+		17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91351A50E76A0035DFE6 /* Commands.cpp */; };
+		17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */; };
+		17ED913C1A50EDFC0035DFE6 /* InMemoryData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */; };
+		17ED913F1A50EF830035DFE6 /* StringMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED913D1A50EF830035DFE6 /* StringMap.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,10 +38,7 @@
 		172DA3901A4C89B000AD6767 /* arag */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = arag; sourceTree = BUILT_PRODUCTS_DIR; };
 		172DA39E1A4C89DC00AD6767 /* AragServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AragServer.cpp; path = ../src/AragServer.cpp; sourceTree = SOURCE_ROOT; };
 		172DA39F1A4C89DC00AD6767 /* AragServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AragServer.h; path = ../src/AragServer.h; sourceTree = SOURCE_ROOT; };
-		172DA3A01A4C89DC00AD6767 /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Commands.cpp; path = ../src/Commands.cpp; sourceTree = SOURCE_ROOT; };
 		172DA3A11A4C89DC00AD6767 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Commands.h; path = ../src/Commands.h; sourceTree = SOURCE_ROOT; };
-		172DA3A21A4C89DC00AD6767 /* CSMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CSMap.cpp; path = ../src/CSMap.cpp; sourceTree = SOURCE_ROOT; };
-		172DA3A31A4C89DC00AD6767 /* CSMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSMap.h; path = ../src/CSMap.h; sourceTree = SOURCE_ROOT; };
 		172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RequestProcessor.cpp; path = ../src/RequestProcessor.cpp; sourceTree = SOURCE_ROOT; };
 		172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RequestProcessor.h; path = ../src/RequestProcessor.h; sourceTree = SOURCE_ROOT; };
 		172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SelfTest.cpp; path = ../test/SelfTest.cpp; sourceTree = SOURCE_ROOT; };
@@ -46,6 +46,15 @@
 		173DCB9B1A4E688F00762A1B /* arag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arag.cpp; sourceTree = "<group>"; };
 		17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RedisProtocol.cpp; sourceTree = "<group>"; };
 		17A13AD31A4CF79E000B0EA6 /* RedisProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RedisProtocol.h; sourceTree = "<group>"; };
+		17ED91321A50E6930035DFE6 /* StringCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringCmds.cpp; sourceTree = "<group>"; };
+		17ED91341A50E6B80035DFE6 /* StringCmds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringCmds.h; sourceTree = "<group>"; };
+		17ED91351A50E76A0035DFE6 /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Commands.cpp; sourceTree = "<group>"; };
+		17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HashCmds.cpp; sourceTree = "<group>"; };
+		17ED91381A50ED0F0035DFE6 /* HashCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HashCmds.h; sourceTree = "<group>"; };
+		17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InMemoryData.cpp; sourceTree = "<group>"; };
+		17ED913B1A50EDFC0035DFE6 /* InMemoryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InMemoryData.h; sourceTree = "<group>"; };
+		17ED913D1A50EF830035DFE6 /* StringMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringMap.cpp; sourceTree = "<group>"; };
+		17ED913E1A50EF830035DFE6 /* StringMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringMap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,8 +87,8 @@
 		172DA3921A4C89B000AD6767 /* arag */ = {
 			isa = PBXGroup;
 			children = (
-				172DA3AC1A4C89E900AD6767 /* test */,
 				172DA39A1A4C89DC00AD6767 /* src */,
+				172DA3AC1A4C89E900AD6767 /* test */,
 			);
 			path = arag;
 			sourceTree = "<group>";
@@ -90,14 +99,20 @@
 				173DCB9B1A4E688F00762A1B /* arag.cpp */,
 				172DA39E1A4C89DC00AD6767 /* AragServer.cpp */,
 				172DA39F1A4C89DC00AD6767 /* AragServer.h */,
-				172DA3A01A4C89DC00AD6767 /* Commands.cpp */,
+				17ED91351A50E76A0035DFE6 /* Commands.cpp */,
 				172DA3A11A4C89DC00AD6767 /* Commands.h */,
-				172DA3A21A4C89DC00AD6767 /* CSMap.cpp */,
-				172DA3A31A4C89DC00AD6767 /* CSMap.h */,
-				172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */,
-				172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */,
+				17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */,
+				17ED91381A50ED0F0035DFE6 /* HashCmds.h */,
+				17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */,
+				17ED913B1A50EDFC0035DFE6 /* InMemoryData.h */,
 				17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */,
 				17A13AD31A4CF79E000B0EA6 /* RedisProtocol.h */,
+				172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */,
+				172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */,
+				17ED91321A50E6930035DFE6 /* StringCmds.cpp */,
+				17ED91341A50E6B80035DFE6 /* StringCmds.h */,
+				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
+				17ED913E1A50EF830035DFE6 /* StringMap.h */,
 				1702B4461A4DFD8700E6093C /* Utils.cpp */,
 				1702B4471A4DFD8700E6093C /* Utils.h */,
 			);
@@ -173,12 +188,15 @@
 			files = (
 				172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */,
 				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
-				172DA3AA1A4C89DC00AD6767 /* CSMap.cpp in Sources */,
 				1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */,
+				17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */,
 				173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */,
+				17ED91331A50E6930035DFE6 /* StringCmds.cpp in Sources */,
+				17ED913C1A50EDFC0035DFE6 /* InMemoryData.cpp in Sources */,
+				17ED913F1A50EF830035DFE6 /* StringMap.cpp in Sources */,
+				17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */,
 				17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */,
 				172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */,
-				172DA3A91A4C89DC00AD6767 /* Commands.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

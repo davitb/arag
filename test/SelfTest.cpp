@@ -11,15 +11,15 @@
 using namespace std;
 using namespace arag;
 
-string runCommandsAndGetLatestResult(CSMap& map, const vector<string>& cmds)
+string runCommandsAndGetLatestResult(InMemoryData& data, const vector<string>& cmds)
 {
     for (int i = 0; i < cmds.size() - 1; ++i) {
         shared_ptr<Command> pCmd(Command::createCommand(cmds[i]));
-        pCmd->execute(map);
+        pCmd->execute(data);
     }
     shared_ptr<Command> pCmd(Command::createCommand(cmds[cmds.size() - 1]));
     
-    return pCmd->execute(map);
+    return pCmd->execute(data);
 }
 
 vector<string> constructCommands(const vector<vector<string>>& cmds)
@@ -143,7 +143,7 @@ void SelfTest::testBasicCommands()
     
     cout << "Running basic commands tests" << endl;
     
-    CSMap map;
+    InMemoryData data;
     vector<string> cmds;
     vector<pair<string, int>> arr;
     vector<vector<string>> args;
@@ -154,7 +154,7 @@ void SelfTest::testBasicCommands()
         {"SET", "k1", "test1" },
         {"GET", "k1" }
     };
-    assert("$5\r\ntest1\r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert("$5\r\ntest1\r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
 
     
     cmds = vector<string>();
@@ -162,7 +162,7 @@ void SelfTest::testBasicCommands()
     args = {
         {"SET", "k1", "test1" }
     };
-    assert("+OK\r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert("+OK\r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cmds = vector<string>();
@@ -173,7 +173,7 @@ void SelfTest::testBasicCommands()
         {"SET", "k3", "test3" },
         {"GET", "k2" }
     };
-    assert("$5\r\ntest2\r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert("$5\r\ntest2\r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cmds = vector<string>();
@@ -185,7 +185,7 @@ void SelfTest::testBasicCommands()
         {"MGET", "k2", "k1", "k3" }
     };
     assert("*3\r\n$5\r\ntest2\r\n$5\r\ntest1\r\n$5\r\ntest3\r\n" ==
-           runCommandsAndGetLatestResult(map, constructCommands(args)));
+           runCommandsAndGetLatestResult(data, constructCommands(args)));
 
     cmds = vector<string>();
     arr = vector<pair<string, int>>();
@@ -194,7 +194,7 @@ void SelfTest::testBasicCommands()
         {"MGET", "k1", "none", "none2" }
     };
     assert("*3\r\n$5\r\ntest1\r\n$-1\r\n$-1\r\n" ==
-           runCommandsAndGetLatestResult(map, constructCommands(args)));
+           runCommandsAndGetLatestResult(data, constructCommands(args)));
 
     cmds = vector<string>();
     arr = vector<pair<string, int>>();
@@ -202,7 +202,7 @@ void SelfTest::testBasicCommands()
         {"SET", "k1", "345" },
         {"INCR", "k1" }
     };
-    assert(":346\r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert(":346\r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cmds = vector<string>();
@@ -212,7 +212,7 @@ void SelfTest::testBasicCommands()
         {"APPEND", "k1", "test3" },
         {"GET", "k1" }
     };
-    assert("$8\r\n345test3\r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert("$8\r\n345test3\r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
 
     
     cmds = vector<string>();
@@ -223,7 +223,7 @@ void SelfTest::testBasicCommands()
         {"GETRANGE", "k1", "3", "7" }
     };
 
-    assert("$5\r\ns is \r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert("$5\r\ns is \r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cmds = vector<string>();
@@ -233,14 +233,14 @@ void SelfTest::testBasicCommands()
         {"GETSET", "k1", "test3" }
     };
     
-    assert("$5\r\ntest1\r\n" == runCommandsAndGetLatestResult(map, constructCommands(args)));
+    assert("$5\r\ntest1\r\n" == runCommandsAndGetLatestResult(data, constructCommands(args)));
 }
 
 void SelfTest::testExpiration()
 {
     cout << "Running expiration tests" << endl;
     
-    CSMap map;
+    InMemoryData data;
     vector<string> cmds;
     vector<pair<string, int>> arr;
     vector<vector<string>> args;
@@ -254,7 +254,7 @@ void SelfTest::testExpiration()
     };
     
     assert("*2\r\n$5\r\ntest1\r\n$5\r\ntest2\r\n" ==
-           runCommandsAndGetLatestResult(map, constructCommands(args)));
+           runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cout << "waiting for 1 secs..." << endl;
@@ -267,7 +267,7 @@ void SelfTest::testExpiration()
     };
     
     assert("*2\r\n$5\r\ntest1\r\n$5\r\ntest2\r\n" ==
-           runCommandsAndGetLatestResult(map, constructCommands(args)));
+           runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cout << "waiting for 2 secs..." << endl;
@@ -280,7 +280,7 @@ void SelfTest::testExpiration()
     };
     
     assert("*2\r\n$-1\r\n$5\r\ntest2\r\n" ==
-           runCommandsAndGetLatestResult(map, constructCommands(args)));
+           runCommandsAndGetLatestResult(data, constructCommands(args)));
     
 
     cout << "waiting for 2 secs..." << endl;
@@ -293,7 +293,7 @@ void SelfTest::testExpiration()
     };
     
     assert("*2\r\n$-1\r\n$-1\r\n" ==
-           runCommandsAndGetLatestResult(map, constructCommands(args)));
+           runCommandsAndGetLatestResult(data, constructCommands(args)));
 }
 
 void SelfTest::testMultiThreading()
@@ -322,7 +322,7 @@ void SelfTest::testMultiThreading()
     }
     
     rp.stopThreads();
-    assert(rp.mData.get("k1") == to_string(numRequests - 1));
+    assert(rp.mData.getStringMap().get("k1") == to_string(numRequests - 1));
 
     // Test with 10 threads and then stop them in the middle of process
     
@@ -349,7 +349,7 @@ void SelfTest::testMultiThreading()
     }
 
     for (int i = 0; i <= numRequests / 2; ++i) {
-        assert(rp.mData.get("k" + to_string(i)) == to_string(i));
+        assert(rp.mData.getStringMap().get("k" + to_string(i)) == to_string(i));
     }
 }
 

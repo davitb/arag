@@ -5,7 +5,7 @@
 #include <vector>
 #include <climits>
 #include <memory>
-#include "CSMap.h"
+#include "InMemoryData.h"
 #include "SelfTest.h"
 
 namespace arag
@@ -20,6 +20,8 @@ namespace command_const
 };
 
 static std::vector<std::string> sSupportedCommands = {
+
+    // String commands
     "GET",
     "SET",
     "GETSET",
@@ -38,7 +40,23 @@ static std::vector<std::string> sSupportedCommands = {
     "BITPOS",
     "GETBIT",
     "SETBIT",
-    "STRLEN"
+    "STRLEN",
+    
+    // Hash commands
+    "HSET",
+    "HGET",
+    "HEXISTS",
+    "HDEL",
+    "HGETALL",
+    "HINCRBY",
+    "HINCRBYFLOAT",
+    "HKEYS",
+    "HLEN",
+    "HMGET",
+    "HMSET",
+    "HSCAN",
+    "HSETNX",
+    "HVALS"
 };
 
 /*
@@ -48,7 +66,7 @@ class Command
 {
 public:
     
-    virtual std::string execute(CSMap& map) = 0;
+    virtual std::string execute(InMemoryData& data) = 0;
     
     std::string getCommandName() const;
     
@@ -57,6 +75,13 @@ public:
 protected:
     
     void setTokens(const std::vector<std::pair<std::string, int>>& tokens);
+    
+    void extractExpirationNum(const std::vector<std::pair<std::string, int>>& tokens,
+                                       int minArgsNum,
+                                       int maxArgsNum,
+                                       StringMap::ExpirationType* pExpType,
+                                       int* pExp);
+    
     
     friend class SelfTest;
     
@@ -71,285 +96,12 @@ public:
     InternalCommand(std::string name);
     
     
-    virtual std::string execute(CSMap& map)
+    virtual std::string execute(InMemoryData& data)
     {
         throw std::logic_error("This function should not be called");
     }
 };
 
-class SetCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 6
-    };
-};
-
-class GetCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class AppendCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
-    };
-};
-
-class GetRangeCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4
-    };
-};
-
-class SetRangeCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4,
-        MAX_VALUE = 512 * 1024 * 1024
-    };
-};
-    
-class GetSetCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
-    };
-};
-
-class IncrCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class MGetCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
-
-class MSetCommand: public Command
-{
-public:
-    
-    MSetCommand(bool msetNX) { mNX = msetNX; };
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = INT_MAX
-    };
-    
-private:
-    bool mNX;
-};
-
-class BitCountCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 4
-    };
-};
-
-class BitOpCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
-    
-class BitPosCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
-    };
-};
-
-class GetBitCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
-class SetBitCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4,
-        MAX_OFFSET = INT_MAX
-    };
-};
-
-class StrlenCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class IncrByCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
-class IncrByFloatCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-    
-class DecrCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class DecrByCommand: public Command
-{
-public:
-    
-    virtual std::string execute(CSMap& map);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-    
     
 };
 

@@ -3,11 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <thread>
-#include <mutex>
-#include <queue>
-#include <future>
-#include "CSMap.h"
+#include "StringMap.h"
 #include "asio.hpp"
 #include "Commands.h"
 #include "RequestProcessor.h"

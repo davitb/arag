@@ -1,7 +1,7 @@
 #include <climits>
 #include <ctime>
 #include <stdlib.h>
-#include "CSMap.h"
+#include "StringMap.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <iostream>
@@ -10,38 +10,21 @@
 using namespace std;
 using namespace arag;
 
-CSMap::Item::Item()
+StringMap::Item::Item()
 {
 }
 
-CSMap::Item::Item(std::string val, ExpirationType etype, int e) : strVal(val), exp(e), expType(etype)
+StringMap::Item::Item(std::string val, ExpirationType etype, int e) : strVal(val), exp(e), expType(etype)
 {
     timestamp = (int)time(0);
 }
 
-CSMap::CSMap()
+StringMap::StringMap()
 {
     counter = 0;
 }
 
-static std::string dbl2str(double d)
-{
-    size_t len = std::snprintf(0, 0, "%.10f", d);
-    std::string s(len+1, 0);
-    // technically non-portable, see below
-    std::snprintf(&s[0], len+1, "%.10f", d);
-    // remove nul terminator
-    s.pop_back();
-    // remove trailing zeros
-    s.erase(s.find_last_not_of('0') + 1, std::string::npos);
-    // remove trailing point
-    if(s.back() == '.') {
-        s.pop_back();
-    }
-    return s;
-}
-
-static bool isExpired(int timestamp, CSMap::ExpirationType expType, int exp)
+static bool isExpired(int timestamp, StringMap::ExpirationType expType, int exp)
 {
     // FIXME: Need to support miliseconds. time() returns in seconds
 
@@ -50,7 +33,7 @@ static bool isExpired(int timestamp, CSMap::ExpirationType expType, int exp)
     return (exp != 0) && (finalTimestamp <= currTimestamp);
 }
 
-int CSMap::set(std::string key, std::string value,
+int StringMap::set(std::string key, std::string value,
                ExpirationType expType, int exp, SetKeyPolicy policy)
 {
     lock_guard<recursive_mutex> lock(mLock);
@@ -74,17 +57,31 @@ int CSMap::set(std::string key, std::string value,
     return (int)map[key].strVal.length();
 }
 
-string CSMap::getset(string key, string value)
+string StringMap::getset(string key, string value)
 {
     lock_guard<recursive_mutex> lock(mLock);
     Item& item = map[key];
+    string oldVal = item.strVal;
     
     set(key, value, item.expType, item.exp);
     
-    return item.strVal;
+    return oldVal;
 }
 
-string CSMap::get(std::string key)
+bool StringMap::deleteKey(string key)
+{
+    try {
+        get(key);
+    }
+    catch (...) {
+        return false;
+    }
+    
+    map.erase(key);
+    return true;
+}
+
+string StringMap::get(std::string key)
 {
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
@@ -99,7 +96,7 @@ string CSMap::get(std::string key)
     return iter->second.strVal;
 }
 
-int CSMap::append(std::string key, std::string value)
+int StringMap::append(std::string key, std::string value)
 {
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
@@ -110,7 +107,7 @@ int CSMap::append(std::string key, std::string value)
     return (int)iter->second.strVal.length();
 }
 
-string CSMap::getRange(std::string key, int start, int end)
+string StringMap::getRange(std::string key, int start, int end)
 {
     string val = get(key);
     if (val == "") {
@@ -142,7 +139,7 @@ string CSMap::getRange(std::string key, int start, int end)
     return val.substr(start, len - start) + val.substr(0, end);
 }
 
-int CSMap::incrBy(string key, int by)
+int StringMap::incrBy(string key, int by)
 {
     int intVal = 0;
     
@@ -156,23 +153,25 @@ int CSMap::incrBy(string key, int by)
     return intVal;
 }
 
-string CSMap::incrBy(string key, double by)
+string StringMap::incrBy(string key, double by)
 {
     double dval = 0;
     
     try {
-        dval = Utils::convertToDouble(get(key)) + by;
+        cout << "key: " << key << endl;
+        string val = get(key);
+        dval = Utils::convertToDouble(val) + by;
     }
     catch (invalid_argument& e) {
     }
     
-    string sVal = dbl2str(dval);
+    string sVal = Utils::dbl2str(dval);
     
     set(key, sVal);
     return sVal;
 }
 
-vector<pair<string, int>> CSMap::mget(const vector<string>& keys)
+vector<pair<string, int>> StringMap::mget(const vector<string>& keys)
 {
     vector<pair<string, int>> vals;
     for (string key: keys) {
@@ -187,17 +186,32 @@ vector<pair<string, int>> CSMap::mget(const vector<string>& keys)
     return vals;
 }
 
-int CSMap::getCounter() const
+vector<pair<string, int>> StringMap::getAll(int getAllType)
+{
+    vector<pair<string, int>> vals;
+    for (auto elem = map.begin(); elem != map.end(); ++elem) {
+        if (getAllType == KEYS_AND_VALUES || getAllType == KEYS) {
+            vals.push_back(make_pair(elem->first, (int)RedisProtocol::DataType::BULK_STRING));
+        }
+        if (getAllType == KEYS_AND_VALUES || getAllType == VALUES) {
+            vals.push_back(make_pair(elem->second.strVal, (int)RedisProtocol::DataType::BULK_STRING));
+        }
+    }
+
+    return vals;
+}
+
+int StringMap::len()
+{
+    return (int)map.size();
+}
+
+int StringMap::getCounter() const
 {
     return counter;
 }
 
-void CSMap::clearCounter()
-{
-    counter = 0;
-}
-
-void CSMap::cleanup()
+void StringMap::cleanup()
 {
     lock_guard<recursive_mutex> lock(mLock);
 

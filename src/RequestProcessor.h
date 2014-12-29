@@ -105,7 +105,7 @@ private:
     // Threads (processing units)
     std::vector<ProcessingUnit> mPunits;
     // Arag Map. This variable holds all the customer data
-    CSMap mData;
+    InMemoryData mData;
     int mThreadCount;
     int mTriggerCleanupLimit;
     

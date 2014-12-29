@@ -1,5 +1,5 @@
-#ifndef __CacheServer__Map__
-#define __CacheServer__Map__
+#ifndef __arag__StringMap__
+#define __arag__StringMap__
 
 #include <string>
 #include <unordered_map>
@@ -14,9 +14,16 @@ namespace arag
     Implements all low level data structures and commands.
     Refer to http://redis.io/commands for more information.
  */
-class CSMap
+class StringMap
 {
 public:
+    
+    enum
+    {
+        KEYS_AND_VALUES,
+        KEYS,
+        VALUES
+    };
     
     enum ExpirationType
     {
@@ -31,7 +38,7 @@ public:
         ONLY_IF_DOESNT_ALREADY_EXISTS
     };
     
-    CSMap();
+    StringMap();
     
     int set(std::string key,
             std::string value,
@@ -40,6 +47,8 @@ public:
             SetKeyPolicy policy = CREATE_IF_DOESNT_EXIST);
     
     std::string get(std::string key);
+
+    bool deleteKey(std::string key);
     
     std::string getset(std::string key, std::string value);
     
@@ -53,9 +62,11 @@ public:
     
     std::vector<std::pair<std::string, int>> mget(const std::vector<std::string>& keys);
     
-    int getCounter() const;
+    std::vector<std::pair<std::string, int>> getAll(int getAllType);
     
-    void clearCounter();
+    int len();
+    
+    int getCounter() const;
     
     void cleanup();
     
@@ -80,7 +91,7 @@ private:
     int counter;
 };
     
-}; // map_server
+}; // __arag__StringMap__
 
 
 #endif /* defined(__CacheServer__Map__) */

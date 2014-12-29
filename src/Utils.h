@@ -31,6 +31,8 @@ public:
     static int getBit(const std::string& str, int offset);
     
     static void setBit(std::string& str, int offset, int bit);
+    
+    static std::string dbl2str(double d);
 };
 
 };

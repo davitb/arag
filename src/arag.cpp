@@ -2,6 +2,7 @@
 #include "AragServer.h"
 #include "SelfTest.h"
 #include "RedisProtocol.h"
+#include <unordered_map>
 
 using namespace std;
 using namespace arag;
