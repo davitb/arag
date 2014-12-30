@@ -116,27 +116,13 @@ string StringMap::getRange(std::string key, int start, int end)
     
     int len = (int)val.length();
     
-    if (abs(start) >= len) {
-        start = len - 1;
+    Utils::normalizeIndexes(start, end, len);
+    
+    if (start >= len || start > end) {
+        return "";
     }
     
-    if (abs(end) >= len) {
-        end = len - 1;
-    }
-    
-    if (start < 0) {
-        start = len - abs(start);
-    }
-    
-    if (end < 0) {
-        end = len - abs(end);
-    }
-    
-    if (start <= end) {
-        return val.substr(start, end - start + 1);
-    }
-    
-    return val.substr(start, len - start) + val.substr(0, end);
+    return val.substr(start, end - start + 1);
 }
 
 int StringMap::incrBy(string key, int by)

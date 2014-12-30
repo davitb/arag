@@ -33,6 +33,8 @@ public:
     static void setBit(std::string& str, int offset, int bit);
     
     static std::string dbl2str(double d);
+    
+    static void normalizeIndexes(int& start, int& end, const int& len);
 };
 
 };

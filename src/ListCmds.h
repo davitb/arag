@@ -32,6 +32,112 @@ private:
     CmdType mCmdType;
 };
 
+class LGetCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        LEN,
+        INDEX
+    };
+    
+    LGetCommand(CmdType type) { mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 3
+    };
+    
+    CmdType mCmdType;
+};
+
+class LRemCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        REM,
+        LPOP,
+        RPOP,
+        RPOPLPUSH
+    };
+    
+    LRemCommand(CmdType type) { mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 4
+    };
+    
+    CmdType mCmdType;
+};
+
+class LRangeCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 4
+    };
+};
+
+class LSetCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 4
+    };
+};
+
+class LTrimCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 4
+    };
+};
+
+class LInsertCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 5,
+        MAX_ARG_NUM = 5
+    };
+};
+    
 };
 
 #endif /* defined(__arag__ListCmds__) */

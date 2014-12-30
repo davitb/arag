@@ -189,3 +189,28 @@ std::string Utils::dbl2str(double d)
     }
     return s;
 }
+
+void Utils::normalizeIndexes(int &start, int &end, const int& len)
+{
+    if (start >= len) {
+        start = len;
+    }
+    
+    if (end >= len) {
+        end = len - 1;
+    }
+    
+    if (start < 0) {
+        start = len - abs(start);
+        if (start < 0) {
+            start = 0;
+        }
+    }
+    
+    if (end < 0) {
+        end = len - abs(end);
+        if (end < 0) {
+            end = 0;
+        }
+    }
+}

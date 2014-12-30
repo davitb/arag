@@ -63,9 +63,19 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["RPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::RPUSHX));
         sNameToCommand["LPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::LPUSH));
         sNameToCommand["LPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::LPUSHX));
+        sNameToCommand["LLEN"] = shared_ptr<Command>(new LGetCommand(LGetCommand::CmdType::LEN));
+        sNameToCommand["LINDEX"] = shared_ptr<Command>(new LGetCommand(LGetCommand::CmdType::INDEX));
+        sNameToCommand["LPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::LPOP));
+        sNameToCommand["RPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::RPOP));
+        sNameToCommand["LREM"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::REM));
+        sNameToCommand["RPOPLPUSH"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::RPOPLPUSH));
+        sNameToCommand["LRANGE"] = shared_ptr<Command>(new LRangeCommand());
+        sNameToCommand["LSET"] = shared_ptr<Command>(new LSetCommand());
+        sNameToCommand["LTRIM"] = shared_ptr<Command>(new LTrimCommand());
+        sNameToCommand["LINSERT"] = shared_ptr<Command>(new LInsertCommand());
     }
     
-    if (sNameToCommand.find(cmdName) == sNameToCommand.end()) {
+    if (sNameToCommand.count(cmdName) == 0) {
         throw invalid_argument("Invalid command");
     }
     
