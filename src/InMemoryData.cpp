@@ -28,6 +28,11 @@ ListMap& InMemoryData::getListMap()
     return mListMap;
 };
 
+SetMap& InMemoryData::getSetMap()
+{
+    return mSetMap;
+};
+
 void InMemoryData::cleanup()
 {
     mStringMap.cleanup();

@@ -21,6 +21,10 @@ namespace command_const
 
 static std::vector<std::string> sSupportedCommands = {
 
+    // Connection commands
+    "PING",
+    "ECHO",
+    
     // String commands
     "GET",
     "SET",
@@ -72,7 +76,24 @@ static std::vector<std::string> sSupportedCommands = {
     "LINDEX",
     "LREM",
     "LTRIM",
-    "RPOPPLUSH"
+    "RPOPPLUSH",
+    
+    // Set commands
+    "SADD",
+    "SMEMBERS",
+    "SCARD",
+    "SDIFF",
+    "SDIFFSTORE",
+    "SINTER",
+    "SINTERSTORE",
+    "SISMEMBER",
+    "SMOVE",
+    "SPOP",
+    "SRANDMEMBER",
+    "SREM",
+    "SSCAN",
+    "SUNION",
+    "SUNIONSTORE"
 };
 
 /*

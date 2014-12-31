@@ -79,7 +79,12 @@ vector<pair<string, int>> RedisProtocol::parse(const std::string& request)
     
     // We expect request to always be ARRAY (start with '*')
     if (request[0] != '*' || len < 4) {
-        throw invalid_argument("parseArray: invalid array");
+        if (request == "PING\r\n") {
+            // FIXME: This is a workaround for INLINE PING command that is issued by redis-benchmark
+            vector<pair<string, int>> tokens = { make_pair("PING", RedisProtocol::DataType::SIMPLE_STRING) };
+            return tokens;
+        }
+        throw invalid_argument("parseArray: invalid array: " + request);
     }
     
     size_t ind = 0;

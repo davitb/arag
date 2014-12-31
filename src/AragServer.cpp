@@ -109,7 +109,7 @@ void Session::doWrite(string str)
 {
     auto self(shared_from_this());
     
-    cout << "write result: " << str << endl;
+    //cout << "write result: " << str << endl;
 
     try {
         // This callback function will be called when async write is done

@@ -5,6 +5,7 @@
 #include <string>
 #include "StringMap.h"
 #include "ListMap.h"
+#include "SetMap.h"
 
 namespace arag
 {
@@ -20,6 +21,8 @@ public:
 
     ListMap& getListMap();
     
+    SetMap& getSetMap();
+    
     int getCounter() const;
     
     void cleanup();
@@ -29,6 +32,7 @@ private:
     StringMap mStringMap;
     ListMap mListMap;
     HashMap mHashMap;
+    SetMap mSetMap;
     int mCounter;
 };
 

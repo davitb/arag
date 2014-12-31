@@ -1,8 +1,8 @@
 #include <iostream>
-#include <random>
 #include <iostream>
 #include "Commands.h"
 #include "StringMap.h"
+#include "Utils.h"
 #include "RequestProcessor.h"
 #include "RedisProtocol.h"
 
@@ -40,12 +40,9 @@ void RequestProcessor::stopThreads()
 void RequestProcessor::enqueueRequest(Request req)
 {
     // Randomly choose a processing unit
-    std::random_device rd;
-    std::default_random_engine e1(rd());
-    std::uniform_int_distribution<int> uniform_dist(0, mThreadCount - 1);
-    int nextUnit = uniform_dist(e1);
+    int nextUnit = Utils::genRandom(0, mThreadCount - 1);
     
-    cout << "Thread #: " << nextUnit << endl;
+    //cout << "Thread #: " << nextUnit << endl;
     
     enqueueRequest(mPunits[nextUnit], req);
 }
@@ -67,7 +64,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         
         Request req = punit.que.front();
         
-        cout << "New request received: " << req.cmdLine << endl;
+        //cout << "New request received: " << req.cmdLine << endl;
         
         punit.que.pop();
         
@@ -105,7 +102,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         }
         
         if (mData.getCounter() > mTriggerCleanupLimit) {
-            enqueueCleanup();
+            //enqueueCleanup();
         }
     }
 }

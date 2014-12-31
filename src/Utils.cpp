@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "RedisProtocol.h"
 #include <bitset>
+#include <random>
 
 using namespace std;
 using namespace arag;
@@ -213,4 +214,12 @@ void Utils::normalizeIndexes(int &start, int &end, const int& len)
             end = 0;
         }
     }
+}
+
+int Utils::genRandom(int min, int max)
+{
+    std::random_device rd;
+    std::default_random_engine e1(rd());
+    std::uniform_int_distribution<int> uniform_dist(min, max);
+    return uniform_dist(e1);
 }

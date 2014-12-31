@@ -11,6 +11,9 @@
 		172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA39E1A4C89DC00AD6767 /* AragServer.cpp */; };
 		172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */; };
 		172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */; };
+		1737FA791A5321500099D0A6 /* SetCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1737FA771A5321500099D0A6 /* SetCmds.cpp */; };
+		1737FA7C1A5321610099D0A6 /* SetMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1737FA7A1A5321610099D0A6 /* SetMap.cpp */; };
+		1737FA7F1A53BE700099D0A6 /* ConnectionCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1737FA7D1A53BE6F0099D0A6 /* ConnectionCmds.cpp */; };
 		173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 173DCB9B1A4E688F00762A1B /* arag.cpp */; };
 		1784BB431A513D13008F7DCE /* ListMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB411A513D13008F7DCE /* ListMap.cpp */; };
 		1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB441A513DE7008F7DCE /* ListCmds.cpp */; };
@@ -45,6 +48,12 @@
 		172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RequestProcessor.h; path = ../src/RequestProcessor.h; sourceTree = SOURCE_ROOT; };
 		172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SelfTest.cpp; path = ../test/SelfTest.cpp; sourceTree = SOURCE_ROOT; };
 		172DA3AE1A4C89E900AD6767 /* SelfTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SelfTest.h; path = ../test/SelfTest.h; sourceTree = SOURCE_ROOT; };
+		1737FA771A5321500099D0A6 /* SetCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SetCmds.cpp; sourceTree = "<group>"; };
+		1737FA781A5321500099D0A6 /* SetCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetCmds.h; sourceTree = "<group>"; };
+		1737FA7A1A5321610099D0A6 /* SetMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SetMap.cpp; sourceTree = "<group>"; };
+		1737FA7B1A5321610099D0A6 /* SetMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetMap.h; sourceTree = "<group>"; };
+		1737FA7D1A53BE6F0099D0A6 /* ConnectionCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConnectionCmds.cpp; sourceTree = "<group>"; };
+		1737FA7E1A53BE700099D0A6 /* ConnectionCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionCmds.h; sourceTree = "<group>"; };
 		173DCB9B1A4E688F00762A1B /* arag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arag.cpp; sourceTree = "<group>"; };
 		1784BB411A513D13008F7DCE /* ListMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListMap.cpp; sourceTree = "<group>"; };
 		1784BB421A513D13008F7DCE /* ListMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListMap.h; sourceTree = "<group>"; };
@@ -107,6 +116,8 @@
 				172DA39F1A4C89DC00AD6767 /* AragServer.h */,
 				17ED91351A50E76A0035DFE6 /* Commands.cpp */,
 				172DA3A11A4C89DC00AD6767 /* Commands.h */,
+				1737FA7D1A53BE6F0099D0A6 /* ConnectionCmds.cpp */,
+				1737FA7E1A53BE700099D0A6 /* ConnectionCmds.h */,
 				17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */,
 				17ED91381A50ED0F0035DFE6 /* HashCmds.h */,
 				17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */,
@@ -119,6 +130,10 @@
 				17A13AD31A4CF79E000B0EA6 /* RedisProtocol.h */,
 				172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */,
 				172DA3A51A4C89DC00AD6767 /* RequestProcessor.h */,
+				1737FA771A5321500099D0A6 /* SetCmds.cpp */,
+				1737FA781A5321500099D0A6 /* SetCmds.h */,
+				1737FA7A1A5321610099D0A6 /* SetMap.cpp */,
+				1737FA7B1A5321610099D0A6 /* SetMap.h */,
 				17ED91321A50E6930035DFE6 /* StringCmds.cpp */,
 				17ED91341A50E6B80035DFE6 /* StringCmds.h */,
 				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
@@ -198,12 +213,15 @@
 			files = (
 				1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */,
 				172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */,
+				1737FA7C1A5321610099D0A6 /* SetMap.cpp in Sources */,
 				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
 				1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */,
 				17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */,
+				1737FA791A5321500099D0A6 /* SetCmds.cpp in Sources */,
 				173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */,
 				17ED91331A50E6930035DFE6 /* StringCmds.cpp in Sources */,
 				1784BB431A513D13008F7DCE /* ListMap.cpp in Sources */,
+				1737FA7F1A53BE700099D0A6 /* ConnectionCmds.cpp in Sources */,
 				17ED913C1A50EDFC0035DFE6 /* InMemoryData.cpp in Sources */,
 				17ED913F1A50EF830035DFE6 /* StringMap.cpp in Sources */,
 				17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */,

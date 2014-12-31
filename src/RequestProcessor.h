@@ -25,7 +25,7 @@ public:
     enum
     {
         // Default number of threads
-        THREAD_COUNT = 2,
+        THREAD_COUNT = 1,
         // The number of added elements after which cleanup will be triggered
         TRIGGER_CLEANUP_LIMIT = 2000
     };

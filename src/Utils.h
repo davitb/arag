@@ -35,6 +35,8 @@ public:
     static std::string dbl2str(double d);
     
     static void normalizeIndexes(int& start, int& end, const int& len);
+    
+    static int genRandom(int min, int max);
 };
 
 };

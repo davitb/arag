@@ -1,11 +1,14 @@
 #include <sstream>
 #include <climits>
 #include <algorithm>
+#include "ConnectionCmds.h"
 #include "StringCmds.h"
 #include "HashCmds.h"
 #include "ListCmds.h"
+#include "SetCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
+#include <iostream>
 
 using namespace std;
 using namespace arag;
@@ -19,6 +22,10 @@ static Command* getCommandByName(const string& cmdName)
         // Internal Commands
         sNameToCommand[CMD_INTERNAL_STOP] = shared_ptr<Command>(new InternalCommand(CMD_INTERNAL_STOP));
         sNameToCommand[CMD_INTERNAL_CLEANUP] = shared_ptr<Command>(new InternalCommand(CMD_INTERNAL_CLEANUP));
+
+        // Connection Commands
+        sNameToCommand["PING"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::PING));
+        sNameToCommand["ECHO"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::ECHO));
         
         // String Commands
         sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());
@@ -73,13 +80,31 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["LSET"] = shared_ptr<Command>(new LSetCommand());
         sNameToCommand["LTRIM"] = shared_ptr<Command>(new LTrimCommand());
         sNameToCommand["LINSERT"] = shared_ptr<Command>(new LInsertCommand());
+        
+        // Set Commands
+        sNameToCommand["SADD"] = shared_ptr<Command>(new SAddCommand());
+        sNameToCommand["SMEMBERS"] = shared_ptr<Command>(new SMembersCommand());
+        sNameToCommand["SCARD"] = shared_ptr<Command>(new SCardCommand(SCardCommand::CmdType::CARD));
+        sNameToCommand["SISMEMBER"] = shared_ptr<Command>(new SCardCommand(SCardCommand::CmdType::ISMEMBER));
+        sNameToCommand["SPOP"] = shared_ptr<Command>(new SRemCommand(SRemCommand::CmdType::POP));
+        sNameToCommand["SREM"] = shared_ptr<Command>(new SRemCommand(SRemCommand::CmdType::REM));
+        sNameToCommand["SDIFF"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::CmdType::DIFF));
+        sNameToCommand["SDIFFSTORE"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::CmdType::DIFFSTORE));
+        sNameToCommand["SINTER"] = shared_ptr<Command>(new SInterCommand(SInterCommand::CmdType::INTER));
+        sNameToCommand["SINTERSTORE"] = shared_ptr<Command>(new SInterCommand(SInterCommand::CmdType::INTERSTORE));
+        sNameToCommand["SUNION"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::CmdType::UNION));
+        sNameToCommand["SUNIONSTORE"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::CmdType::UNIONSTORE));
+        sNameToCommand["SMOVE"] = shared_ptr<Command>(new SMoveCommand());
     }
     
-    if (sNameToCommand.count(cmdName) == 0) {
+    string upperCaseCmd = cmdName;
+    std::transform(upperCaseCmd.begin(), upperCaseCmd.end(), upperCaseCmd.begin(), ::toupper);
+    
+    if (sNameToCommand.count(upperCaseCmd) == 0) {
         throw invalid_argument("Invalid command");
     }
     
-    return sNameToCommand[cmdName].get();
+    return sNameToCommand[upperCaseCmd].get();
 }
 
 Command& Command::getCommand(const string& cmdline)
