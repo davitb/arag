@@ -62,8 +62,39 @@ string SetMap::getRandMember(const std::string &key)
     }
 
     unordered_set<string>& s = mSetMap[key];
+    int rand = Utils::genRandom(0, (int)s.size() - 1);
     auto iter = s.begin();
+    std::advance(iter, rand);
     return *iter;
+}
+
+vector<pair<string, int>> SetMap::getRandMembers(const std::string &key, const int n)
+{
+    if (size(key) == 0) {
+        return vector<pair<string, int>>();
+    }
+
+    SetType& s = mSetMap[key];
+
+    int size = (int)s.size();
+    vector<pair<string, int>> res(min(n, size));
+    if (n >= size) {
+        auto iter = s.begin();
+        for (int i = 0; i < size; ++i) {
+            res[i] = make_pair(*iter++, RedisProtocol::DataType::BULK_STRING);
+        }
+        return res;
+    }
+    
+    int rand = Utils::genRandom(0, size - n);
+    auto iter = s.begin();
+    std::advance(iter, rand);
+    
+    for (int i = 0; i < n; ++i) {
+        res[i] = make_pair(*iter++, RedisProtocol::DataType::BULK_STRING);
+    }
+    
+    return res;
 }
 
 void SetMap::diff(const string& key, const vector<string>& diffKeys, SetType& destSet)

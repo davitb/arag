@@ -38,7 +38,6 @@ double Utils::convertToDouble(std::string val)
 {
     try {
         size_t idx = 0;
-        cout << val << endl;
         double dval = std::stod(val, &idx);
         if (idx != val.length()) {
             throw invalid_argument("Must be a double number");
@@ -134,7 +133,6 @@ int Utils::getBitPos(const std::string& str, int setBit, bool lookInRange)
     for (int i = 0; i < str.length(); ++i) {
         bitset<8> bits(str[i]);
         
-        cout << bits << endl;
         for (int j = 0; j < 8; ++j) {
             if (bits[7 - j] == setBit) {
                 return i * 8 + j;

@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include <algorithm>
 #include "SetCmds.h"
 #include "RedisProtocol.h"
@@ -367,6 +368,45 @@ string SMoveCommand::execute(InMemoryData& data)
         int ret = setMap.move(source, dest, member);
         
         return RedisProtocol::serializeNonArray(to_string(ret), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string SRandMemberCommand::execute(InMemoryData& data)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        SetMap& setMap = data.getSetMap();
+        
+        string key = mTokens[1].first;
+        
+        if (cmdNum == Consts::MIN_ARG_NUM) {
+            string member = setMap.getRandMember(key);
+            return RedisProtocol::serializeNonArray(member, RedisProtocol::DataType::BULK_STRING);
+        }
+        
+        int count = Utils::convertToInt(mTokens[2].first);
+        
+        vector<pair<string, int>> res;
+        if (count < 0) {
+            for (int i = 1; i <= abs(count); ++i) {
+                res.push_back(make_pair(setMap.getRandMember(key), RedisProtocol::DataType::BULK_STRING));
+            }
+        }
+        else {
+            res = setMap.getRandMembers(key, count);
+        }
+        
+        return RedisProtocol::serializeArray(res);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;

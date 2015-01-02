@@ -6,6 +6,7 @@
 #include "HashCmds.h"
 #include "ListCmds.h"
 #include "SetCmds.h"
+#include "SortedSetCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <iostream>
@@ -95,6 +96,19 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["SUNION"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::CmdType::UNION));
         sNameToCommand["SUNIONSTORE"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::CmdType::UNIONSTORE));
         sNameToCommand["SMOVE"] = shared_ptr<Command>(new SMoveCommand());
+        sNameToCommand["SRANDMEMBER"] = shared_ptr<Command>(new SRandMemberCommand());
+        
+        // Sorted Set Commands
+        sNameToCommand["ZADD"] = shared_ptr<Command>(new ZAddCommand());
+        sNameToCommand["ZRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::CmdType::RANGE));
+        sNameToCommand["ZREVRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::CmdType::REVRANGE));
+        sNameToCommand["ZINCRBY"] = shared_ptr<Command>(new ZIncrByCommand());
+        sNameToCommand["ZSCORE"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::CmdType::SCORE));
+        sNameToCommand["ZRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::CmdType::RANK));
+        sNameToCommand["ZREVRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::CmdType::REVRANK));
+        sNameToCommand["ZCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::COUNT));
+        sNameToCommand["ZCARD"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::CARD));
+        sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand(ZRemCommand::CmdType::REM));
     }
     
     string upperCaseCmd = cmdName;

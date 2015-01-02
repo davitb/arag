@@ -168,6 +168,20 @@ private:
     };
 };
 
+class SRandMemberCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 3
+    };
+};
+
 };
 
 #endif /* defined(__arag__SetCmds__) */

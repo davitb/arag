@@ -144,7 +144,6 @@ string StringMap::incrBy(string key, double by)
     double dval = 0;
     
     try {
-        cout << "key: " << key << endl;
         string val = get(key);
         dval = Utils::convertToDouble(val) + by;
     }

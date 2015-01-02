@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+namespace arag
+{
+
 class SetMap
 {
 public:
@@ -21,6 +24,8 @@ public:
     std::vector<std::pair<std::string, int>> getMembers(const std::string& key);
     
     std::string getRandMember(const std::string& key);
+    
+    std::vector<std::pair<std::string, int>> getRandMembers(const std::string &key, const int n);
     
     int rem(const std::string& key, const std::string& val);
     
@@ -40,6 +45,8 @@ public:
     
 private:
     SetMapType mSetMap;
+};
+
 };
 
 #endif /* defined(__arag__SetMap__) */

@@ -93,7 +93,15 @@ static std::vector<std::string> sSupportedCommands = {
     "SREM",
     "SSCAN",
     "SUNION",
-    "SUNIONSTORE"
+    "SUNIONSTORE",
+    
+    // Sorted Set commands
+    "ZADD",
+    "ZRANGE",
+    "ZSCORE",
+    "ZRANK",
+    "ZCOUNT",
+    "ZCARD"
 };
 
 /*

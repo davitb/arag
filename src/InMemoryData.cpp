@@ -33,6 +33,11 @@ SetMap& InMemoryData::getSetMap()
     return mSetMap;
 };
 
+SortedSetMap& InMemoryData::getSortedSetMap()
+{
+    return mSortedSetMap;
+};
+
 void InMemoryData::cleanup()
 {
     mStringMap.cleanup();
