@@ -50,13 +50,40 @@ private:
 
 //----------------------------------------------------------------
 
+class ZRangeByLexCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        RANGEBYLEX,
+        REVRANGEBYLEX
+    };
+    
+    ZRangeByLexCommand(CmdType type) {mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 7
+    };
+    
+    CmdType mCmdType;
+};
+
+//----------------------------------------------------------------
+
 class ZCountCommand: public Command
 {
 public:
     enum CmdType
     {
         COUNT,
-        CARD
+        CARD,
+        LEXCOUNT
     };
     
     ZCountCommand(CmdType type) {mCmdType = type; }
@@ -170,7 +197,59 @@ private:
     CmdType mCmdType;
 };
     
+//----------------------------------------------------------------
+
+class ZRangeByCommand: public Command
+{
+public:
     
+    enum CmdType
+    {
+        RANGEBYSCORE,
+        REVRANGEBYSCORE
+    };
+    
+    ZRangeByCommand(CmdType type) {mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 8
+    };
+    
+    CmdType mCmdType;
+};
+
+//----------------------------------------------------------------
+
+class ZRemByCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        REMRANGEBYSCORE,
+        REMRANGEBYRANK,
+        REMRANGEBYLEX
+    };
+    
+    ZRemByCommand(CmdType type) {mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = 4
+    };
+    
+    CmdType mCmdType;
+};
+  
 };
 
 

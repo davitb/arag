@@ -160,10 +160,24 @@ string ZCountCommand::execute(InMemoryData& data)
                     throw invalid_argument("Invalid args");
                 }
                 
-                double min = Utils::convertToDouble(mTokens[2].first);
-                double max = Utils::convertToDouble(mTokens[3].first);
+                double min = Utils::convertToDoubleByLimit(mTokens[2].first, false);
+                double max = Utils::convertToDoubleByLimit(mTokens[3].first, true);
                 
                 int count = setMap.count(key, min, max);
+                
+                return RedisProtocol::serializeNonArray(to_string(count), RedisProtocol::DataType::INTEGER);
+            }
+                
+            case LEXCOUNT:
+            {
+                if (cmdNum != Consts::MAX_ARG_NUM) {
+                    throw invalid_argument("Invalid args");
+                }
+                
+                string min = Utils::convertToStringByLimit(mTokens[2].first, false);
+                string max = Utils::convertToStringByLimit(mTokens[3].first, true);
+                
+                int count = setMap.lexCount(key, min, max);
                 
                 return RedisProtocol::serializeNonArray(to_string(count), RedisProtocol::DataType::INTEGER);
             }
@@ -344,6 +358,195 @@ string ZUnionCommand::execute(InMemoryData& data)
         }
         
         return RedisProtocol::serializeNonArray(to_string(numAdded), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string ZRangeByCommand::execute(InMemoryData& data)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int offset = 0;
+        int count = INT_MAX;
+        
+        bool bWithScores = false;
+        
+        int pos = 4;
+        
+        if (cmdNum > pos && mTokens[4].first == "WITHSCORES") {
+            bWithScores = true;
+            pos++; // Skip WITHSCORES
+        }
+        
+        if (cmdNum > pos && mTokens[pos].first == "LIMIT") {
+            if (cmdNum != pos + 3) {
+                throw invalid_argument("Invalid args");
+            }
+            
+            offset = Utils::convertToInt(mTokens[pos + 1].first);
+            count = Utils::convertToInt(mTokens[pos + 2].first);
+        }
+        
+        SortedSetMap& setMap = data.getSortedSetMap();
+        
+        switch (mCmdType)
+        {
+            case RANGEBYSCORE:
+            {
+                double min = Utils::convertToDoubleByLimit(mTokens[2].first, false);
+                double max = Utils::convertToDoubleByLimit(mTokens[3].first, true);
+                
+                SortedSetMap::RedisArray arr = setMap.rangeByScore(key,
+                                                                   min, max,
+                                                                   offset, count,
+                                                                   bWithScores,
+                                                                   false);
+                return RedisProtocol::serializeArray(arr);
+            }
+                
+            case REVRANGEBYSCORE:
+            {
+                double max = Utils::convertToDoubleByLimit(mTokens[2].first, true);
+                double min = Utils::convertToDoubleByLimit(mTokens[3].first, false);
+                
+                SortedSetMap::RedisArray arr = setMap.rangeByScore(key,
+                                                                   min, max,
+                                                                   offset, count,
+                                                                   bWithScores,
+                                                                   true);
+                return RedisProtocol::serializeArray(arr);
+            }
+                
+        }
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string ZRangeByLexCommand::execute(InMemoryData& data)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int offset = 0;
+        int count = INT_MAX;
+        
+        int pos = 4;
+        
+        if (cmdNum > pos && mTokens[pos].first == "LIMIT") {
+            if (cmdNum != pos + 3) {
+                throw invalid_argument("Invalid args");
+            }
+            
+            offset = Utils::convertToInt(mTokens[pos + 1].first);
+            count = Utils::convertToInt(mTokens[pos + 2].first);
+        }
+        
+        SortedSetMap& setMap = data.getSortedSetMap();
+        
+        switch (mCmdType)
+        {
+            case RANGEBYLEX:
+            {
+                string min = Utils::convertToStringByLimit(mTokens[2].first, false);
+                string max = Utils::convertToStringByLimit(mTokens[3].first, true);
+                
+                SortedSetMap::RedisArray arr = setMap.rangeByLex(key,
+                                                                   min, max,
+                                                                   offset, count,
+                                                                   false);
+                return RedisProtocol::serializeArray(arr);
+            }
+                
+            case REVRANGEBYLEX:
+            {
+                string max = Utils::convertToStringByLimit(mTokens[2].first, false);
+                string min = Utils::convertToStringByLimit(mTokens[3].first, true);
+                
+                SortedSetMap::RedisArray arr = setMap.rangeByLex(key,
+                                                                   min, max,
+                                                                   offset, count,
+                                                                   true);
+                return RedisProtocol::serializeArray(arr);
+            }
+                
+        }
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string ZRemByCommand::execute(InMemoryData& data)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string key = mTokens[1].first;
+        int numRemoved = 0;
+        
+        SortedSetMap& setMap = data.getSortedSetMap();
+        
+        switch (mCmdType)
+        {
+            case REMRANGEBYSCORE:
+            {
+                double min = Utils::convertToDoubleByLimit(mTokens[2].first, false);
+                double max = Utils::convertToDoubleByLimit(mTokens[3].first, true);
+                
+                numRemoved = setMap.remByScore(key, min, max);
+                break;
+            }
+                
+            case REMRANGEBYRANK:
+            {
+                int start = Utils::convertToInt(mTokens[2].first);
+                int stop = Utils::convertToInt(mTokens[3].first);
+                
+                Utils::normalizeIndexes(start, stop, setMap.size(key));
+                
+                numRemoved = setMap.remByRank(key, start, stop);
+                break;
+            }
+                
+            case REMRANGEBYLEX:
+            {
+                string min = Utils::convertToStringByLimit(mTokens[2].first, false);
+                string max = Utils::convertToStringByLimit(mTokens[3].first, true);
+                
+                numRemoved = setMap.remByLex(key, min, max);
+                break;
+            }
+        }
+        
+        return RedisProtocol::serializeNonArray(to_string(numRemoved), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;

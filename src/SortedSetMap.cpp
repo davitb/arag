@@ -2,6 +2,7 @@
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <iostream>
+#include <cfloat>
 
 using namespace std;
 using namespace arag;
@@ -10,8 +11,7 @@ using namespace goodliffe;
 static int bound(const SortedSetMap::SortedSet::SkipListType& l,
                 int first,
                 int last,
-                const double& value,
-                bool direction)
+                function<bool(const SortedSetMap::Item&)> fComp)
 {
     int it;
     int count, step;
@@ -22,12 +22,45 @@ static int bound(const SortedSetMap::SortedSet::SkipListType& l,
         it = first;
         step = count / 2;
         it += step;
-        if ((direction == false && l[it].score < value) || (direction && !(value < l[it].score))) {
+        
+        if (fComp(l[it])) {
             first = ++it;
             count -= step + 1;
-        } else count = step;
+        }
+        else {
+            count = step;
+        }
     }
     return first;
+}
+
+static int bound(const SortedSetMap::SortedSet::SkipListType& l,
+                       int first,
+                       int last,
+                       bool bDVal,
+                       double dval,
+                       string sval,
+                       SortedSetMap::Bound direction)
+{
+    function<bool(const SortedSetMap::Item&)> fComp;
+    
+    fComp = [bDVal, dval, sval, direction] (const SortedSetMap::Item& item) {
+        if (bDVal) {
+            if ((direction == SortedSetMap::Bound::LOWER_BOUND && item.score < dval) ||
+                (direction == SortedSetMap::Bound::UPPER_BOUND && !(dval < item.score))) {
+                return true;
+            }
+        }
+        else {
+            if ((direction == SortedSetMap::Bound::LOWER_BOUND && (item.val.compare(sval) < 0)) ||
+                (direction == SortedSetMap::Bound::UPPER_BOUND && !((sval.compare(item.val) < 0)))) {
+                return true;
+            }
+        }
+        return false;
+    };
+    
+    return bound(l, first, last, fComp);
 }
 
 int SortedSetMap::insert(const std::string &key, const std::string &val, double score)
@@ -65,6 +98,10 @@ SortedSetMap::RedisArray SortedSetMap::range(const std::string &key, int start, 
     SortedSet& sset = mSetMap[key];
     
     RedisArray ret;
+    
+    if (sset.mMap.size() == 0) {
+        return ret;
+    }
         
     for (int i = start; i <= end; ++i) {
         const Item& item = sset.mSkipList[i];
@@ -130,10 +167,136 @@ int SortedSetMap::count(const std::string &key, double min, double max)
 {
     SortedSet& sset = mSetMap[key];
     
-    int lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), min, false);
-    int upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), max, true);
+    int lower = 0;
+    if (min != DBL_MIN) {
+        lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), true, min, "", LOWER_BOUND);
+    }
+    
+    int upper = (int)sset.mSkipList.size();
+    if (max != DBL_MAX) {
+        upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), true, max, "", UPPER_BOUND);
+    }
     
     return (int)(upper - lower);
+}
+
+int SortedSetMap::lexCount(const std::string &key, const string& min, const string& max)
+{
+    SortedSet& sset = mSetMap[key];
+    
+    int lower = 0;
+    if (min[0] != char(-127)) {
+        lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), false, 0, min, LOWER_BOUND);
+    }
+    
+    int upper = (int)sset.mSkipList.size();
+    if (max[0] != char(127)) {
+        upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), false, 0, max, UPPER_BOUND);
+    }
+    
+    return (int)(upper - lower);
+}
+
+SortedSetMap::RedisArray SortedSetMap::rangeByScore(const std::string &key,
+                                                    double min,
+                                                    double max,
+                                                    int offset,
+                                                    int count,
+                                                    bool bWithScores,
+                                                    bool bReverse)
+{
+    SortedSet& sset = mSetMap[key];
+    
+    RedisArray ret;
+    
+    int lower = 0;
+    if (min != DBL_MIN) {
+        lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), true, min, "", LOWER_BOUND);
+    }
+    
+    int upper = (int)sset.mSkipList.size();
+    if (max != DBL_MAX) {
+        upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), true, max, "", UPPER_BOUND);
+    }
+    
+    if (count < upper - lower) {
+        if (bReverse) {
+            lower = upper - count;
+        }
+        else {
+            upper = lower + count;
+        }
+    }
+    
+    function<void(RedisArray&, const Item&, bool)> fAddToArray;
+    // A function that adds items to RedisArray
+    fAddToArray = [] (RedisArray& ret, const Item& item, bool bWithScores) {
+        ret.push_back(make_pair(item.val, RedisProtocol::DataType::BULK_STRING));
+        if (bWithScores) {
+            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::DataType::BULK_STRING));
+        }
+    };
+    
+    if (!bReverse) {
+        for (int i = offset + lower; i < upper; ++i) {
+            fAddToArray(ret, sset.mSkipList[i], bWithScores);
+        }
+    }
+    else {
+        for (int i = upper - offset - 1; i >= lower; --i) {
+            fAddToArray(ret, sset.mSkipList[i], bWithScores);
+        }
+    }
+    return ret;
+}
+
+SortedSetMap::RedisArray SortedSetMap::rangeByLex(const std::string &key,
+                                                  const std::string& min,
+                                                  const std::string& max,
+                                                    int offset,
+                                                    int count,
+                                                    bool bReverse)
+{
+    SortedSet& sset = mSetMap[key];
+    
+    RedisArray ret;
+    
+    int lower = 0;
+    if (min[0] != CHAR_MIN) {
+        lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), false, 0, min, LOWER_BOUND);
+    }
+    
+    int upper = (int)sset.mSkipList.size();
+    if (max[0] != CHAR_MAX) {
+        upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), false, 0, max, UPPER_BOUND);
+    }
+    
+    if (count < upper - lower) {
+        if (bReverse) {
+            lower = upper - count;
+        }
+        else {
+            upper = lower + count;
+        }
+    }
+    
+    function<void(RedisArray&, const Item&, bool)> fAddToArray;
+    // A function that adds items to RedisArray
+    fAddToArray = [] (RedisArray& ret, const Item& item, bool bWithScores) {
+        ret.push_back(make_pair(item.val, RedisProtocol::DataType::BULK_STRING));
+    };
+    
+    if (!bReverse) {
+        for (int i = offset + lower; i < upper; ++i) {
+            fAddToArray(ret, sset.mSkipList[i], false);
+        }
+    }
+    else {
+        for (int i = upper - offset - 1; i >= lower; --i) {
+            fAddToArray(ret, sset.mSkipList[i], false);
+        }
+    }
+    return ret;
 }
 
 int SortedSetMap::size(const std::string &key)
@@ -271,4 +434,61 @@ int SortedSetMap::uni(const string& destKey,
     }
     
     return (int)destSet.mMap.size();
+}
+
+int SortedSetMap::remByRank(const std::string &key, int start, int stop)
+{
+    SortedSet& sset = mSetMap[key];
+
+    auto first = sset.mSkipList.iterator_at(start);
+    auto last = sset.mSkipList.iterator_at(stop);
+    int num = (int)std::distance(first, last) + 1;
+    
+    for (auto iter = first; iter != last + 1; ++iter) {
+        sset.mMap.erase((*iter).val);
+    }
+    
+    if (first == sset.mSkipList.begin() && last == sset.mSkipList.end()) {
+        sset.mSkipList.clear();
+    }
+    else {
+        sset.mSkipList.erase(first, last + 1);
+    }
+    
+    return num;
+}
+
+int SortedSetMap::remByScore(const std::string &key, double min, double max)
+{
+    SortedSet& sset = mSetMap[key];
+
+    int lower = 0;
+    if (min != DBL_MIN) {
+        lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), true, min, "", LOWER_BOUND);
+    }
+    
+    int upper = (int)sset.mSkipList.size();
+    if (max != DBL_MAX) {
+        upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), true, max, "", UPPER_BOUND);
+    }
+
+    return remByRank(key, lower, upper - 1);
+}
+
+
+int SortedSetMap::remByLex(const std::string &key, const std::string &min, const std::string &max)
+{
+    SortedSet& sset = mSetMap[key];
+    
+    int lower = 0;
+    if (min[0] != CHAR_MIN) {
+        lower = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), false, 0, min, LOWER_BOUND);
+    }
+    
+    int upper = (int)sset.mSkipList.size();
+    if (max[0] != CHAR_MAX) {
+        upper = bound(sset.mSkipList, 0, (int)sset.mSkipList.size(), false, 0, max, UPPER_BOUND);
+    }
+    
+    return remByRank(key, lower, upper - 1);
 }

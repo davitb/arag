@@ -4,6 +4,7 @@
 #include "RedisProtocol.h"
 #include <bitset>
 #include <random>
+#include <cfloat>
 
 using namespace std;
 using namespace arag;
@@ -49,6 +50,69 @@ double Utils::convertToDouble(std::string val)
     }
     
     throw invalid_argument("Must be double number");
+}
+
+
+double Utils::convertToDoubleByLimit(std::string val, bool bUpperLimit)
+{
+    if (val[0] == '(') {
+        val = val.substr(1, val.length() - 1);
+        // We will treat this number as the lowest possible double that our system supports.
+        // Ideally we would use the predefined DBL_EPSILON from <cfloat> however it seems
+        // that in order to properly use it we need to turn off optimization on compilers.
+        // From other side, we don't really need to support such small numbers in our system.
+        // Take a look at this discussion
+        // http://stackoverflow.com/questions/7517588/different-floating-point-result-with-optimization-enabled-compiler-bug
+        const double epslion = 2.2204460492503131E-10;
+        if (bUpperLimit) {
+            return Utils::convertToDouble(val) - epslion;
+        }
+        else {
+            return Utils::convertToDouble(val) + epslion;
+        }
+    }
+    if (val[0] == '[') {
+        val = val.substr(1, val.length() - 1);
+        return Utils::convertToDouble(val);
+    }
+    else
+    if (val == "-inf") {
+        return DBL_MIN;
+    }
+    else
+    if (val == "+inf") {
+        return DBL_MAX;
+    }
+
+    return Utils::convertToDouble(val);
+}
+
+string Utils::convertToStringByLimit(std::string val, bool bUpperLimit)
+{
+    if (val[0] == '(') {
+        val = val.substr(1, val.length() - 1);
+        const char epslion = char(1);
+        if (bUpperLimit) {
+            val[val.size() - 1] -= epslion;
+            val.append(1, epslion);
+        }
+        else {
+            val.append(1, epslion);
+        }
+    }
+    if (val[0] == '[') {
+        val = val.substr(1, val.length() - 1);
+    }
+    else
+    if (val == "-") {
+        val[0] = CHAR_MIN;
+    }
+    else
+    if (val == "+") {
+        val[0] = CHAR_MAX;
+    }
+    
+    return val;
 }
 
 int Utils::countSetBits(unsigned char n)

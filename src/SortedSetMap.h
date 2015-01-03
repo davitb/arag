@@ -13,7 +13,7 @@ namespace arag
 
 class SortedSetMap
 {
-private:
+public:
     
     class Item
     {
@@ -46,7 +46,6 @@ private:
         };
     };
 
-public:
     class SortedSet
     {
     public:
@@ -58,18 +57,41 @@ public:
     
 public:
     typedef std::vector<std::pair<std::string, int>> RedisArray;
+    
+    enum Bound
+    {
+        UPPER_BOUND,
+        LOWER_BOUND
+    };
 
     int insert(const std::string &key, const std::string& val, double score);
     
     RedisArray range(const std::string &key, int start, int end, bool bWithScores);
-    
+
+    RedisArray rangeByScore(const std::string &key,
+                            double min,
+                            double max,
+                            int offset,
+                            int count,
+                            bool bWithScores,
+                            bool bReverse);
+
+    RedisArray rangeByLex(const std::string &key,
+                          const std::string& min,
+                          const std::string& max,
+                            int offset,
+                            int count,
+                            bool bReverse);
+
     RedisArray revRange(const std::string &key, int start, int end, bool bWithScores);
-    
+
     double score(const std::string& key, const std::string& member);
 
     int rank(const std::string& key, const std::string& member, bool reverse);
 
     int count(const std::string &key, double min, double max);
+    
+    int lexCount(const std::string &key, const std::string& min, const std::string& max);
     
     int size(const std::string &key);
     
@@ -86,6 +108,12 @@ public:
             const std::vector<std::string>& keys,
             const std::vector<int>& weights,
             const std::string& aggregate);
+    
+    int remByRank(const std::string &key, int start, int end);
+
+    int remByScore(const std::string &key, double min, double max);
+
+    int remByLex(const std::string &key, const std::string& min, const std::string& max);
     
 private:
 

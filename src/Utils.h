@@ -18,6 +18,10 @@ public:
 
     static double convertToDouble(std::string val);
     
+    static double convertToDoubleByLimit(std::string val, bool bUpperLimit);
+
+    static std::string convertToStringByLimit(std::string val, bool bUpperLimit);
+    
     static int countSetBits(unsigned char n);
     
     static std::string performBitOperation(const std::string& op,
