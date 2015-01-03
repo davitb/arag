@@ -6,6 +6,8 @@
 namespace arag
 {
     
+//----------------------------------------------------------------
+    
 class ZAddCommand: public Command
 {
 public:
@@ -20,6 +22,8 @@ private:
     };
 };
 
+//----------------------------------------------------------------
+    
 class ZRangeCommand: public Command
 {
 public:
@@ -44,6 +48,8 @@ private:
     CmdType mCmdType;
 };
 
+//----------------------------------------------------------------
+
 class ZCountCommand: public Command
 {
 public:
@@ -66,7 +72,9 @@ private:
     
     CmdType mCmdType;    
 };
-    
+
+//----------------------------------------------------------------
+
 class ZScoreCommand: public Command
 {
 public:
@@ -92,6 +100,8 @@ private:
     CmdType mCmdType;
 };
 
+//----------------------------------------------------------------
+    
 class ZIncrByCommand: public Command
 {
 public:
@@ -105,6 +115,8 @@ private:
         MAX_ARG_NUM = 4
     };
 };
+
+//----------------------------------------------------------------
 
 class ZRemCommand: public Command
 {
@@ -131,6 +143,33 @@ private:
     
     CmdType mCmdType;
 };
+
+//----------------------------------------------------------------
+    
+class ZUnionCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        UNION,
+        INTERSECT
+    };
+    
+    ZUnionCommand(CmdType type) {mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 4,
+        MAX_ARG_NUM = INT_MAX
+    };
+    
+    CmdType mCmdType;
+};
+    
     
 };
 

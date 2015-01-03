@@ -122,7 +122,7 @@ int SetMap::diff(const string& destKey, const string& key, const vector<string>&
 void SetMap::inter(const vector<string>& keys, SetType& destSet)
 {
     destSet = mSetMap[keys[0]];
-    
+
     bool erased = false;
     auto iter = destSet.begin();
     while (iter != destSet.end()) {

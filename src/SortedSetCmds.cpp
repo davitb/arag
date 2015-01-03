@@ -252,3 +252,100 @@ string ZRemCommand::execute(InMemoryData& data)
         return redis_const::NULL_BULK_STRING;
     }
 }
+
+//-------------------------------------------------------------------------
+
+string ZUnionCommand::execute(InMemoryData& data)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        string dest = mTokens[1].first;
+        int numKeys = Utils::convertToInt(mTokens[2].first);
+
+        if (numKeys == 0) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        int pos = 3;
+        if (cmdNum < numKeys + pos) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        vector<string> keys(numKeys);
+        for (int i = 0; i < numKeys; ++i) {
+            keys[i] = mTokens[pos + i].first;
+        }
+
+        pos += numKeys; // Skip all keys
+        
+        string aggregate = "SUM";
+        bool bWeigthsProvided = false;
+        vector<int> weights(numKeys);
+        
+        // Initialize with default 1s
+        for (int i = 0; i < numKeys; ++i) {
+            weights[i] = 1;
+        }
+        
+        if (cmdNum > pos) {
+            if (mTokens[pos].first != "WEIGHTS" && mTokens[pos].first != "AGGREGATE") {
+                throw invalid_argument("Invalid args");
+            }
+            
+            if (mTokens[pos].first == "WEIGHTS") {
+                if (cmdNum < numKeys + pos) {
+                    throw invalid_argument("Invalid args");
+                }
+                
+                bWeigthsProvided = true;
+                pos += 1; // Skip "WEIGTHS"
+                for (int i = 0; i < numKeys; ++i) {
+                    weights[i] = Utils::convertToInt(mTokens[pos + i].first);
+                }
+                pos += numKeys; // Skip weights
+            }
+            
+            if (mTokens[pos].first == "AGGREGATE") {
+                if (cmdNum < pos + 1) {
+                    throw invalid_argument("Invalid args");
+                }
+                
+                pos += 1; // Skip "AGGREGATE"
+                aggregate = mTokens[pos].first;
+                if (aggregate != "SUM" && aggregate != "MIN" && aggregate != "MAX") {
+                    throw invalid_argument("Invalid args");
+                }
+            }
+        }
+        
+        SortedSetMap& setMap = data.getSortedSetMap();
+        
+        int numAdded = 0;
+        
+        switch (mCmdType)
+        {
+            case UNION:
+            {
+                numAdded = setMap.uni(dest, keys, weights, aggregate);
+                break;
+            }
+                
+            case INTERSECT:
+            {
+                numAdded = setMap.intersect(dest, keys, weights, aggregate);
+                break;
+            }
+        }
+        
+        return RedisProtocol::serializeNonArray(to_string(numAdded), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}

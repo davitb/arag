@@ -173,3 +173,102 @@ int SortedSetMap::rem(const std::string &key, const std::string &val)
     return 1;
 }
 
+int SortedSetMap::intersect(const string& destKey,
+                         const vector<string>& keys,
+                         const vector<int>& weights,
+                         const string& aggregate)
+{
+    SortedSet tempSS = mSetMap[keys[0]];
+    SortedSet::MapType& tempMap = tempSS.mMap;
+    
+    bool erased = false;
+    auto iter = tempMap.begin();
+    while (iter != tempMap.end()) {
+        erased = false;
+        for (int i = 1; i < keys.size(); ++i) {
+            SortedSet::MapType& nextMap = mSetMap[keys[i]].mMap;
+            
+            auto elem = nextMap.find(iter->first);
+            if (elem == nextMap.end()) {
+                iter = tempMap.erase(iter);
+                erased = true;
+                break;
+            }
+
+            // Item found, need to update with Weights and Aggregation
+            double newVal = elem->second * weights[i];
+            double& curVal = tempMap[elem->first];
+            curVal *= weights[0];
+            if (aggregate == "SUM") {
+                curVal += newVal;
+            }
+            else
+            if (aggregate == "MIN") {
+                curVal = min(newVal, curVal);
+            }
+            else
+            if (aggregate == "MAX") {
+                curVal = max(newVal, curVal);
+            }
+        }
+        if (!erased) {
+            iter++;
+        }
+    }
+    
+    mSetMap[destKey].mMap = tempSS.mMap;
+    
+    SortedSet& destSS = mSetMap[destKey];
+    
+    // Insert all elements into Skip List
+    for (auto elem : destSS.mMap) {
+        destSS.mSkipList.insert(Item(elem.first, elem.second));
+    }
+    
+    return (int)destSS.mMap.size();
+}
+
+int SortedSetMap::uni(const string& destKey,
+                      const vector<string>& keys,
+                      const vector<int>& weights,
+                      const string& aggregate)
+{
+    SortedSet& destSet = mSetMap[destKey];
+    
+    destSet = SortedSet();
+    
+    for (int i = 0; i < keys.size(); ++i) {
+        SortedSet& ss = mSetMap[keys[i]];
+        
+        // Copy all elements in the map
+        for (auto elem : ss.mMap) {
+            double newVal = elem.second * weights[i];
+            if (aggregate == "SUM") {
+                destSet.mMap[elem.first] += newVal;
+            }
+            else
+            if (aggregate == "MIN") {
+                double oldVal = INT_MAX;
+                if (destSet.mMap.find(elem.first) != destSet.mMap.end()) {
+                    oldVal = destSet.mMap[elem.first];
+                }
+                destSet.mMap[elem.first] = min(newVal, oldVal);
+            }
+            else
+            if (aggregate == "MAX") {
+                double oldVal = INT_MIN;
+                if (destSet.mMap.find(elem.first) != destSet.mMap.end()) {
+                    oldVal = destSet.mMap[elem.first];
+                }
+                destSet.mMap[elem.first] = max(newVal, oldVal);
+            }
+        }
+    }
+
+    // Insert all elements into Skip List
+    for (auto elem : destSet.mMap) {
+        destSet.mSkipList.insert(Item(elem.first, elem.second));
+    }
+    
+    return (int)destSet.mMap.size();
+}

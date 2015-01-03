@@ -77,6 +77,16 @@ public:
     
     int rem(const std::string &key, const std::string &member);
     
+    int uni(const std::string& destKey,
+            const std::vector<std::string>& keys,
+            const std::vector<int>& weights,
+            const std::string& aggregate);
+
+    int intersect(const std::string& destKey,
+            const std::vector<std::string>& keys,
+            const std::vector<int>& weights,
+            const std::string& aggregate);
+    
 private:
 
     std::unordered_map<std::string, SortedSet> mSetMap;

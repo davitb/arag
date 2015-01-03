@@ -101,7 +101,21 @@ static std::vector<std::string> sSupportedCommands = {
     "ZSCORE",
     "ZRANK",
     "ZCOUNT",
-    "ZCARD"
+    "ZCARD",
+    "ZINCRBY",
+    "ZREVRANGE",
+    "ZREM",
+    "ZREVRANK",
+    "ZUNIONSTORE",
+    "ZINTERSTORE",
+    "ZRANGEBYSCORE",
+    "ZRANGEBYRANK",
+    "ZREVRANGEBYSCORE",
+    "ZREMRANGEBYSCORE",
+    "ZLEXCOUNT",
+    "ZREMRANGEBYLEX",
+    "ZRANGEBYLEX",
+    "ZREVRANGEBYLEX"
 };
 
 /*

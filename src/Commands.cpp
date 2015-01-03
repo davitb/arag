@@ -109,6 +109,8 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["ZCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::COUNT));
         sNameToCommand["ZCARD"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::CARD));
         sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand(ZRemCommand::CmdType::REM));
+        sNameToCommand["ZUNIONSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::CmdType::UNION));
+        sNameToCommand["ZINTERSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::CmdType::INTERSECT));
     }
     
     string upperCaseCmd = cmdName;
