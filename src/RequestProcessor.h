@@ -7,6 +7,7 @@
 #include <queue>
 #include <functional>
 #include "Commands.h"
+#include "SessionContext.h"
 
 using namespace std;
 using namespace arag;
@@ -54,18 +55,16 @@ public:
         std::string cmdLine;
         function<void(std::string)> cb;
         RequestType type;
+        std::reference_wrapper<SessionContext> mSessionCtx;
+        SessionContext fakeCtx;
         
-        Request(std::string cmdLine, RequestType type, function<void(std::string)> cb) {
-            this->cmdLine = cmdLine;
-            this->type = type;
-            this->cb = cb;
-        }
+        Request(const std::string& cmdLine,
+                RequestType type,
+                SessionContext& sessionCtx,
+                function<void(std::string)> cb);
         
-        Request(std::string cmdLine, RequestType type) {
-            this->cmdLine = cmdLine;
-            this->type = type;
-            this->cb = nullptr;
-        }
+        Request(const std::string& cmdLine, RequestType type);
+        
     };
     
 private:
@@ -104,10 +103,9 @@ public:
 private:
     // Threads (processing units)
     std::vector<ProcessingUnit> mPunits;
-    // Arag Map. This variable holds all the customer data
-    InMemoryData mData;
     int mThreadCount;
     int mTriggerCleanupLimit;
+    SessionContext mInternalSessionCtx;
     
 private:
     

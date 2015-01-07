@@ -44,6 +44,8 @@ public:
     
     std::vector<std::pair<std::string, int>> getRange(const std::string& key, int start, int end);
     
+    void clearKeys();
+    
 private:
     std::unordered_map<std::string, std::list<std::string>> mListMap;
 };

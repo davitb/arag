@@ -20,7 +20,7 @@ public:
     
     HSetCommand(CmdType type) { cmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -36,7 +36,7 @@ class HGetCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -50,7 +50,7 @@ class HExistsCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -64,7 +64,7 @@ class HDelCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -89,7 +89,7 @@ public:
     
     HGetAllCommand(CmdType type) { cmdType = type; };
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -113,7 +113,7 @@ public:
     
     HIncrByCommand(CmdType type) { cmdType = type; };
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

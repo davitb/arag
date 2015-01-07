@@ -114,6 +114,8 @@ public:
     int remByScore(const std::string &key, double min, double max);
 
     int remByLex(const std::string &key, const std::string& min, const std::string& max);
+
+    void clearKeys();
     
 private:
 

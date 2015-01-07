@@ -12,7 +12,7 @@ class ZAddCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -36,7 +36,7 @@ public:
     
     ZRangeCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -62,7 +62,7 @@ public:
     
     ZRangeByLexCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -88,7 +88,7 @@ public:
     
     ZCountCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -115,7 +115,7 @@ public:
 
     ZScoreCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -133,7 +133,7 @@ class ZIncrByCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -159,7 +159,7 @@ public:
     
     ZRemCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -185,7 +185,7 @@ public:
     
     ZUnionCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -211,7 +211,7 @@ public:
     
     ZRangeByCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -238,7 +238,7 @@ public:
     
     ZRemByCommand(CmdType type) {mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

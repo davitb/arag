@@ -42,6 +42,8 @@ public:
     int uni(const std::string& destKey, const std::vector<std::string>& keys);
 
     int move(const std::string& source, const std::string& dest, const std::string& member);
+
+    void clearKeys();
     
 private:
     SetMapType mSetMap;

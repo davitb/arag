@@ -10,7 +10,7 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string ZAddCommand::execute(InMemoryData& data)
+string ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -43,7 +43,7 @@ string ZAddCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZRangeCommand::execute(InMemoryData& data)
+string ZRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -95,7 +95,7 @@ string ZRangeCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZScoreCommand::execute(InMemoryData& data)
+string ZScoreCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -138,7 +138,7 @@ string ZScoreCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZCountCommand::execute(InMemoryData& data)
+string ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -197,7 +197,7 @@ string ZCountCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZIncrByCommand::execute(InMemoryData& data)
+string ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -224,7 +224,7 @@ string ZIncrByCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZRemCommand::execute(InMemoryData& data)
+string ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -269,7 +269,7 @@ string ZRemCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZUnionCommand::execute(InMemoryData& data)
+string ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -366,7 +366,7 @@ string ZUnionCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZRangeByCommand::execute(InMemoryData& data)
+string ZRangeByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -437,7 +437,7 @@ string ZRangeByCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZRangeByLexCommand::execute(InMemoryData& data)
+string ZRangeByLexCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -499,7 +499,7 @@ string ZRangeByLexCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string ZRemByCommand::execute(InMemoryData& data)
+string ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();

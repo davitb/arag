@@ -10,7 +10,7 @@ class SetCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -24,7 +24,7 @@ class GetCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
     
 private:
@@ -39,7 +39,7 @@ class AppendCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -53,7 +53,7 @@ class GetRangeCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -67,7 +67,7 @@ class SetRangeCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -82,7 +82,7 @@ class GetSetCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -96,7 +96,7 @@ class IncrCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -110,7 +110,7 @@ class MGetCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -126,7 +126,7 @@ public:
     
     MSetCommand(bool msetNX) { mNX = msetNX; };
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -143,7 +143,7 @@ class BitCountCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -157,7 +157,7 @@ class BitOpCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -171,7 +171,7 @@ class BitPosCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -185,7 +185,7 @@ class GetBitCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -199,7 +199,7 @@ class SetBitCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
     enum Consts
     {
@@ -213,7 +213,7 @@ class StrlenCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -227,7 +227,7 @@ class IncrByCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -241,7 +241,7 @@ class IncrByFloatCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -255,7 +255,7 @@ class DecrCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -269,7 +269,7 @@ class DecrByCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

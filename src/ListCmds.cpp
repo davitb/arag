@@ -10,7 +10,7 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string LPushCommand::execute(InMemoryData& data)
+string LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -72,7 +72,7 @@ string LPushCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string LGetCommand::execute(InMemoryData& data)
+string LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -119,7 +119,7 @@ string LGetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string LRemCommand::execute(InMemoryData& data)
+string LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -188,7 +188,7 @@ string LRemCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string LRangeCommand::execute(InMemoryData& data)
+string LRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -217,7 +217,7 @@ string LRangeCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string LSetCommand::execute(InMemoryData& data)
+string LSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -248,7 +248,7 @@ string LSetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string LTrimCommand::execute(InMemoryData& data)
+string LTrimCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -279,7 +279,7 @@ string LTrimCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string LInsertCommand::execute(InMemoryData& data)
+string LInsertCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();

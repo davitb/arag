@@ -492,3 +492,9 @@ int SortedSetMap::remByLex(const std::string &key, const std::string &min, const
     
     return remByRank(key, lower, upper - 1);
 }
+
+
+void SortedSetMap::clearKeys()
+{
+    mSetMap.clear();
+}

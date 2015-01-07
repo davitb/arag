@@ -10,7 +10,7 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string SAddCommand::execute(InMemoryData& data)
+string SAddCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -39,7 +39,7 @@ string SAddCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SMembersCommand::execute(InMemoryData& data)
+string SMembersCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -62,7 +62,7 @@ string SMembersCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SCardCommand::execute(InMemoryData& data)
+string SCardCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -107,7 +107,7 @@ string SCardCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SRemCommand::execute(InMemoryData& data)
+string SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -158,7 +158,7 @@ string SRemCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SDiffCommand::execute(InMemoryData& data)
+string SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -224,7 +224,7 @@ string SDiffCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SInterCommand::execute(InMemoryData& data)
+string SInterCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -287,7 +287,7 @@ string SInterCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SUnionCommand::execute(InMemoryData& data)
+string SUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -350,7 +350,7 @@ string SUnionCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SMoveCommand::execute(InMemoryData& data)
+string SMoveCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     
@@ -376,7 +376,7 @@ string SMoveCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SRandMemberCommand::execute(InMemoryData& data)
+string SRandMemberCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     

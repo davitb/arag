@@ -1,6 +1,8 @@
 #include "InMemoryData.h"
+#include "Config.h"
 
 using namespace arag;
+using namespace std;
 
 int InMemoryData::getCounter() const
 {
@@ -44,5 +46,52 @@ void InMemoryData::cleanup()
     
     for (auto map = mHashMap.begin(); map != mHashMap.end(); ++map) {
         map->second.cleanup();
+    }
+}
+
+void InMemoryData::flush()
+{
+    mStringMap.clearKeys();
+    mSetMap.clearKeys();
+    mSortedSetMap.clearKeys();
+    mListMap.clearKeys();
+    mHashMap.clear();
+}
+
+//---------------------------------------------------
+
+Database& Database::instance()
+{
+    static Database sDB(Config::DATABASE_COUNT);
+    return sDB;
+}
+
+Database::Database(int count)
+{
+    mDatabases = vector<InMemoryData>(count);
+}
+
+InMemoryData& Database::get(int index)
+{
+    if (index >= mDatabases.size()) {
+        throw invalid_argument("Index is bigger than number of DBs");
+    }
+    
+    return mDatabases[index];
+}
+
+void Database::flush(int index)
+{
+    if (index >= mDatabases.size()) {
+        throw invalid_argument("Index is bigger than number of DBs");
+    }
+
+    if (index == FLUSH_ALL) {
+        for (int i = 0; i < mDatabases.size(); ++i) {
+            mDatabases[i].flush();
+        }
+    }
+    else {
+        mDatabases[index].flush();
     }
 }

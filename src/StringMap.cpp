@@ -212,3 +212,8 @@ void StringMap::cleanup()
     }
 }
 
+void StringMap::clearKeys()
+{
+    lock_guard<recursive_mutex> lock(mLock);
+    map.clear();
+}

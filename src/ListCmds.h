@@ -20,7 +20,7 @@ public:
     
     LPushCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -44,7 +44,7 @@ public:
     
     LGetCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -70,7 +70,7 @@ public:
     
     LRemCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -86,7 +86,7 @@ class LRangeCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -100,7 +100,7 @@ class LSetCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -114,7 +114,7 @@ class LTrimCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -128,7 +128,7 @@ class LInsertCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

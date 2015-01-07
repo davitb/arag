@@ -11,7 +11,7 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string HSetCommand::execute(InMemoryData& data)
+string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -82,7 +82,7 @@ string HSetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string HGetCommand::execute(InMemoryData& data)
+string HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -106,7 +106,7 @@ string HGetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string HExistsCommand::execute(InMemoryData& data)
+string HExistsCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -139,7 +139,7 @@ string HExistsCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string HDelCommand::execute(InMemoryData& data)
+string HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -166,7 +166,7 @@ string HDelCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string HGetAllCommand::execute(InMemoryData& data)
+string HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -225,7 +225,7 @@ string HGetAllCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string HIncrByCommand::execute(InMemoryData& data)
+string HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();

@@ -6,6 +6,8 @@
 #include <climits>
 #include <memory>
 #include "InMemoryData.h"
+#include "SessionContext.h"
+#include "Config.h"
 #include "SelfTest.h"
 
 namespace arag
@@ -125,7 +127,7 @@ class Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data) = 0;
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx) = 0;
     
     std::string getCommandName() const;
     
@@ -155,7 +157,7 @@ public:
     InternalCommand(std::string name);
     
     
-    virtual std::string execute(InMemoryData& data)
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx)
     {
         throw std::logic_error("This function should not be called");
     }

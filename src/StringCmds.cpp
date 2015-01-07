@@ -11,7 +11,7 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string SetCommand::execute(InMemoryData& data)
+string SetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -50,7 +50,7 @@ string SetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string GetCommand::execute(InMemoryData& data)
+string GetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -70,7 +70,7 @@ string GetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string GetSetCommand::execute(InMemoryData& data)
+string GetSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -93,7 +93,7 @@ string GetSetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string AppendCommand::execute(InMemoryData& data)
+string AppendCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -116,7 +116,7 @@ string AppendCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string IncrCommand::execute(InMemoryData& data)
+string IncrCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -139,7 +139,7 @@ string IncrCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string IncrByCommand::execute(InMemoryData& data)
+string IncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -163,7 +163,7 @@ string IncrByCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string IncrByFloatCommand::execute(InMemoryData& data)
+string IncrByFloatCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -186,7 +186,7 @@ string IncrByFloatCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string DecrCommand::execute(InMemoryData& data)
+string DecrCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -209,7 +209,7 @@ string DecrCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string DecrByCommand::execute(InMemoryData& data)
+string DecrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -233,7 +233,7 @@ string DecrByCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string GetRangeCommand::execute(InMemoryData& data)
+string GetRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -259,7 +259,7 @@ string GetRangeCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SetRangeCommand::execute(InMemoryData& data)
+string SetRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -316,7 +316,7 @@ string SetRangeCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string MGetCommand::execute(InMemoryData& data)
+string MGetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -341,7 +341,7 @@ string MGetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string MSetCommand::execute(InMemoryData& data)
+string MSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -389,7 +389,7 @@ string MSetCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string BitCountCommand::execute(InMemoryData& data)
+string BitCountCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -428,7 +428,7 @@ string BitCountCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string BitOpCommand::execute(InMemoryData& data)
+string BitOpCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -460,7 +460,7 @@ string BitOpCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string BitPosCommand::execute(InMemoryData& data)
+string BitPosCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -507,7 +507,7 @@ string BitPosCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string GetBitCommand::execute(InMemoryData& data)
+string GetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -540,7 +540,7 @@ string GetBitCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string SetBitCommand::execute(InMemoryData& data)
+string SetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();
@@ -588,7 +588,7 @@ string SetBitCommand::execute(InMemoryData& data)
 
 //-------------------------------------------------------------------------
 
-string StrlenCommand::execute(InMemoryData& data)
+string StrlenCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
     StringMap& map = data.getStringMap();

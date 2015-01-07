@@ -7,19 +7,22 @@
 #include "AragServer.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
+#include "SessionContext.h"
 
 using namespace std;
 using namespace arag;
 
 string runCommandsAndGetLatestResult(InMemoryData& data, const vector<string>& cmds)
 {
+    SessionContext ctx;
+    
     for (int i = 0; i < cmds.size() - 1; ++i) {
         Command& cmd = Command::getCommand(cmds[i]);
-        cmd.execute(data);
+        cmd.execute(data, ctx);
     }
     Command& cmd = Command::getCommand(cmds[cmds.size() - 1]);
     
-    return cmd.execute(data);
+    return cmd.execute(data, ctx);
 }
 
 vector<string> constructCommands(const vector<vector<string>>& cmds)
@@ -322,7 +325,7 @@ void SelfTest::testMultiThreading()
     }
     
     rp.stopThreads();
-    assert(rp.mData.getStringMap().get("k1") == to_string(numRequests - 1));
+    assert(Database::instance().get(0).getStringMap().get("k1") == to_string(numRequests - 1));
 
     // Test with 10 threads and then stop them in the middle of process
     
@@ -349,7 +352,7 @@ void SelfTest::testMultiThreading()
     }
 
     for (int i = 0; i <= numRequests / 2; ++i) {
-        assert(rp.mData.getStringMap().get("k" + to_string(i)) == to_string(i));
+        assert(Database::instance().get(0).getStringMap().get("k" + to_string(i)) == to_string(i));
     }
 }
 

@@ -9,6 +9,28 @@
 using namespace std;
 using namespace arag;
 
+//-----------------------------------------------------------------
+
+RequestProcessor::Request::Request(const std::string& cmdLine,
+                                   RequestType type,
+                                   SessionContext& sessionCtx,
+                                   function<void(std::string)> cb) : mSessionCtx(sessionCtx)
+{
+    this->cmdLine = cmdLine;
+    this->type = type;
+    this->cb = cb;
+}
+
+RequestProcessor::Request::Request(const std::string& cmdLine,
+                                   RequestType type)  : mSessionCtx(fakeCtx)
+{
+    this->cmdLine = cmdLine;
+    this->type = type;
+    this->cb = nullptr;
+}
+
+//-----------------------------------------------------------------
+
 RequestProcessor::RequestProcessor(int threadCount)
 {
     mThreadCount = threadCount;
@@ -31,7 +53,8 @@ void RequestProcessor::stopThreads()
     cout << "Stopping all threads" << endl;
     
     for (int i = 0; i < mPunits.size(); ++i) {
-        RequestProcessor::Request req(command_const::CMD_INTERNAL_STOP, RequestType::INTERNAL);
+        RequestProcessor::Request req(command_const::CMD_INTERNAL_STOP,
+                                      RequestType::INTERNAL);
         enqueueRequest(mPunits[i], req);
         mPunits[i].thd.join();
     }
@@ -63,6 +86,8 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         punit.cond.wait(lock, [&punit] { return !punit.que.empty(); });
         
         Request req = punit.que.front();
+        int selectedDBIndex = req.mSessionCtx.get().getDatabaseIndex();
+        InMemoryData& selectedDB = Database::instance().get(selectedDBIndex);
         
         //cout << "New request received: " << req.cmdLine << endl;
         
@@ -86,7 +111,8 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
             }
             
             // Execute the command
-            string res = cmd.execute(mData);
+            
+            string res = cmd.execute(selectedDB, req.mSessionCtx);
             
             // Call the callback to write the response to socket
             if (req.cb != nullptr) {
@@ -95,13 +121,14 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         }
         catch (exception& e) {
             cout << "exception occured: " << e.what() << endl;
+            cout << "command: " << req.cmdLine << endl;
             
             if (req.cb != nullptr) {
                 req.cb(redis_const::ERR_GENERIC);
             }
         }
         
-        if (mData.getCounter() > mTriggerCleanupLimit) {
+        if (selectedDB.getCounter() > mTriggerCleanupLimit) {
             //enqueueCleanup();
         }
     }
@@ -117,7 +144,7 @@ RequestProcessor::ResultType RequestProcessor::processInternalCommand(std::strin
     if (cmd == command_const::CMD_INTERNAL_CLEANUP) {
         cout << "Trigerring cleanup" << endl;
         try {
-            mData.cleanup();
+            //mData.cleanup();
         }
         catch (exception& e) {
             cout << "exception occured: " << e.what() << endl;
@@ -130,7 +157,7 @@ RequestProcessor::ResultType RequestProcessor::processInternalCommand(std::strin
 
 void RequestProcessor::enqueueCleanup()
 {
-    Request req(command_const::CMD_INTERNAL_CLEANUP, RequestType::INTERNAL);
-    enqueueRequest(req);
+//    Request req(command_const::CMD_INTERNAL_CLEANUP, RequestType::INTERNAL);
+//    enqueueRequest(req);
 }
 

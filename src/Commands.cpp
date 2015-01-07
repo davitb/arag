@@ -2,6 +2,7 @@
 #include <climits>
 #include <algorithm>
 #include "ConnectionCmds.h"
+#include "ServerCmds.h"
 #include "StringCmds.h"
 #include "HashCmds.h"
 #include "ListCmds.h"
@@ -27,6 +28,12 @@ static Command* getCommandByName(const string& cmdName)
         // Connection Commands
         sNameToCommand["PING"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::PING));
         sNameToCommand["ECHO"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::ECHO));
+        sNameToCommand["SELECT"] = shared_ptr<Command>(new SelectCommand());
+
+        // Server Commands
+        sNameToCommand["INFO"] = shared_ptr<Command>(new InfoCommand());
+        sNameToCommand["FLUSHDB"] = shared_ptr<Command>(new FlushCommand(FlushCommand::FLUSHDB));
+        sNameToCommand["FLUSHALL"] = shared_ptr<Command>(new FlushCommand(FlushCommand::FLUSHALL));
         
         // String Commands
         sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());

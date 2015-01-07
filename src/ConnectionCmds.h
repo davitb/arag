@@ -18,7 +18,7 @@ public:
     
     PingCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -28,6 +28,20 @@ private:
     };
     
     CmdType mCmdType;
+};
+
+class SelectCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 2
+    };
 };
 
 };

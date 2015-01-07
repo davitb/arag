@@ -181,3 +181,8 @@ int SetMap::move(const string& source, const string& dest, const string& member)
     mSetMap[dest].insert(member);
     return 1;
 }
+
+void SetMap::clearKeys()
+{
+    mSetMap.clear();
+}

@@ -10,7 +10,7 @@ class SAddCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -24,7 +24,7 @@ class SMembersCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -46,7 +46,7 @@ public:
     
     SCardCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -70,7 +70,7 @@ public:
     
     SRemCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -94,7 +94,7 @@ public:
     
     SDiffCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -118,7 +118,7 @@ public:
     
     SInterCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -142,7 +142,7 @@ public:
     
     SUnionCommand(CmdType type) { mCmdType = type; }
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -158,7 +158,7 @@ class SMoveCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -172,7 +172,7 @@ class SRandMemberCommand: public Command
 {
 public:
     
-    virtual std::string execute(InMemoryData& data);
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

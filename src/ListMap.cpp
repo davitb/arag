@@ -273,3 +273,8 @@ int ListMap::insert(const std::string &key,
     return (int)l.size();
 }
 
+
+void ListMap::clearKeys()
+{
+    mListMap.clear();
+}

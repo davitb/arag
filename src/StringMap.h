@@ -70,6 +70,8 @@ public:
     
     void cleanup();
     
+    void clearKeys();
+    
 private:
     
     class Item

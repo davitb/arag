@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
 #include "StringMap.h"
 #include "ListMap.h"
 #include "SetMap.h"
@@ -10,16 +11,17 @@
 
 namespace arag
 {
-    
+
 class InMemoryData
 {
 public:
+    
     typedef std::unordered_map<std::string, StringMap> HashMap;
     
     StringMap& getFromHashMap(const std::string& key);
     
     StringMap& getStringMap();
-
+    
     ListMap& getListMap();
     
     SetMap& getSetMap();
@@ -30,6 +32,8 @@ public:
     
     void cleanup();
     
+    void flush();
+    
 private:
     
     StringMap mStringMap;
@@ -39,6 +43,30 @@ private:
     SortedSetMap mSortedSetMap;
     int mCounter;
 };
+
+    
+    
+class Database
+{
+public:
+
+    enum
+    {
+        FLUSH_ALL = -1
+    };
+    
+    static Database& instance();
+    
+    Database(int count);
+    
+    InMemoryData& get(int index);
+    
+    void flush(int index);
+    
+private:
+    std::vector<InMemoryData> mDatabases;
+};
+
 
 };
 
