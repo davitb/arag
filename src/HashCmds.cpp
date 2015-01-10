@@ -154,7 +154,7 @@ string HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
         int numDeleted = 0;
         
         for (int i = 1; i < mTokens.size(); ++i) {
-            numDeleted += (map.deleteKey(mTokens[i].first) == true ? 1 : 0);
+            numDeleted += map.deleteKey(mTokens[i].first);
         }
         
         return RedisProtocol::serializeNonArray(to_string(numDeleted), RedisProtocol::DataType::INTEGER);
@@ -213,7 +213,7 @@ string HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx)
 
             case LEN:
             {
-                return RedisProtocol::serializeNonArray(to_string(map.len()),
+                return RedisProtocol::serializeNonArray(to_string(map.size()),
                                                         RedisProtocol::DataType::INTEGER);
             }
         }

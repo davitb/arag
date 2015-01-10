@@ -23,6 +23,7 @@ void ClientSession::doRead()
     mSocket.async_read_some(asio::buffer(mBuffer), [this, self] (std::error_code ec, std::size_t length) {
         if (!ec) {
             
+            //int available = mSocket.available();
             string cmdLine(mBuffer.begin(), length);
             
             // This function will be called after response is ready.
@@ -30,6 +31,9 @@ void ClientSession::doRead()
                 // Write the result string to socket
                 doWrite(result);
             };
+            
+            mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
+                                      mSocket.remote_endpoint().port());
             
             RequestProcessor::Request req(cmdLine,
                                           RequestProcessor::RequestType::EXTERNAL,
@@ -46,7 +50,7 @@ void ClientSession::doWrite(string str)
 {
     auto self(shared_from_this());
     
-    cout << "write result: " << str << endl;
+    //cout << "write result: " << str << endl;
     
     try {
         // This callback function will be called when async write is done
@@ -64,4 +68,9 @@ void ClientSession::doWrite(string str)
     catch (std::exception& e) {
         cout << e.what() << endl;
     }
+}
+
+SessionContext ClientSession::getContext()
+{
+    return mCtx;
 }

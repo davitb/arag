@@ -44,6 +44,63 @@ private:
     CmdType mCmdType;
 };
 
+    
+class ClientCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 3
+    };
+};
+
+    
+class ConfigCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 4
+    };
+};
+
+    
+class SingleArgumentCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        DBSIZE,
+        LASTSAVE,
+        TIME
+    };
+    
+    SingleArgumentCommand(CmdType type) { mCmdType = type; }
+    
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 1,
+        MAX_ARG_NUM = 1
+    };
+    
+    CmdType mCmdType;
+};
+
+    
 };
 
 #endif /* defined(__arag__ServerCmds__) */

@@ -61,9 +61,22 @@ void Arag::doAccept()
     // Accept new connections and start a session when it's established
     mAcceptor.async_accept(mSocket, [this](std::error_code ec) {
         if (!ec) {
-            std::make_shared<ClientSession>(std::move(mSocket), mProcessor)->start();
+            shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket), mProcessor);
+            mSessions.push_back(session);
+            session->start();
         }
 
         doAccept();
     });
+}
+
+vector<SessionContext> Arag::getSessions()
+{
+    vector<SessionContext> sessions;
+    
+    for (int i = 0; i < mSessions.size(); ++i) {
+        sessions.push_back(mSessions[i]->getContext());
+    }
+    
+    return sessions;
 }

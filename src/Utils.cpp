@@ -6,6 +6,8 @@
 #include <random>
 #include <cfloat>
 
+#include <sys/time.h>
+
 using namespace std;
 using namespace arag;
 
@@ -284,4 +286,13 @@ int Utils::genRandom(int min, int max)
     std::default_random_engine e1(rd());
     std::uniform_int_distribution<int> uniform_dist(min, max);
     return uniform_dist(e1);
+}
+
+void Utils::getTimeOfDay(long &secs, long &msecs)
+{
+    timeval t;
+    gettimeofday(&t, NULL);
+    
+    secs = t.tv_sec;
+    msecs = t.tv_usec;
 }

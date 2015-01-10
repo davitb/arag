@@ -299,6 +299,11 @@ SortedSetMap::RedisArray SortedSetMap::rangeByLex(const std::string &key,
     return ret;
 }
 
+int SortedSetMap::size()
+{
+    return (int)(mSetMap.size());
+}
+
 int SortedSetMap::size(const std::string &key)
 {
     SortedSet& sset = mSetMap[key];
@@ -497,4 +502,18 @@ int SortedSetMap::remByLex(const std::string &key, const std::string &min, const
 void SortedSetMap::clearKeys()
 {
     mSetMap.clear();
+}
+
+int SortedSetMap::delKey(const std::string &key)
+{
+    auto iter = mSetMap.find(key);
+    if (iter == mSetMap.end()) {
+        return 0;
+    }
+
+    SortedSet& sset = iter->second;
+    sset.mSkipList.clear();
+    
+    mSetMap.erase(iter);
+    return 1;
 }

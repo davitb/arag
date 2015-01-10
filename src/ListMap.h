@@ -25,6 +25,8 @@ public:
     
     int push(const std::string& key, const std::string& val, Position direction);
     
+    int size();
+
     int len(const std::string& key);
     
     std::string val(const std::string& key, int pos);
@@ -46,8 +48,12 @@ public:
     
     void clearKeys();
     
+    int delKey(const std::string& key);
+    
 private:
-    std::unordered_map<std::string, std::list<std::string>> mListMap;
+    typedef std::list<std::string> ListType;
+    typedef std::unordered_map<std::string, ListType> ListMapType;
+    ListMapType mListMap;
 };
 
 };

@@ -7,6 +7,11 @@
 using namespace std;
 using namespace arag;
 
+int SetMap::size()
+{
+    return (int)mSetMap.size();
+}
+
 int SetMap::size(const std::string &key)
 {
     auto iter = mSetMap.find(key);
@@ -185,4 +190,18 @@ int SetMap::move(const string& source, const string& dest, const string& member)
 void SetMap::clearKeys()
 {
     mSetMap.clear();
+}
+
+int SetMap::delKey(const std::string& key)
+{
+    auto iter = mSetMap.find(key);
+    if (iter == mSetMap.end()) {
+        return 0;
+    }
+    
+    SetType& sset = iter->second;
+    sset.clear();
+    
+    mSetMap.erase(iter);
+    return 1;
 }

@@ -1,6 +1,8 @@
 #ifndef __arag__SessionContext__
 #define __arag__SessionContext__
 
+#include <string>
+
 namespace arag
 {
 
@@ -13,7 +15,15 @@ public:
     void setDatabaseIndex(int index);
 
     void setAuthenticationStatus(bool authenticated);
+    
+    void setClientName(std::string name);
 
+    void setConnectionDetails(std::string ip, int port);
+    
+    std::string getIPAndPort() const;
+
+    std::string getClientName() const;
+    
     int getDatabaseIndex() const;
     
     bool isAuthenticated() const;
@@ -21,6 +31,9 @@ public:
 private:
     bool mIsAuthenticated;
     int mDatabaseIndex;
+    std::string mClientName;
+    int mClientID;
+    std::string mIPAddress;
 };
     
 };

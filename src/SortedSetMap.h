@@ -93,6 +93,8 @@ public:
     
     int lexCount(const std::string &key, const std::string& min, const std::string& max);
     
+    int size();
+    
     int size(const std::string &key);
     
     double incrBy(const std::string &key, const std::string &member, double by);
@@ -116,6 +118,8 @@ public:
     int remByLex(const std::string &key, const std::string& min, const std::string& max);
 
     void clearKeys();
+    
+    int delKey(const std::string& key);
     
 private:
 

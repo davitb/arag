@@ -58,6 +58,21 @@ void InMemoryData::flush()
     mHashMap.clear();
 }
 
+int InMemoryData::size()
+{
+    return (int)(mStringMap.size() + mSetMap.size() +
+            mSortedSetMap.size() + mListMap.size() + mHashMap.size());
+}
+
+int InMemoryData::delKey(const std::string &key)
+{
+    return mStringMap.deleteKey(key) +
+            mSetMap.delKey(key) +
+            mSortedSetMap.delKey(key) +
+            mListMap.delKey(key) +
+            (int)mHashMap.erase(key);
+}
+
 //---------------------------------------------------
 
 Database& Database::instance()

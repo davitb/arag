@@ -24,6 +24,7 @@
 		17B4EFEA1A5C473500B2E5B0 /* SessionContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFE81A5C473500B2E5B0 /* SessionContext.cpp */; };
 		17B4EFED1A5C4D6100B2E5B0 /* Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFEB1A5C4D6100B2E5B0 /* Config.cpp */; };
 		17B4EFF01A5C6FAD00B2E5B0 /* ServerCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */; };
+		17B4EFF31A60EA1F00B2E5B0 /* KeyCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFF11A60EA1F00B2E5B0 /* KeyCmds.cpp */; };
 		17ED91331A50E6930035DFE6 /* StringCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91321A50E6930035DFE6 /* StringCmds.cpp */; };
 		17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91351A50E76A0035DFE6 /* Commands.cpp */; };
 		17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */; };
@@ -79,6 +80,8 @@
 		17B4EFEC1A5C4D6100B2E5B0 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerCmds.cpp; sourceTree = "<group>"; };
 		17B4EFEF1A5C6FAD00B2E5B0 /* ServerCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerCmds.h; sourceTree = "<group>"; };
+		17B4EFF11A60EA1F00B2E5B0 /* KeyCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyCmds.cpp; sourceTree = "<group>"; };
+		17B4EFF21A60EA1F00B2E5B0 /* KeyCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyCmds.h; sourceTree = "<group>"; };
 		17ED91321A50E6930035DFE6 /* StringCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringCmds.cpp; sourceTree = "<group>"; };
 		17ED91341A50E6B80035DFE6 /* StringCmds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringCmds.h; sourceTree = "<group>"; };
 		17ED91351A50E76A0035DFE6 /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Commands.cpp; sourceTree = "<group>"; };
@@ -170,16 +173,18 @@
 				1737FA7E1A53BE700099D0A6 /* ConnectionCmds.h */,
 				17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */,
 				17ED91381A50ED0F0035DFE6 /* HashCmds.h */,
+				17B4EFF11A60EA1F00B2E5B0 /* KeyCmds.cpp */,
+				17B4EFF21A60EA1F00B2E5B0 /* KeyCmds.h */,
 				1784BB441A513DE7008F7DCE /* ListCmds.cpp */,
 				1784BB451A513DE7008F7DCE /* ListCmds.h */,
+				17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */,
+				17B4EFEF1A5C6FAD00B2E5B0 /* ServerCmds.h */,
 				1737FA771A5321500099D0A6 /* SetCmds.cpp */,
 				1737FA781A5321500099D0A6 /* SetCmds.h */,
 				171978011A55ED6000BEDB62 /* SortedSetCmds.cpp */,
 				171978021A55ED6000BEDB62 /* SortedSetCmds.h */,
 				17ED91321A50E6930035DFE6 /* StringCmds.cpp */,
 				17ED91341A50E6B80035DFE6 /* StringCmds.h */,
-				17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */,
-				17B4EFEF1A5C6FAD00B2E5B0 /* ServerCmds.h */,
 			);
 			name = Commands;
 			sourceTree = "<group>";
@@ -187,16 +192,16 @@
 		1761F8C61A53DD1000146F9B /* Structures */ = {
 			isa = PBXGroup;
 			children = (
-				1737FA7A1A5321610099D0A6 /* SetMap.cpp */,
-				1737FA7B1A5321610099D0A6 /* SetMap.h */,
-				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
-				17ED913E1A50EF830035DFE6 /* StringMap.h */,
 				17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */,
 				17ED913B1A50EDFC0035DFE6 /* InMemoryData.h */,
 				1784BB411A513D13008F7DCE /* ListMap.cpp */,
 				1784BB421A513D13008F7DCE /* ListMap.h */,
+				1737FA7A1A5321610099D0A6 /* SetMap.cpp */,
+				1737FA7B1A5321610099D0A6 /* SetMap.h */,
 				175BFA4D1A54728F001751CE /* SortedSetMap.cpp */,
 				175BFA4E1A54728F001751CE /* SortedSetMap.h */,
+				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
+				17ED913E1A50EF830035DFE6 /* StringMap.h */,
 			);
 			name = Structures;
 			sourceTree = "<group>";
@@ -275,6 +280,7 @@
 				17ED913C1A50EDFC0035DFE6 /* InMemoryData.cpp in Sources */,
 				17ED913F1A50EF830035DFE6 /* StringMap.cpp in Sources */,
 				17B4EFE71A5B902500B2E5B0 /* ClientSession.cpp in Sources */,
+				17B4EFF31A60EA1F00B2E5B0 /* KeyCmds.cpp in Sources */,
 				17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */,
 				17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */,
 				171978031A55ED6000BEDB62 /* SortedSetCmds.cpp in Sources */,

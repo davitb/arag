@@ -48,7 +48,7 @@ public:
     
     std::string get(std::string key);
 
-    bool deleteKey(std::string key);
+    int deleteKey(std::string key);
     
     std::string getset(std::string key, std::string value);
     
@@ -64,7 +64,7 @@ public:
     
     std::vector<std::pair<std::string, int>> getAll(int getAllType);
     
-    int len();
+    int size();
     
     int getCounter() const;
     

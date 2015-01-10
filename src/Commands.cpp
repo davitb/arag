@@ -8,6 +8,7 @@
 #include "ListCmds.h"
 #include "SetCmds.h"
 #include "SortedSetCmds.h"
+#include "KeyCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <iostream>
@@ -34,6 +35,11 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["INFO"] = shared_ptr<Command>(new InfoCommand());
         sNameToCommand["FLUSHDB"] = shared_ptr<Command>(new FlushCommand(FlushCommand::FLUSHDB));
         sNameToCommand["FLUSHALL"] = shared_ptr<Command>(new FlushCommand(FlushCommand::FLUSHALL));
+        sNameToCommand["CLIENT"] = shared_ptr<Command>(new ClientCommand());
+        sNameToCommand["CONFIG"] = shared_ptr<Command>(new ConfigCommand());
+        sNameToCommand["DBSIZE"] = shared_ptr<Command>(new SingleArgumentCommand(SingleArgumentCommand::DBSIZE));
+        sNameToCommand["LASTSAVE"] = shared_ptr<Command>(new SingleArgumentCommand(SingleArgumentCommand::LASTSAVE));
+        sNameToCommand["TIME"] = shared_ptr<Command>(new SingleArgumentCommand(SingleArgumentCommand::TIME));
         
         // String Commands
         sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());
@@ -126,6 +132,10 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["ZREMRANGEBYLEX"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::CmdType::REMRANGEBYLEX));
         sNameToCommand["ZRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::CmdType::RANGEBYLEX));
         sNameToCommand["ZREVRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::CmdType::REVRANGEBYLEX));
+        
+        // Key Commands
+        sNameToCommand["DEL"] = shared_ptr<Command>(new DelCommand());
+        
     }
     
     string upperCaseCmd = cmdName;

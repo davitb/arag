@@ -31,19 +31,14 @@ int ListMap::push(const string& key, const string& val, Position direction)
         case BACK:
             l.push_back(val);
             break;
-            
-//        case INSERT_BEFORE:
-//            if (pos == 0) {
-//                l.push_front(val);
-//                break;
-//            }
-//            auto iter = l.begin();
-//            while (pos-- != 0) iter++;
-//            l.insert(iter, val);
-//            break;
     }
     
     return (int)mListMap[key].size();
+}
+
+int ListMap::size()
+{
+    return (int)mListMap.size();
 }
 
 int ListMap::len(const std::string &key)
@@ -277,4 +272,19 @@ int ListMap::insert(const std::string &key,
 void ListMap::clearKeys()
 {
     mListMap.clear();
+}
+
+
+int ListMap::delKey(const std::string& key)
+{
+    auto iter = mListMap.find(key);
+    if (iter == mListMap.end()) {
+        return 0;
+    }
+    
+    ListType& l = iter->second;
+    l.clear();
+    
+    mListMap.erase(iter);
+    return 1;
 }

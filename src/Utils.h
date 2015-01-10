@@ -42,6 +42,8 @@ public:
     static void normalizeIndexes(int& start, int& end, const int& len);
     
     static int genRandom(int min, int max);
+    
+    static void getTimeOfDay(long& secs, long& msecs);
 };
 
 };

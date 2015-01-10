@@ -3,18 +3,17 @@
 
 #include <string>
 #include <vector>
-#include "StringMap.h"
 #include "asio.hpp"
-#include "Commands.h"
 #include "RequestProcessor.h"
 #include "Config.h"
+#include "ClientSession.h"
+#include "SessionContext.h"
 #include "SelfTest.h"
 
 namespace arag
 {
 
 static const int PORT_NUM = 6379;
-static const int MAX_REQUEST_LEN = 512;
     
 /*
     Arag server implementation. All it does is starts to listening to
@@ -29,6 +28,8 @@ public:
     void startServer();
     
     void stopServer();
+    
+    std::vector<SessionContext> getSessions();
 
 private:
     
@@ -42,6 +43,7 @@ private:
     
 private:
     RequestProcessor mProcessor;
+    std::vector<std::shared_ptr<ClientSession>> mSessions;
     asio::ip::tcp::acceptor mAcceptor;
     asio::ip::tcp::socket mSocket;
 };

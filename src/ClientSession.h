@@ -1,7 +1,8 @@
 #ifndef __arag__ClientSession__
 #define __arag__ClientSession__
 
-#include "AragServer.h"
+#include "asio.hpp"
+#include "RequestProcessor.h"
 #include "SessionContext.h"
 
 namespace arag
@@ -14,11 +15,18 @@ namespace arag
 class ClientSession : public std::enable_shared_from_this<ClientSession>
 {
 public:
+
+    enum
+    {
+        MAX_REQUEST_LEN = 512 // * 64 * 1024 // 640KB
+    };
     
     ClientSession(asio::ip::tcp::socket socket, RequestProcessor& rp);
     
     // Start to listen for commands
     void start();
+    
+    SessionContext getContext();
     
 private:
     

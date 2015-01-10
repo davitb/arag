@@ -14,7 +14,9 @@ class SetMap
 public:
     typedef std::unordered_set<std::string> SetType;
     typedef std::unordered_map<std::string, SetType> SetMapType;
-   
+
+    int size();
+    
     int size(const std::string& key);
     
     int isMember(const std::string& key, const std::string& val);
@@ -44,6 +46,8 @@ public:
     int move(const std::string& source, const std::string& dest, const std::string& member);
 
     void clearKeys();
+    
+    int delKey(const std::string& key);
     
 private:
     SetMapType mSetMap;

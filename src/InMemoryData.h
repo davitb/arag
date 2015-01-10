@@ -28,11 +28,15 @@ public:
     
     SortedSetMap& getSortedSetMap();
     
+    int size();
+    
     int getCounter() const;
     
     void cleanup();
     
     void flush();
+    
+    int delKey(const std::string& key);
     
 private:
     

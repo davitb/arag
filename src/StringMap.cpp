@@ -68,17 +68,17 @@ string StringMap::getset(string key, string value)
     return oldVal;
 }
 
-bool StringMap::deleteKey(string key)
+int StringMap::deleteKey(string key)
 {
     try {
         get(key);
     }
     catch (...) {
-        return false;
+        return 0;
     }
     
     map.erase(key);
-    return true;
+    return 1;
 }
 
 string StringMap::get(std::string key)
@@ -186,7 +186,7 @@ vector<pair<string, int>> StringMap::getAll(int getAllType)
     return vals;
 }
 
-int StringMap::len()
+int StringMap::size()
 {
     return (int)map.size();
 }
