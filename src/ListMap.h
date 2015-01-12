@@ -6,12 +6,13 @@
 #include <list>
 #include <vector>
 #include <mutex>
+#include "IMapCommon.h"
 #include "SelfTest.h"
 
 namespace arag
 {
 
-class ListMap
+class ListMap : public IMapCommon
 {
 public:
 
@@ -21,11 +22,9 @@ public:
         BACK
     };
     
-    bool keyExists(std::string key);
-    
     int push(const std::string& key, const std::string& val, Position direction);
     
-    int size();
+    virtual int size();
 
     int len(const std::string& key);
     
@@ -46,9 +45,11 @@ public:
     
     std::vector<std::pair<std::string, int>> getRange(const std::string& key, int start, int end);
     
-    void clearKeys();
+    virtual void clearKeys();
     
-    int delKey(const std::string& key);
+    virtual int delKey(const std::string& key);
+    
+    virtual bool keyExists(const std::string &key);
     
 private:
     typedef std::list<std::string> ListType;

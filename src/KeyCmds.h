@@ -22,6 +22,23 @@ private:
     };
 };
 
+//----------------------------------------------------------------
+
+class ExistsCommand: public Command
+{
+public:
+    
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 2,
+        MAX_ARG_NUM = 2
+    };
+};
+    
+    
 ////----------------------------------------------------------------
 //
 //class : public Command

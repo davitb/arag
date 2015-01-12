@@ -112,6 +112,10 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
             
             // Execute the command
             
+            if (!cmd.isKeyTypeValid(selectedDB)) {
+                throw invalid_argument("Wrong key operation");
+            }
+            
             string res = cmd.execute(selectedDB, req.mSessionCtx);
             
             // Call the callback to write the response to socket

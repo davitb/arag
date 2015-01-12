@@ -26,6 +26,7 @@ string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
         string val = mTokens[3].first;
         
         StringMap& map = data.getFromHashMap(key);
+        
         int ret = 0;
         
         switch (cmdType)
@@ -154,7 +155,7 @@ string HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
         int numDeleted = 0;
         
         for (int i = 1; i < mTokens.size(); ++i) {
-            numDeleted += map.deleteKey(mTokens[i].first);
+            numDeleted += map.delKey(mTokens[i].first);
         }
         
         return RedisProtocol::serializeNonArray(to_string(numDeleted), RedisProtocol::DataType::INTEGER);

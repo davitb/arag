@@ -8,6 +8,7 @@
 #include "ListMap.h"
 #include "SetMap.h"
 #include "SortedSetMap.h"
+#include "HLLMap.h"
 
 namespace arag
 {
@@ -16,17 +17,30 @@ class InMemoryData
 {
 public:
     
+    enum ContainerType
+    {
+        NONE,
+        STRING,
+        HASH,
+        LIST,
+        SET,
+        SORTEDSET,
+        HLL
+    };
+    
     typedef std::unordered_map<std::string, StringMap> HashMap;
     
     StringMap& getFromHashMap(const std::string& key);
     
-    StringMap& getStringMap();
+    StringMap& getStringMap() { return mStringMap; }
     
-    ListMap& getListMap();
+    ListMap& getListMap() { return mListMap; }
     
-    SetMap& getSetMap();
+    SetMap& getSetMap() { return mSetMap; }
     
-    SortedSetMap& getSortedSetMap();
+    SortedSetMap& getSortedSetMap() { return mSortedSetMap; }
+
+    HLLMap& getHyperLogLogMap() { return mHLLMap; }
     
     int size();
     
@@ -38,6 +52,10 @@ public:
     
     int delKey(const std::string& key);
     
+    bool keyExists(const std::string& key);
+    
+    ContainerType getKeyType(const std::string& key);
+    
 private:
     
     StringMap mStringMap;
@@ -45,6 +63,7 @@ private:
     HashMap mHashMap;
     SetMap mSetMap;
     SortedSetMap mSortedSetMap;
+    HLLMap mHLLMap;
     int mCounter;
 };
 

@@ -68,7 +68,7 @@ string StringMap::getset(string key, string value)
     return oldVal;
 }
 
-int StringMap::deleteKey(string key)
+int StringMap::delKey(const std::string& key)
 {
     try {
         get(key);
@@ -216,4 +216,9 @@ void StringMap::clearKeys()
 {
     lock_guard<recursive_mutex> lock(mLock);
     map.clear();
+}
+
+bool StringMap::keyExists(const std::string &key)
+{
+    return map.find(key) != map.end();
 }

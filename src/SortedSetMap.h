@@ -7,11 +7,12 @@
 #include <vector>
 #include <functional>
 #include "random_access_skip_list.h"
+#include "IMapCommon.h"
 
 namespace arag
 {
 
-class SortedSetMap
+class SortedSetMap : public IMapCommon
 {
 public:
     
@@ -120,6 +121,8 @@ public:
     void clearKeys();
     
     int delKey(const std::string& key);
+    
+    bool keyExists(const std::string &key);
     
 private:
 

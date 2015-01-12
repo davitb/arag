@@ -36,3 +36,26 @@ string DelCommand::execute(InMemoryData& db, SessionContext& ctx)
         return redis_const::NULL_BULK_STRING;
     }
 }
+
+//-------------------------------------------------------------------------
+
+string ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+
+        string key = mTokens[1].first;
+        
+        int ret = db.keyExists(key) ? 1 : 0;
+        
+        return RedisProtocol::serializeNonArray(to_string(ret), RedisProtocol::DataType::INTEGER);
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}

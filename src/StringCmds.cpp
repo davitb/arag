@@ -40,7 +40,7 @@ string SetCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         map.set(key, val, expType, exp, policy);
-
+        
         return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
     catch (std::exception& e) {

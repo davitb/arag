@@ -5,11 +5,12 @@
 #include <unordered_set>
 #include <string>
 #include <vector>
+#include "IMapCommon.h"
 
 namespace arag
 {
 
-class SetMap
+class SetMap : public IMapCommon
 {
 public:
     typedef std::unordered_set<std::string> SetType;
@@ -48,6 +49,8 @@ public:
     void clearKeys();
     
     int delKey(const std::string& key);
+    
+    bool keyExists(const std::string &key);
     
 private:
     SetMapType mSetMap;

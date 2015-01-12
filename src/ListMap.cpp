@@ -10,15 +10,6 @@
 using namespace std;
 using namespace arag;
 
-bool ListMap::keyExists(std::string key)
-{
-    if (mListMap.count(key) == 0) {
-        return false;
-    }
-    
-    return true;
-}
-
 int ListMap::push(const string& key, const string& val, Position direction)
 {
     list<string>& l = mListMap[key];
@@ -287,4 +278,9 @@ int ListMap::delKey(const std::string& key)
     
     mListMap.erase(iter);
     return 1;
+}
+
+bool ListMap::keyExists(const std::string &key)
+{
+    return mListMap.find(key) != mListMap.end();
 }

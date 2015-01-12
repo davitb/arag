@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include <mutex>
+#include "IMapCommon.h"
 #include "SelfTest.h"
 
 namespace arag
@@ -14,7 +15,7 @@ namespace arag
     Implements all low level data structures and commands.
     Refer to http://redis.io/commands for more information.
  */
-class StringMap
+class StringMap : public IMapCommon
 {
 public:
     
@@ -48,8 +49,6 @@ public:
     
     std::string get(std::string key);
 
-    int deleteKey(std::string key);
-    
     std::string getset(std::string key, std::string value);
     
     int append(std::string key, std::string value);
@@ -64,13 +63,17 @@ public:
     
     std::vector<std::pair<std::string, int>> getAll(int getAllType);
     
-    int size();
+    virtual int size();
     
-    int getCounter() const;
+    virtual int delKey(const std::string& key);
     
+    virtual bool keyExists(const std::string& key);
+    
+    virtual void clearKeys();
+
     void cleanup();
     
-    void clearKeys();
+    int getCounter() const;
     
 private:
     

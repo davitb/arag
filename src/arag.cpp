@@ -3,7 +3,7 @@
 #include "SelfTest.h"
 #include "RedisProtocol.h"
 #include <string>
-#include <cfloat>
+#include "HLLMap.h"
 
 using namespace std;
 using namespace arag;
@@ -13,13 +13,19 @@ using goodliffe::random_access_skip_list;
 int main(int argc, char* argv[])
 {
     {
-//        string s = "1";
-//        //s.append(1, 1);
-//        s[0] = 1;
-//        if (s[0] == 1) {
-//            cout << "yes";
-//        }
-//        cout << s;
+//        HLLMap hll;
+//        hll.add("hll", "foo");
+//        hll.add("hll", "bar");
+//        cout << hll.add("hll", "zap");
+//
+//        cout << hll.count("hll") << endl;
+//        
+//        cout << hll.add("hll", "foo");
+//        cout << hll.add("hll", "bar");
+//        cout << hll.add("hll", "zap");
+//        
+//        cout << hll.count("hll") << endl;
+//        
 //        return 1;
     }
     

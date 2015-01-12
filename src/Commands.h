@@ -28,11 +28,34 @@ class Command
 {
 public:
     
+    class Context
+    {
+    public:
+        int mKeyArgIndex;
+        InMemoryData::ContainerType mContainerType;
+
+        Context()
+        {
+            mKeyArgIndex = -1;
+            mContainerType = InMemoryData::ContainerType::NONE;
+        }
+        
+        Context(int k, InMemoryData::ContainerType t)
+        {
+            mKeyArgIndex = k;
+            mContainerType = t;
+        }
+    };
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx) = 0;
     
     std::string getCommandName() const;
     
     static Command& getCommand(const std::string& cmdline);
+    
+    void setCommandContext(Context ctx);
+    
+    bool isKeyTypeValid(InMemoryData& db);
 
 protected:
     
@@ -49,6 +72,7 @@ protected:
     
 protected:
     std::vector<std::pair<std::string, int>> mTokens;
+    Context mCtx;
 };
 
 class InternalCommand: public Command

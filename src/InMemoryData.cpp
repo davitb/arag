@@ -20,26 +20,6 @@ StringMap& InMemoryData::getFromHashMap(const std::string& key)
     return mHashMap[key];
 };
 
-StringMap& InMemoryData::getStringMap()
-{
-    return mStringMap;
-};
-
-ListMap& InMemoryData::getListMap()
-{
-    return mListMap;
-};
-
-SetMap& InMemoryData::getSetMap()
-{
-    return mSetMap;
-};
-
-SortedSetMap& InMemoryData::getSortedSetMap()
-{
-    return mSortedSetMap;
-};
-
 void InMemoryData::cleanup()
 {
     mStringMap.cleanup();
@@ -56,22 +36,63 @@ void InMemoryData::flush()
     mSortedSetMap.clearKeys();
     mListMap.clearKeys();
     mHashMap.clear();
+    mHLLMap.clearKeys();
 }
 
 int InMemoryData::size()
 {
     return (int)(mStringMap.size() + mSetMap.size() +
-            mSortedSetMap.size() + mListMap.size() + mHashMap.size());
+            mSortedSetMap.size() + mListMap.size() + mHashMap.size() + mHLLMap.size());
 }
 
 int InMemoryData::delKey(const std::string &key)
 {
-    return mStringMap.deleteKey(key) +
+    return mStringMap.delKey(key) +
             mSetMap.delKey(key) +
             mSortedSetMap.delKey(key) +
             mListMap.delKey(key) +
+            mHLLMap.delKey(key) +
             (int)mHashMap.erase(key);
 }
+
+InMemoryData::ContainerType InMemoryData::getKeyType(const std::string &key)
+{
+    if (mStringMap.keyExists(key)) {
+        return ContainerType::STRING;
+    }
+
+    if (mSetMap.keyExists(key)) {
+        return ContainerType::SET;
+    }
+
+    if (mSortedSetMap.keyExists(key)) {
+        return ContainerType::SORTEDSET;
+    }
+
+    if (mListMap.keyExists(key)) {
+        return ContainerType::LIST;
+    }
+
+    if ((mHashMap.find(key) != mHashMap.end())) {
+        return ContainerType::HASH;
+    }
+
+    if (mHLLMap.keyExists(key)) {
+        return ContainerType::HLL;
+    }
+    
+    return ContainerType::NONE;
+}
+
+bool InMemoryData::keyExists(const std::string& key)
+{
+    bool bExists = mStringMap.keyExists(key) || mSetMap.keyExists(key) ||
+    mSortedSetMap.keyExists(key) || mListMap.keyExists(key) ||
+    (mHashMap.find(key) != mHashMap.end());
+    
+    return bExists;
+}
+
 
 //---------------------------------------------------
 

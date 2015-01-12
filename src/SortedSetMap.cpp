@@ -517,3 +517,8 @@ int SortedSetMap::delKey(const std::string &key)
     mSetMap.erase(iter);
     return 1;
 }
+
+bool SortedSetMap::keyExists(const std::string &key)
+{
+    return mSetMap.find(key) != mSetMap.end();
+}

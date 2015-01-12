@@ -55,7 +55,7 @@ string InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
         InfoBuilder out;
         
         out.addSection("Server");
-        out.addProperty("redis_version", "2.6.14");
+        out.addProperty("redis_version", redis_const::REDIS_VERSION);
         
         return RedisProtocol::serializeNonArray(out.serialize(), RedisProtocol::DataType::BULK_STRING);
     }
