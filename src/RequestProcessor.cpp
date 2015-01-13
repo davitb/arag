@@ -5,28 +5,20 @@
 #include "Utils.h"
 #include "RequestProcessor.h"
 #include "RedisProtocol.h"
+#include "AragServer.h"
 
 using namespace std;
 using namespace arag;
 
 //-----------------------------------------------------------------
 
-RequestProcessor::Request::Request(const std::string& cmdLine,
+RequestProcessor::Request::Request(Command& cmd,
                                    RequestType type,
-                                   SessionContext& sessionCtx,
-                                   function<void(std::string)> cb) : mSessionCtx(sessionCtx)
+                                   int sessionID)
+                                    : mCommand(cmd)
 {
-    this->cmdLine = cmdLine;
-    this->type = type;
-    this->cb = cb;
-}
-
-RequestProcessor::Request::Request(const std::string& cmdLine,
-                                   RequestType type)  : mSessionCtx(fakeCtx)
-{
-    this->cmdLine = cmdLine;
-    this->type = type;
-    this->cb = nullptr;
+    mType = type;
+    mSessionID = sessionID;
 }
 
 //-----------------------------------------------------------------
@@ -53,8 +45,10 @@ void RequestProcessor::stopThreads()
     cout << "Stopping all threads" << endl;
     
     for (int i = 0; i < mPunits.size(); ++i) {
-        RequestProcessor::Request req(command_const::CMD_INTERNAL_STOP,
-                                      RequestType::INTERNAL);
+        shared_ptr<Command> stopCmd = std::make_shared<InternalCommand>(command_const::CMD_INTERNAL_STOP);
+        RequestProcessor::Request req(*stopCmd.get(),
+                                      RequestType::INTERNAL,
+                                      SessionContext::Consts::FAKE_SESSION);
         enqueueRequest(mPunits[i], req);
         mPunits[i].thd.join();
     }
@@ -73,8 +67,15 @@ void RequestProcessor::enqueueRequest(Request req)
 void RequestProcessor::enqueueRequest(ProcessingUnit& punit, Request req)
 {
     lock_guard<mutex> lock(punit.lock);
-    punit.que.push(req);
+    punit.que.push_back(req);
     punit.cond.notify_one();
+}
+
+RequestProcessor::Request RequestProcessor::extractNextRequest(std::list<Request>& que)
+{
+    Request req = que.front();
+    que.pop_front();
+    return req;
 }
 
 void RequestProcessor::processingThread(ProcessingUnit& punit)
@@ -85,22 +86,20 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         // Wait for the conditional variable
         punit.cond.wait(lock, [&punit] { return !punit.que.empty(); });
         
-        Request req = punit.que.front();
-        int selectedDBIndex = req.mSessionCtx.get().getDatabaseIndex();
+        Request req = extractNextRequest(punit.que);
+        ClientSession& session = Arag::instance().getClientSession(req.mSessionID);
+        SessionContext sessionCtx = session.getContext();
+        int selectedDBIndex = sessionCtx.getDatabaseIndex();
         InMemoryData& selectedDB = Database::instance().get(selectedDBIndex);
-        
-        //cout << "New request received: " << req.cmdLine << endl;
-        
-        punit.que.pop();
         
         lock.unlock();
         
         try {
             // Create appropriate command
-            Command& cmd = Command::getCommand(req.cmdLine);
+            Command& cmd = req.mCommand;
             
             // Check if this is an internal operation and execute it
-            if (req.type == RequestType::INTERNAL) {
+            if (req.mType == RequestType::INTERNAL) {
                 ResultType rt = processInternalCommand(cmd.getCommandName());
                 if (rt == ResultType::STOP) {
                     break;
@@ -116,24 +115,19 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
                 throw invalid_argument("Wrong key operation");
             }
             
-            string res = cmd.execute(selectedDB, req.mSessionCtx);
+            string res = cmd.execute(selectedDB, sessionCtx);
             
-            // Call the callback to write the response to socket
-            if (req.cb != nullptr && res.length() != 0) {
-                req.cb(res);
+            if (res.length() != 0 && req.mType != RequestType::INTERNAL) {
+                session.writeResponse(res);
             }
         }
         catch (exception& e) {
-//            cout << "exception occured: " << e.what() << endl;
-//            cout << "command: " << req.cmdLine << endl;
+            //cout << "exception occured: " << e.what() << endl;
+            //cout << "command: " << cmdLine << endl;
             
-            if (req.cb != nullptr) {
-                req.cb(redis_const::ERR_GENERIC);
+            if (req.mType != RequestType::INTERNAL) {
+                session.writeResponse(redis_const::ERR_GENERIC);
             }
-        }
-        
-        if (selectedDB.getCounter() > mTriggerCleanupLimit) {
-            //enqueueCleanup();
         }
     }
 }

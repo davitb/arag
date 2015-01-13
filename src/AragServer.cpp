@@ -17,6 +17,8 @@ using asio::ip::tcp;
 Arag::Arag()
 : mAcceptor(Arag::ioServiceInstance(), tcp::endpoint(tcp::v4(), PORT_NUM)), mSocket(Arag::ioServiceInstance())
 {
+    shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket), mProcessor);
+    mSessions[SessionContext::FAKE_SESSION] = session;
 }
 
 Arag::~Arag()
@@ -62,7 +64,7 @@ void Arag::doAccept()
     mAcceptor.async_accept(mSocket, [this](std::error_code ec) {
         if (!ec) {
             shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket), mProcessor);
-            mSessions.push_back(session);
+            mSessions[session->getContext().getSessionID()] = session;
             session->start();
 //            std::make_shared<ClientSession>(std::move(mSocket), mProcessor)->start();
         }
@@ -73,11 +75,29 @@ void Arag::doAccept()
 
 vector<SessionContext> Arag::getSessions()
 {
+    lock_guard<mutex> lock(mSessionMapLock);
     vector<SessionContext> sessions;
     
-    for (int i = 0; i < mSessions.size(); ++i) {
-        sessions.push_back(mSessions[i]->getContext());
+    for (auto iter = mSessions.begin(); iter != mSessions.end(); ++iter) {
+        sessions.push_back(iter->second->getContext());
     }
     
     return sessions;
+}
+
+ClientSession& Arag::getClientSession(int sessionID)
+{
+    lock_guard<mutex> lock(mSessionMapLock);
+    auto elem = mSessions.find(sessionID);
+    if (elem == mSessions.end()) {
+        throw invalid_argument("Arag::getClientSession: Wrong sessionID");
+    }
+    
+    return *elem->second;
+}
+
+void Arag::removeSession(int sessionID)
+{
+    lock_guard<mutex> lock(mSessionMapLock);
+    mSessions.erase(sessionID);
 }

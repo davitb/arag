@@ -4,10 +4,9 @@
 #include <string>
 #include <thread>
 #include <mutex>
-#include <queue>
+#include <list>
 #include <functional>
 #include "Commands.h"
-#include "SessionContext.h"
 
 using namespace std;
 using namespace arag;
@@ -52,19 +51,12 @@ public:
     class Request
     {
     public:
-        std::string cmdLine;
-        function<void(std::string)> cb;
-        RequestType type;
-        std::reference_wrapper<SessionContext> mSessionCtx;
-        SessionContext fakeCtx;
         
-        Request(const std::string& cmdLine,
-                RequestType type,
-                SessionContext& sessionCtx,
-                function<void(std::string)> cb);
-        
-        Request(const std::string& cmdLine, RequestType type);
-        
+        std::reference_wrapper<Command> mCommand;
+        RequestType mType;
+        int mSessionID;
+
+        Request(Command& cmd, RequestType type, int sessionID);
     };
     
 private:
@@ -77,7 +69,7 @@ private:
     public:
         std::thread thd;
         std::mutex lock;
-        std::queue<Request> que;
+        std::list<Request> que;
         std::condition_variable cond;
     };
     
@@ -89,6 +81,8 @@ private:
     void enqueueCleanup();
     
     ResultType processInternalCommand(std::string cmd);
+    
+    Request extractNextRequest(std::list<Request>& que);
     
 public:
     
@@ -105,7 +99,6 @@ private:
     std::vector<ProcessingUnit> mPunits;
     int mThreadCount;
     int mTriggerCleanupLimit;
-    SessionContext mInternalSessionCtx;
     
 private:
     

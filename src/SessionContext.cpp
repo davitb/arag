@@ -1,4 +1,5 @@
 #include "SessionContext.h"
+#include "Utils.h"
 
 using namespace arag;
 using namespace std;
@@ -7,6 +8,7 @@ SessionContext::SessionContext()
 {
     mDatabaseIndex = 0;
     mIsAuthenticated = false;
+    mSessionID = Utils::genRandom(0, INT_MAX);
 }
 
 void SessionContext::setDatabaseIndex(int index)

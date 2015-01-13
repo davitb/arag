@@ -1,12 +1,14 @@
 #include <iostream>
 #include "ClientSession.h"
 #include "RedisProtocol.h"
+#include "AragServer.h"
 
 using namespace std;
 using namespace arag;
 using asio::ip::tcp;
 
-ClientSession::ClientSession(tcp::socket socket, RequestProcessor& rp) : mSocket(std::move(socket)), mRP(rp)
+ClientSession::ClientSession(tcp::socket socket, RequestProcessor& rp)
+            : mSocket(std::move(socket)), mRP(rp)
 {
 }
 
@@ -24,41 +26,54 @@ void ClientSession::doRead()
     mSocket.async_read_some(asio::buffer(mBuffer), [this, self] (std::error_code ec, std::size_t length) {
 
         if (ec) {
+            Arag::instance().removeSession(mCtx.getSessionID());
             return;
         }
         
-        string cmdLine = string(mBuffer.begin(), length);
+        try {
+        
+            string cmdLine = string(mBuffer.begin(), length);
 
-        // If the request is more than default MAX_REQUEST_LEN - read the remaining here
-        size_t available = 0;
-        while ((available = mSocket.available()) > 0) {
-            std::vector<char> data(available);
-            asio::read(mSocket, asio::buffer(data));
-            cmdLine += string(mBuffer.begin(), length) + string(&data[0]);
+            // If the request is more than default MAX_REQUEST_LEN - read the remaining here
+            size_t available = 0;
+            while ((available = mSocket.available()) > 0) {
+                std::vector<char> data(available);
+                asio::read(mSocket, asio::buffer(data));
+                cmdLine += string(mBuffer.begin(), length) + string(&data[0]);
+            }
+
+            // This function will be called after response is ready.
+            function<void(string)> responseCallback = [this, self](string result) {
+                // Write the result string to socket
+                writeResponse(result);
+            };
+            
+            mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
+                                      mSocket.remote_endpoint().port());
+            
+            RequestProcessor::Request req(Command::getCommand(cmdLine),
+                                          RequestProcessor::RequestType::EXTERNAL,
+                                          mCtx.getSessionID());
+            
+            // Enqueue the request to Request Processor
+            mRP.get().enqueueRequest(req);
         }
-
-        // This function will be called after response is ready.
-        function<void(string)> responseCallback = [this, self](string result) {
-            // Write the result string to socket
-            doWrite(result);
-        };
-        
-        mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
-                                  mSocket.remote_endpoint().port());
-        
-        RequestProcessor::Request req(cmdLine,
-                                      RequestProcessor::RequestType::EXTERNAL,
-                                      mCtx,
-                                      responseCallback);
-        
-        // Enqueue the request to Request Processor
-        mRP.get().enqueueRequest(req);
+        catch (std::exception& e) {
+            cout << e.what() << endl;
+            // Send ERROR back to the client
+            writeResponse(redis_const::ERR_GENERIC);
+        }
     });
 }
 
-void ClientSession::doWrite(string str)
+void ClientSession::writeResponse(const std::string &str)
 {
     auto self(shared_from_this());
+    
+    if (str.length() == 0) {
+        // Start to listen for the next command
+        doRead();
+    }
     
     //cout << "write result: " << str << endl;
     

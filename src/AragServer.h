@@ -30,6 +30,10 @@ public:
     void stopServer();
     
     std::vector<SessionContext> getSessions();
+    
+    ClientSession& getClientSession(int sessionID);
+    
+    void removeSession(int sessionID);
 
 private:
     
@@ -43,9 +47,10 @@ private:
     
 private:
     RequestProcessor mProcessor;
-    std::vector<std::shared_ptr<ClientSession>> mSessions;
+    std::unordered_map<int, std::shared_ptr<ClientSession>> mSessions;
     asio::ip::tcp::acceptor mAcceptor;
     asio::ip::tcp::socket mSocket;
+    std::mutex mSessionMapLock;
 };
     
 }; // arag

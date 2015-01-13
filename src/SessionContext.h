@@ -6,10 +6,17 @@
 namespace arag
 {
 
+class ClientSession;
+    
 class SessionContext
 {
 public:
     
+    enum Consts
+    {
+        FAKE_SESSION = -1
+    };
+        
     SessionContext();
     
     void setDatabaseIndex(int index);
@@ -28,14 +35,26 @@ public:
     
     bool isAuthenticated() const;
     
+    ClientSession& getClientSession() const;
+    
+    void setSessionID(int sid)
+    {
+        mSessionID = sid;
+    }
+    
+    int getSessionID() const
+    {
+        return mSessionID;
+    }
+    
 private:
     bool mIsAuthenticated;
     int mDatabaseIndex;
     std::string mClientName;
-    int mClientID;
+    int mSessionID;
     std::string mIPAddress;
 };
-    
+
 };
 
 #endif /* defined(__arag__SessionContext__) */

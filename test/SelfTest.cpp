@@ -306,7 +306,7 @@ void SelfTest::testMultiThreading()
     // Test with 10 threads
     
     int numRequests = 1000;
-    rp.mThreadCount = 10;
+    rp.mThreadCount = 1;
     rp.mTriggerCleanupLimit = 2000;
     rp.startThreads();
     
@@ -320,7 +320,9 @@ void SelfTest::testMultiThreading()
         cmdLine += "$2\r\nk1\r\n";
         cmdLine += "$" + lenIstr + "\r\n" + istr + "\r\n";
         
-        RequestProcessor::Request req(cmdLine, RequestProcessor::RequestType::EXTERNAL);
+        RequestProcessor::Request req(Command::getCommand(cmdLine),
+                                      RequestProcessor::RequestType::EXTERNAL,
+                                      SessionContext::FAKE_SESSION);
         rp.enqueueRequest(req);
     }
     
@@ -329,7 +331,7 @@ void SelfTest::testMultiThreading()
 
     // Test with 10 threads and then stop them in the middle of process
     
-    rp.mThreadCount = 10;
+    rp.mThreadCount = 1;
     rp.mTriggerCleanupLimit = 2000;
     rp.startThreads();
     
@@ -343,7 +345,9 @@ void SelfTest::testMultiThreading()
         cmdLine += "$" + lenKstr + "\r\nk" + istr + "\r\n";
         cmdLine += "$" + lenIstr + "\r\n" + istr + "\r\n";
         
-        RequestProcessor::Request req(cmdLine, RequestProcessor::RequestType::EXTERNAL);
+        RequestProcessor::Request req(Command::getCommand(cmdLine),
+                                      RequestProcessor::RequestType::EXTERNAL,
+                                      SessionContext::FAKE_SESSION);
         rp.enqueueRequest(req);
         
         if (i == numRequests / 2) {

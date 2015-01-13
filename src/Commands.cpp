@@ -258,6 +258,11 @@ Command& Command::getCommand(const string& cmdline)
 
 //-------------------------------------------------------------------------
 
+Command::Command()
+{
+    mType = Type::NORMAL;
+}
+
 bool Command::isKeyTypeValid(InMemoryData& db)
 {
     if (mCtx.mKeyArgIndex == -1) {

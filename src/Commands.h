@@ -28,6 +28,14 @@ class Command
 {
 public:
     
+    enum Type
+    {
+        NORMAL,
+        TRANSACTION_START,
+        TRANSACTION_END,
+        WAITING_FOR_EVENT
+    };
+    
     class Context
     {
     public:
@@ -47,6 +55,10 @@ public:
         }
     };
     
+public:
+    
+    Command();
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx) = 0;
     
     std::string getCommandName() const;
@@ -56,6 +68,16 @@ public:
     void setCommandContext(Context ctx);
     
     bool isKeyTypeValid(InMemoryData& db);
+    
+    Type getType() const
+    {
+        return mType;
+    }
+    
+    void setType(Type t)
+    {
+        mType = t;
+    }
 
 protected:
     
@@ -73,6 +95,7 @@ protected:
 protected:
     std::vector<std::pair<std::string, int>> mTokens;
     Context mCtx;
+    Type mType;
 };
 
 class InternalCommand: public Command
