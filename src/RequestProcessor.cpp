@@ -119,13 +119,13 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
             string res = cmd.execute(selectedDB, req.mSessionCtx);
             
             // Call the callback to write the response to socket
-            if (req.cb != nullptr) {
+            if (req.cb != nullptr && res.length() != 0) {
                 req.cb(res);
             }
         }
         catch (exception& e) {
-            cout << "exception occured: " << e.what() << endl;
-            cout << "command: " << req.cmdLine << endl;
+//            cout << "exception occured: " << e.what() << endl;
+//            cout << "command: " << req.cmdLine << endl;
             
             if (req.cb != nullptr) {
                 req.cb(redis_const::ERR_GENERIC);

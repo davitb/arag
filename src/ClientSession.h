@@ -18,7 +18,7 @@ public:
 
     enum
     {
-        MAX_REQUEST_LEN = 512 // * 64 * 1024 // 640KB
+        MAX_REQUEST_LEN = 64 * 1024 // 64KB
     };
     
     ClientSession(asio::ip::tcp::socket socket, RequestProcessor& rp);

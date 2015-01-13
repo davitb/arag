@@ -69,17 +69,12 @@ public:
      */
     int add(const char* str, uint32_t len) {
         
-        double oldEstimate = estimate();
-        
         uint32_t hash;
         MurmurHash3_x86_32(str, len, HLL_HASH_SEED, (void*) &hash);
         uint32_t index = hash >> (32 - b_);
         uint8_t rank = rho((hash << b_), 32 - b_);
         if (rank > M_[index]) {
             M_[index] = rank;
-        }
-        
-        if (estimate() != oldEstimate) {
             return 1;
         }
         

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "ClientSession.h"
+#include "RedisProtocol.h"
 
 using namespace std;
 using namespace arag;
@@ -21,28 +22,37 @@ void ClientSession::doRead()
     
     // Async read
     mSocket.async_read_some(asio::buffer(mBuffer), [this, self] (std::error_code ec, std::size_t length) {
-        if (!ec) {
-            
-            //int available = mSocket.available();
-            string cmdLine(mBuffer.begin(), length);
-            
-            // This function will be called after response is ready.
-            function<void(string)> responseCallback = [this, self](string result) {
-                // Write the result string to socket
-                doWrite(result);
-            };
-            
-            mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
-                                      mSocket.remote_endpoint().port());
-            
-            RequestProcessor::Request req(cmdLine,
-                                          RequestProcessor::RequestType::EXTERNAL,
-                                          mCtx,
-                                          responseCallback);
-            
-            // Enqueue the request to Request Processor
-            mRP.get().enqueueRequest(req);
+
+        if (ec) {
+            return;
         }
+        
+        string cmdLine = string(mBuffer.begin(), length);
+
+        // If the request is more than default MAX_REQUEST_LEN - read the remaining here
+        size_t available = 0;
+        while ((available = mSocket.available()) > 0) {
+            std::vector<char> data(available);
+            asio::read(mSocket, asio::buffer(data));
+            cmdLine += string(mBuffer.begin(), length) + string(&data[0]);
+        }
+
+        // This function will be called after response is ready.
+        function<void(string)> responseCallback = [this, self](string result) {
+            // Write the result string to socket
+            doWrite(result);
+        };
+        
+        mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
+                                  mSocket.remote_endpoint().port());
+        
+        RequestProcessor::Request req(cmdLine,
+                                      RequestProcessor::RequestType::EXTERNAL,
+                                      mCtx,
+                                      responseCallback);
+        
+        // Enqueue the request to Request Processor
+        mRP.get().enqueueRequest(req);
     });
 }
 

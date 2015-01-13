@@ -17,6 +17,7 @@
 		1737FA7F1A53BE700099D0A6 /* ConnectionCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1737FA7D1A53BE6F0099D0A6 /* ConnectionCmds.cpp */; };
 		173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 173DCB9B1A4E688F00762A1B /* arag.cpp */; };
 		175BFA4F1A54728F001751CE /* SortedSetMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 175BFA4D1A54728F001751CE /* SortedSetMap.cpp */; };
+		176AB9BD1A6476E400185FBD /* PubSubCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 176AB9BB1A6476E400185FBD /* PubSubCmds.cpp */; };
 		1784BB431A513D13008F7DCE /* ListMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB411A513D13008F7DCE /* ListMap.cpp */; };
 		1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB441A513DE7008F7DCE /* ListCmds.cpp */; };
 		17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */; };
@@ -68,6 +69,8 @@
 		173DCB9B1A4E688F00762A1B /* arag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arag.cpp; sourceTree = "<group>"; };
 		175BFA4D1A54728F001751CE /* SortedSetMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SortedSetMap.cpp; sourceTree = "<group>"; };
 		175BFA4E1A54728F001751CE /* SortedSetMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SortedSetMap.h; sourceTree = "<group>"; };
+		176AB9BB1A6476E400185FBD /* PubSubCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PubSubCmds.cpp; sourceTree = "<group>"; };
+		176AB9BC1A6476E400185FBD /* PubSubCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PubSubCmds.h; sourceTree = "<group>"; };
 		1784BB411A513D13008F7DCE /* ListMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListMap.cpp; sourceTree = "<group>"; };
 		1784BB421A513D13008F7DCE /* ListMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListMap.h; sourceTree = "<group>"; };
 		1784BB441A513DE7008F7DCE /* ListCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListCmds.cpp; sourceTree = "<group>"; };
@@ -186,6 +189,8 @@
 				17B4EFF21A60EA1F00B2E5B0 /* KeyCmds.h */,
 				1784BB441A513DE7008F7DCE /* ListCmds.cpp */,
 				1784BB451A513DE7008F7DCE /* ListCmds.h */,
+				176AB9BB1A6476E400185FBD /* PubSubCmds.cpp */,
+				176AB9BC1A6476E400185FBD /* PubSubCmds.h */,
 				17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */,
 				17B4EFEF1A5C6FAD00B2E5B0 /* ServerCmds.h */,
 				1737FA771A5321500099D0A6 /* SetCmds.cpp */,
@@ -297,6 +302,7 @@
 				17B4EFF31A60EA1F00B2E5B0 /* KeyCmds.cpp in Sources */,
 				17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */,
 				17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */,
+				176AB9BD1A6476E400185FBD /* PubSubCmds.cpp in Sources */,
 				171978031A55ED6000BEDB62 /* SortedSetCmds.cpp in Sources */,
 				172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */,
 			);

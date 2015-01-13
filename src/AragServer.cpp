@@ -64,6 +64,7 @@ void Arag::doAccept()
             shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket), mProcessor);
             mSessions.push_back(session);
             session->start();
+//            std::make_shared<ClientSession>(std::move(mSocket), mProcessor)->start();
         }
 
         doAccept();
