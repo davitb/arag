@@ -12,6 +12,8 @@ class ZAddCommand: public Command
 {
 public:
     
+    DEEP_CLONE(ZAddCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -36,6 +38,8 @@ public:
     
     ZRangeCommand(CmdType type) {mCmdType = type; }
     
+    DEEP_CLONE(ZRangeCommand)
+
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -62,6 +66,8 @@ public:
     
     ZRangeByLexCommand(CmdType type) {mCmdType = type; }
     
+    DEEP_CLONE(ZRangeByLexCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -87,6 +93,8 @@ public:
     };
     
     ZCountCommand(CmdType type) {mCmdType = type; }
+    
+    DEEP_CLONE(ZCountCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -115,6 +123,8 @@ public:
 
     ZScoreCommand(CmdType type) {mCmdType = type; }
     
+    DEEP_CLONE(ZScoreCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -132,6 +142,8 @@ private:
 class ZIncrByCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(ZIncrByCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -159,6 +171,8 @@ public:
     
     ZRemCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(ZRemCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -184,6 +198,8 @@ public:
     };
     
     ZUnionCommand(CmdType type) {mCmdType = type; }
+    
+    DEEP_CLONE(ZUnionCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -211,6 +227,8 @@ public:
     
     ZRangeByCommand(CmdType type) {mCmdType = type; }
     
+    DEEP_CLONE(ZRangeByCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -237,6 +255,8 @@ public:
     };
     
     ZRemByCommand(CmdType type) {mCmdType = type; }
+    
+    DEEP_CLONE(ZRemByCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

@@ -12,7 +12,7 @@ using namespace arag;
 
 //-----------------------------------------------------------------
 
-RequestProcessor::Request::Request(Command& cmd,
+RequestProcessor::Request::Request(shared_ptr<Command> cmd,
                                    RequestType type,
                                    int sessionID)
                                     : mCommand(cmd)
@@ -46,7 +46,7 @@ void RequestProcessor::stopThreads()
     
     for (int i = 0; i < mPunits.size(); ++i) {
         shared_ptr<Command> stopCmd = std::make_shared<InternalCommand>(command_const::CMD_INTERNAL_STOP);
-        RequestProcessor::Request req(*stopCmd.get(),
+        RequestProcessor::Request req(stopCmd,
                                       RequestType::INTERNAL,
                                       SessionContext::Consts::FAKE_SESSION);
         enqueueRequest(mPunits[i], req);
@@ -96,7 +96,7 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         
         try {
             // Create appropriate command
-            Command& cmd = req.mCommand;
+            Command& cmd = *req.mCommand.get();
             
             // Check if this is an internal operation and execute it
             if (req.mType == RequestType::INTERNAL) {

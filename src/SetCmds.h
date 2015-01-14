@@ -10,6 +10,8 @@ class SAddCommand: public Command
 {
 public:
     
+    DEEP_CLONE(SAddCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -23,6 +25,8 @@ private:
 class SMembersCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(SMembersCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -45,6 +49,8 @@ public:
     };
     
     SCardCommand(CmdType type) { mCmdType = type; }
+    
+    DEEP_CLONE(SCardCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -70,6 +76,8 @@ public:
     
     SRemCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(SRemCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -93,6 +101,8 @@ public:
     };
     
     SDiffCommand(CmdType type) { mCmdType = type; }
+    
+    DEEP_CLONE(SDiffCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -118,6 +128,8 @@ public:
     
     SInterCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(SInterCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -142,6 +154,8 @@ public:
     
     SUnionCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(SUnionCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -158,6 +172,8 @@ class SMoveCommand: public Command
 {
 public:
     
+    DEEP_CLONE(SMoveCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -171,6 +187,8 @@ private:
 class SRandMemberCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(SRandMemberCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

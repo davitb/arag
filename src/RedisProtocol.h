@@ -23,6 +23,8 @@ class RedisProtocol
 {
 public:
   
+    typedef std::vector<std::pair<std::string, int>> RedisArray;
+    
     // Data types supported by the protocol
     enum DataType
     {
@@ -36,8 +38,10 @@ public:
   
     // Parses the request and returns a pair of {value, dataType}.
     // Redis server assumes that the request has always ARRAY type.
-    static std::vector<std::pair<std::string, int>> parse(const std::string& request);
+    static void parse(const std::string& request, std::vector<RedisArray>& commands);
 
+    static RedisArray parse(const std::string& request);
+    
     // Serializes given response into Redis format.
     static std::string serializeNonArray(const std::string& response, const DataType type);
 

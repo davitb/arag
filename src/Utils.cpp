@@ -5,6 +5,7 @@
 #include <bitset>
 #include <random>
 #include <cfloat>
+#include <regex>
 
 #include <sys/time.h>
 
@@ -295,4 +296,21 @@ void Utils::getTimeOfDay(long &secs, long &msecs)
     
     secs = t.tv_sec;
     msecs = t.tv_usec;
+}
+
+bool Utils::checkPattern(const std::string& str, std::string patt)
+{
+    string finalStr = str;
+    size_t pos = 0;
+    
+    while ((pos = patt.find('?')) != std::string::npos) {
+        if (pos != 0 && patt[pos - 1] != '\\') {
+            patt[pos] = '.';
+        }
+        pos++;
+    }
+    
+    std::regex r(patt);
+    
+    return std::regex_search(str, r);
 }

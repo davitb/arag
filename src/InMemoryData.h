@@ -4,11 +4,14 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <list>
 #include "StringMap.h"
 #include "ListMap.h"
 #include "SetMap.h"
 #include "SortedSetMap.h"
 #include "HLLMap.h"
+#include "Utils.h"
+#include <iostream>
 
 namespace arag
 {
@@ -16,6 +19,10 @@ namespace arag
 class InMemoryData
 {
 public:
+
+    typedef std::unordered_map<std::string, StringMap> HashMap;
+    typedef std::pair<std::list<int>, std::pair<bool, std::string>> PubSubElement;
+    typedef std::unordered_map<std::string, PubSubElement> SubscribersMap;
     
     enum ContainerType
     {
@@ -28,7 +35,6 @@ public:
         HLL
     };
     
-    typedef std::unordered_map<std::string, StringMap> HashMap;
     
     StringMap& getFromHashMap(const std::string& key);
     
@@ -41,6 +47,18 @@ public:
     SortedSetMap& getSortedSetMap() { return mSortedSetMap; }
 
     HLLMap& getHyperLogLogMap() { return mHLLMap; }
+
+    void addSubscriber(const std::string& channel, int sid, bool pattern = false);
+
+    std::list<PubSubElement> getSubscribers(const std::string& channel);
+    
+    void removeSubscriber(const std::string& channel, int sid);
+    
+    std::vector<std::string> unsubscribeFromAllChannels(int sid);
+    
+    void removeSubscriber(const std::vector<std::string>& patterns, int sid);
+    
+    int getSubscribersNum(int sid);
     
     int size();
     
@@ -63,6 +81,7 @@ private:
     HashMap mHashMap;
     SetMap mSetMap;
     SortedSetMap mSortedSetMap;
+    SubscribersMap mSubscrMap;
     HLLMap mHLLMap;
     int mCounter;
 };

@@ -12,6 +12,8 @@ public:
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
+    DEEP_CLONE(SetCommand)
+    
 private:
     enum Consts
     {
@@ -23,6 +25,8 @@ private:
 class GetCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(GetCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -39,6 +43,8 @@ class AppendCommand: public Command
 {
 public:
     
+    DEEP_CLONE(AppendCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -53,6 +59,8 @@ class GetRangeCommand: public Command
 {
 public:
     
+    DEEP_CLONE(GetRangeCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -66,6 +74,8 @@ private:
 class SetRangeCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(SetRangeCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -82,6 +92,8 @@ class GetSetCommand: public Command
 {
 public:
     
+    DEEP_CLONE(GetSetCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -96,6 +108,8 @@ class IncrCommand: public Command
 {
 public:
     
+    DEEP_CLONE(IncrCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -109,6 +123,8 @@ private:
 class MGetCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(MGetCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -125,6 +141,8 @@ class MSetCommand: public Command
 public:
     
     MSetCommand(bool msetNX) { mNX = msetNX; };
+    
+    DEEP_CLONE(MSetCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -143,6 +161,8 @@ class BitCountCommand: public Command
 {
 public:
     
+    DEEP_CLONE(BitCountCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -156,6 +176,8 @@ private:
 class BitOpCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(BitOpCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -171,6 +193,8 @@ class BitPosCommand: public Command
 {
 public:
     
+    DEEP_CLONE(BitPosCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -184,6 +208,8 @@ private:
 class GetBitCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(GetBitCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -199,6 +225,8 @@ class SetBitCommand: public Command
 {
 public:
     
+    DEEP_CLONE(SetBitCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
     enum Consts
@@ -212,6 +240,8 @@ public:
 class StrlenCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(StrlenCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -227,6 +257,8 @@ class IncrByCommand: public Command
 {
 public:
     
+    DEEP_CLONE(IncrByCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -240,6 +272,8 @@ private:
 class IncrByFloatCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(IncrByFloatCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -255,6 +289,8 @@ class DecrCommand: public Command
 {
 public:
     
+    DEEP_CLONE(DecrCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -268,6 +304,8 @@ private:
 class DecrByCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(DecrByCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

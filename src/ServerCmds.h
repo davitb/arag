@@ -10,6 +10,8 @@ class InfoCommand: public Command
 {
 public:
     
+    DEEP_CLONE(InfoCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
         
 private:
@@ -32,6 +34,8 @@ public:
     
     FlushCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(FlushCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -49,6 +53,8 @@ class ClientCommand: public Command
 {
 public:
     
+    DEEP_CLONE(ClientCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -63,6 +69,8 @@ private:
 class ConfigCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(ConfigCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -87,6 +95,8 @@ public:
     };
     
     SingleArgumentCommand(CmdType type) { mCmdType = type; }
+
+    DEEP_CLONE(SingleArgumentCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

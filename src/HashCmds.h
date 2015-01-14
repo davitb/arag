@@ -20,6 +20,8 @@ public:
     
     HSetCommand(CmdType type) { cmdType = type; }
     
+    DEEP_CLONE(HSetCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -36,6 +38,8 @@ class HGetCommand: public Command
 {
 public:
     
+    DEEP_CLONE(HGetCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -50,6 +54,8 @@ class HExistsCommand: public Command
 {
 public:
     
+    DEEP_CLONE(HExistsCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -63,6 +69,8 @@ private:
 class HDelCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(HDelCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -89,6 +97,8 @@ public:
     
     HGetAllCommand(CmdType type) { cmdType = type; };
     
+    DEEP_CLONE(HGetAllCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -112,6 +122,8 @@ public:
     };
     
     HIncrByCommand(CmdType type) { cmdType = type; };
+    
+    DEEP_CLONE(HIncrByCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

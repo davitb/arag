@@ -68,7 +68,7 @@ string parseData(const string& str, size_t pos, size_t& newPos, RedisProtocol::D
     return str.substr(pos, ind - pos);
 }
 
-vector<pair<string, int>> RedisProtocol::parse(const std::string& request)
+void RedisProtocol::parse(const std::string& request, vector<RedisArray>& commands)
 {
     size_t len = request.length();
     
@@ -82,7 +82,7 @@ vector<pair<string, int>> RedisProtocol::parse(const std::string& request)
         if (request == "PING\r\n") {
             // FIXME: This is a workaround for INLINE PING command that is issued by redis-benchmark
             vector<pair<string, int>> tokens = { make_pair("PING", RedisProtocol::DataType::SIMPLE_STRING) };
-            return tokens;
+            return commands.push_back(tokens);
         }
         throw invalid_argument("parseArray: invalid array: " + request);
     }
@@ -107,11 +107,20 @@ vector<pair<string, int>> RedisProtocol::parse(const std::string& request)
         ind = newPos;
     }
     
-    if (ind != len) {
-        throw invalid_argument("RedisProtocol::parse: Invalid string");
-    }
+    commands.push_back(tokens);
     
-    return tokens;
+    if (ind != len) {        
+        string nextRequest = request.substr(ind, request.length() - ind);
+        parse(nextRequest, commands);
+        return;
+    }
+}
+
+RedisProtocol::RedisArray RedisProtocol::parse(const string& cmdline)
+{
+    vector<RedisArray> tokensList;
+    parse(cmdline, tokensList);
+    return tokensList[0];
 }
 
 string RedisProtocol::serializeNonArray(const string& response, const DataType type)

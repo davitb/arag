@@ -10,6 +10,13 @@
 #include "Config.h"
 #include "SelfTest.h"
 
+#define DEEP_CLONE(class) \
+virtual class* clone() const \
+{\
+    return new class(*this);\
+}\
+
+
 namespace arag
 {
 
@@ -59,11 +66,16 @@ public:
     
     Command();
     
+    virtual Command* clone() const = 0;
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx) = 0;
     
     std::string getCommandName() const;
     
-    static Command& getCommand(const std::string& cmdline);
+    static void getCommand(const std::string& cmdline,
+                           std::vector<std::shared_ptr<Command>>& commands);
+
+    static std::shared_ptr<Command> getCommand(const std::string& cmdline);
     
     void setCommandContext(Context ctx);
     
@@ -104,6 +116,7 @@ public:
     
     InternalCommand(std::string name);
     
+    DEEP_CLONE(InternalCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx)
     {

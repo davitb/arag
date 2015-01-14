@@ -44,6 +44,8 @@ public:
     static int genRandom(int min, int max);
     
     static void getTimeOfDay(long& secs, long& msecs);
+    
+    static bool checkPattern(const std::string& str, std::string patt);
 };
 
 };

@@ -12,6 +12,8 @@ class DelCommand: public Command
 {
 public:
     
+    DEEP_CLONE(DelCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -28,6 +30,8 @@ class ExistsCommand: public Command
 {
 public:
     
+    DEEP_CLONE(ExistsCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -37,33 +41,6 @@ private:
         MAX_ARG_NUM = 2
     };
 };
-    
-    
-////----------------------------------------------------------------
-//
-//class : public Command
-//{
-//public:
-//    
-//    enum CmdType
-//    {
-//        RANGE,
-//        REVRANGE
-//    };
-//    
-//    ZRangeCommand(CmdType type) {mCmdType = type; }
-//    
-//    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-//    
-//private:
-//    enum Consts
-//    {
-//        MIN_ARG_NUM = 4,
-//        MAX_ARG_NUM = 5
-//    };
-//    
-//    CmdType mCmdType;
-//};
 
 };
 

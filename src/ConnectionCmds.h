@@ -17,6 +17,8 @@ public:
     };
     
     PingCommand(CmdType type) { mCmdType = type; }
+
+    DEEP_CLONE(PingCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -33,6 +35,8 @@ private:
 class SelectCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(SelectCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

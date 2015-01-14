@@ -52,11 +52,11 @@ public:
     {
     public:
         
-        std::reference_wrapper<Command> mCommand;
+        shared_ptr<Command> mCommand;
         RequestType mType;
         int mSessionID;
 
-        Request(Command& cmd, RequestType type, int sessionID);
+        Request(shared_ptr<Command> cmd, RequestType type, int sessionID);
     };
     
 private:

@@ -17,12 +17,12 @@ string runCommandsAndGetLatestResult(InMemoryData& data, const vector<string>& c
     SessionContext ctx;
     
     for (int i = 0; i < cmds.size() - 1; ++i) {
-        Command& cmd = Command::getCommand(cmds[i]);
-        cmd.execute(data, ctx);
+        shared_ptr<Command> cmd = Command::getCommand(cmds[i]);
+        cmd->execute(data, ctx);
     }
-    Command& cmd = Command::getCommand(cmds[cmds.size() - 1]);
+    shared_ptr<Command> cmd = Command::getCommand(cmds[cmds.size() - 1]);
     
-    return cmd.execute(data, ctx);
+    return cmd->execute(data, ctx);
 }
 
 vector<string> constructCommands(const vector<vector<string>>& cmds)

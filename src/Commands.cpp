@@ -10,6 +10,7 @@
 #include "SortedSetCmds.h"
 #include "KeyCmds.h"
 #include "HLLCmds.h"
+#include "PubSubCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <iostream>
@@ -18,7 +19,7 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
-static Command* getCommandByName(const string& cmdName)
+static shared_ptr<Command> getCommandByName(const string& cmdName)
 {
     static unordered_map<string, shared_ptr<Command>> sNameToCommand;
     
@@ -221,6 +222,13 @@ static Command* getCommandByName(const string& cmdName)
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());
         sNameToCommand["PFCOUNT"] = shared_ptr<Command>(new PFCountCommand());
         sNameToCommand["PFMERGE"] = shared_ptr<Command>(new PFMergeCommand());
+        
+        // PubSub Commands
+        sNameToCommand["SUBSCRIBE"] = shared_ptr<Command>(new SubscribeCommand());
+        sNameToCommand["PUBLISH"] = shared_ptr<Command>(new PublishCommand());
+        sNameToCommand["UNSUBSCRIBE"] = shared_ptr<Command>(new UnsubscribeCommand());
+        sNameToCommand["PSUBSCRIBE"] = shared_ptr<Command>(new PSubscribeCommand());
+        sNameToCommand["PUNSUBSCRIBE"] = shared_ptr<Command>(new PUnsubscribeCommand());
     }
     
     string upperCaseCmd = cmdName;
@@ -230,30 +238,45 @@ static Command* getCommandByName(const string& cmdName)
         throw invalid_argument("Invalid command");
     }
     
-    return sNameToCommand[upperCaseCmd].get();
+    return shared_ptr<Command>(sNameToCommand[upperCaseCmd]->clone());
 }
 
-Command& Command::getCommand(const string& cmdline)
+void Command::getCommand(const string& cmdline, vector<shared_ptr<Command>>& commands)
 {
     // Skip parsing if this is an internal command
     if (cmdline.substr(0, CMD_INTERNAL_PREFIX.length()) == CMD_INTERNAL_PREFIX) {
-        return *getCommandByName(cmdline);
+        commands.push_back(getCommandByName(cmdline));
     }
     
-    vector<pair<string, int>> tokens = RedisProtocol::parse(cmdline);
+    vector<RedisProtocol::RedisArray> parsedCommands;
     
-    if (tokens.size() == 0) {
+    RedisProtocol::parse(cmdline, parsedCommands);
+    
+    if (parsedCommands.size() == 0) {
         throw invalid_argument("Invalid Command");
     }
     
-    Command* pCmd = getCommandByName(tokens[0].first);
-    if (pCmd == nullptr) {
-        throw invalid_argument("Invalid Command");
+    //cout << endl << "Stream of commands:" << endl;
+    for (int i = 0; i < parsedCommands.size(); ++i) {
+        RedisProtocol::RedisArray& tokens = parsedCommands[i];
+//        for (auto elem : tokens) {
+//            cout << elem.first << " ";
+//        }
+//        cout << endl;
+        shared_ptr<Command> pCmd = getCommandByName(tokens[0].first);
+        
+        pCmd->setTokens(tokens);
+        
+        commands.push_back(pCmd);
     }
-    
-    pCmd->setTokens(tokens);
-    
-    return *pCmd;
+//    cout << "End of stream of commands:" << endl;
+}
+
+shared_ptr<Command> Command::getCommand(const string &cmdline)
+{
+    vector<shared_ptr<Command>> cmds;
+    getCommand(cmdline, cmds);
+    return cmds[0];
 }
 
 //-------------------------------------------------------------------------

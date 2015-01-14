@@ -20,6 +20,8 @@ public:
     
     LPushCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(LPushCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -43,6 +45,8 @@ public:
     };
     
     LGetCommand(CmdType type) { mCmdType = type; }
+    
+    DEEP_CLONE(LGetCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -70,6 +74,8 @@ public:
     
     LRemCommand(CmdType type) { mCmdType = type; }
     
+    DEEP_CLONE(LRemCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -86,6 +92,8 @@ class LRangeCommand: public Command
 {
 public:
     
+    DEEP_CLONE(LRangeCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -99,6 +107,8 @@ private:
 class LSetCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(LSetCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
@@ -114,6 +124,8 @@ class LTrimCommand: public Command
 {
 public:
     
+    DEEP_CLONE(LTrimCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -127,6 +139,8 @@ private:
 class LInsertCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(LInsertCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     

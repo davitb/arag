@@ -2,6 +2,7 @@
 #include "ClientSession.h"
 #include "RedisProtocol.h"
 #include "AragServer.h"
+#include <regex>
 
 using namespace std;
 using namespace arag;
@@ -33,30 +34,36 @@ void ClientSession::doRead()
         try {
         
             string cmdLine = string(mBuffer.begin(), length);
+            
+//            cout << "SessionID: " << mCtx.getSessionID() << " ";
+//            cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n");;
 
             // If the request is more than default MAX_REQUEST_LEN - read the remaining here
             size_t available = 0;
-            while ((available = mSocket.available()) > 0) {
-                std::vector<char> data(available);
-                asio::read(mSocket, asio::buffer(data));
-                cmdLine += string(mBuffer.begin(), length) + string(&data[0]);
-            }
+//            while ((available = mSocket.available()) > 0) {
+//                cout << "------------------------------------------" << endl;
+//                std::vector<char> data(available);
+//                asio::read(mSocket, asio::buffer(data));
+//                cmdLine += string(mBuffer.begin(), length) + string(&data[0]);
+//            }
 
-            // This function will be called after response is ready.
-            function<void(string)> responseCallback = [this, self](string result) {
-                // Write the result string to socket
-                writeResponse(result);
-            };
-            
             mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
                                       mSocket.remote_endpoint().port());
             
-            RequestProcessor::Request req(Command::getCommand(cmdLine),
-                                          RequestProcessor::RequestType::EXTERNAL,
-                                          mCtx.getSessionID());
+            vector<shared_ptr<Command>> cmds;
+            Command::getCommand(cmdLine, cmds);
+            for (int i = 0; i < cmds.size(); ++i) {
+                RequestProcessor::Request req(cmds[i],
+                                              RequestProcessor::RequestType::EXTERNAL,
+                                              mCtx.getSessionID());
+                
+                // Enqueue the request to Request Processor
+                mRP.get().enqueueRequest(req);
+            }
             
-            // Enqueue the request to Request Processor
-            mRP.get().enqueueRequest(req);
+            // Read the next request
+            doRead();
+            
         }
         catch (std::exception& e) {
             cout << e.what() << endl;
@@ -71,8 +78,7 @@ void ClientSession::writeResponse(const std::string &str)
     auto self(shared_from_this());
     
     if (str.length() == 0) {
-        // Start to listen for the next command
-        doRead();
+        return;
     }
     
     //cout << "write result: " << str << endl;
@@ -84,8 +90,6 @@ void ClientSession::writeResponse(const std::string &str)
             if (ec) {
                 cout << "response: " << system_error(ec).what() << endl;
             }
-            // Start to listen for the next command
-            doRead();
         };
         
         asio::async_write(mSocket, asio::buffer(str.c_str(), str.length()), writeFunction);

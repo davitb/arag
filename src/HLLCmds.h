@@ -12,6 +12,8 @@ class PFAddCommand: public Command
 {
 public:
     
+    DEEP_CLONE(PFAddCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -26,6 +28,8 @@ class PFCountCommand: public Command
 {
 public:
     
+    DEEP_CLONE(PFCountCommand)
+    
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -39,6 +43,8 @@ private:
 class PFMergeCommand: public Command
 {
 public:
+    
+    DEEP_CLONE(PFMergeCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
