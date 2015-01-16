@@ -10,6 +10,7 @@
 #include "SetMap.h"
 #include "SortedSetMap.h"
 #include "HLLMap.h"
+#include "PubSubMap.h"
 #include "Utils.h"
 #include <iostream>
 
@@ -21,8 +22,6 @@ class InMemoryData
 public:
 
     typedef std::unordered_map<std::string, StringMap> HashMap;
-    typedef std::pair<std::list<int>, std::pair<bool, std::string>> PubSubElement;
-    typedef std::unordered_map<std::string, PubSubElement> SubscribersMap;
     
     enum ContainerType
     {
@@ -48,17 +47,7 @@ public:
 
     HLLMap& getHyperLogLogMap() { return mHLLMap; }
 
-    void addSubscriber(const std::string& channel, int sid, bool pattern = false);
-
-    std::list<PubSubElement> getSubscribers(const std::string& channel);
-    
-    void removeSubscriber(const std::string& channel, int sid);
-    
-    std::vector<std::string> unsubscribeFromAllChannels(int sid);
-    
-    void removeSubscriber(const std::vector<std::string>& patterns, int sid);
-    
-    int getSubscribersNum(int sid);
+    PubSubMap& getPubSubMap() { return mPubSubMap; }
     
     int size();
     
@@ -81,7 +70,7 @@ private:
     HashMap mHashMap;
     SetMap mSetMap;
     SortedSetMap mSortedSetMap;
-    SubscribersMap mSubscrMap;
+    PubSubMap mPubSubMap;
     HLLMap mHLLMap;
     int mCounter;
 };

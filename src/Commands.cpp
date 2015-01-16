@@ -235,7 +235,7 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
     std::transform(upperCaseCmd.begin(), upperCaseCmd.end(), upperCaseCmd.begin(), ::toupper);
     
     if (sNameToCommand.count(upperCaseCmd) == 0) {
-        throw invalid_argument("Invalid command");
+        throw invalid_argument("Invalid command: " + cmdName);
     }
     
     return shared_ptr<Command>(sNameToCommand[upperCaseCmd]->clone());

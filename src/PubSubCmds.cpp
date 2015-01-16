@@ -50,7 +50,7 @@ static string prepareResponseWithNill(const string& type)
 }
 
 static string subscribe(const RedisProtocol::RedisArray& tokens,
-                        InMemoryData& db,
+                        PubSubMap& pubSub,
                         SessionContext& ctx,
                         const string& type,
                         bool pattern)
@@ -59,18 +59,18 @@ static string subscribe(const RedisProtocol::RedisArray& tokens,
     for (int i = 1; i < tokens.size(); ++i) {
         int sid = ctx.getSessionID();
         
-        db.addSubscriber(tokens[i].first, sid, pattern);
+        pubSub.addSubscriber(tokens[i].first, sid, pattern);
         
         response += prepareResponse(type,
                                     tokens[i].first,
-                                    to_string(db.getSubscribersNum(sid)));
+                                    to_string(pubSub.getSubscribersNum(sid)));
     }
     
     return response;
 }
 
 static string unsubscribe(const RedisProtocol::RedisArray& tokens,
-                          InMemoryData& db,
+                          PubSubMap& pubSub,
                           SessionContext& ctx,
                           const string& type)
 {
@@ -78,7 +78,7 @@ static string unsubscribe(const RedisProtocol::RedisArray& tokens,
     
     if (tokens.size() == 1) {
         // Unscubscribe from all channels
-        vector<string> channels = db.unsubscribeFromAllChannels(ctx.getSessionID());
+        vector<string> channels = pubSub.unsubscribeFromAllChannels(ctx.getSessionID());
         if (channels.size() == 0) {
             return prepareResponseWithNill(type);
         }
@@ -93,11 +93,11 @@ static string unsubscribe(const RedisProtocol::RedisArray& tokens,
     for (int i = 1; i < tokens.size(); ++i) {
         int sid = ctx.getSessionID();
         
-        db.removeSubscriber(tokens[i].first, sid);
+        pubSub.removeSubscriber(tokens[i].first, sid);
         
         response += prepareResponse(type,
                                     tokens[i].first,
-                                    to_string(db.getSubscribersNum(sid)));
+                                    to_string(pubSub.getSubscribersNum(sid)));
     }
     
     return response;
@@ -115,7 +115,7 @@ string SubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
             throw invalid_argument("Invalid args");
         }
         
-        return subscribe(mTokens, db, ctx, "subscribe", false);
+        return subscribe(mTokens, db.getPubSubMap(), ctx, "subscribe", false);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -134,7 +134,7 @@ string PSubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
             throw invalid_argument("Invalid args");
         }
         
-        return subscribe(mTokens, db, ctx, "psubscribe", true);
+        return subscribe(mTokens, db.getPubSubMap(), ctx, "psubscribe", true);
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -156,7 +156,9 @@ string PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
         string channel = mTokens[1].first;
         string message = mTokens[2].first;
         
-        list<InMemoryData::PubSubElement> subscribersList = db.getSubscribers(channel);
+        PubSubMap& pubSub = db.getPubSubMap();
+        
+        list<PubSubMap::PubSubElement> subscribersList = pubSub.getSubscribers(channel);
 
         int num = 0;
         
@@ -187,7 +189,7 @@ string PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
                 }
                 catch (std::invalid_argument& e) {
                     //cout << e.what() << endl;
-                    db.removeSubscriber(subscrs.second.second, sid);
+                    pubSub.removeSubscriber(subscrs.second.second, sid);
                 }
             }
         }
@@ -212,7 +214,7 @@ string UnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
             throw invalid_argument("Invalid args");
         }
 
-        return unsubscribe(mTokens, db, ctx, "unsubscribe");
+        return unsubscribe(mTokens, db.getPubSubMap(), ctx, "unsubscribe");
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -231,7 +233,7 @@ string PUnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
             throw invalid_argument("Invalid args");
         }
         
-        return unsubscribe(mTokens, db, ctx, "punsubscribe");
+        return unsubscribe(mTokens, db.getPubSubMap(), ctx, "punsubscribe");
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;

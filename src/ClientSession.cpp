@@ -35,8 +35,8 @@ void ClientSession::doRead()
         
             string cmdLine = string(mBuffer.begin(), length);
             
-//            cout << "SessionID: " << mCtx.getSessionID() << " ";
-//            cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n");;
+            cout << "SessionID: " << mCtx.getSessionID() << " ";
+            cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
 
             // If the request is more than default MAX_REQUEST_LEN - read the remaining here
             size_t available = 0;
@@ -60,16 +60,15 @@ void ClientSession::doRead()
                 // Enqueue the request to Request Processor
                 mRP.get().enqueueRequest(req);
             }
-            
-            // Read the next request
-            doRead();
-            
         }
         catch (std::exception& e) {
             cout << e.what() << endl;
             // Send ERROR back to the client
             writeResponse(redis_const::ERR_GENERIC);
         }
+        
+        // Read the next request
+        doRead();        
     });
 }
 

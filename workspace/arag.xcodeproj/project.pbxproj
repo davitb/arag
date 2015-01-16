@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1702B4461A4DFD8700E6093C /* Utils.cpp */; };
 		171978031A55ED6000BEDB62 /* SortedSetCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 171978011A55ED6000BEDB62 /* SortedSetCmds.cpp */; };
+		171EF7641A674D8C0033EFD1 /* PubSubMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 171EF7621A674D8C0033EFD1 /* PubSubMap.cpp */; };
 		172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA39E1A4C89DC00AD6767 /* AragServer.cpp */; };
 		172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */; };
 		172DA3AF1A4C89E900AD6767 /* SelfTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 172DA3AD1A4C89E900AD6767 /* SelfTest.cpp */; };
@@ -52,6 +53,8 @@
 		1702B4471A4DFD8700E6093C /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		171978011A55ED6000BEDB62 /* SortedSetCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SortedSetCmds.cpp; sourceTree = "<group>"; };
 		171978021A55ED6000BEDB62 /* SortedSetCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SortedSetCmds.h; sourceTree = "<group>"; };
+		171EF7621A674D8C0033EFD1 /* PubSubMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PubSubMap.cpp; sourceTree = "<group>"; };
+		171EF7631A674D8C0033EFD1 /* PubSubMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PubSubMap.h; sourceTree = "<group>"; };
 		172DA3901A4C89B000AD6767 /* arag */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = arag; sourceTree = BUILT_PRODUCTS_DIR; };
 		172DA39E1A4C89DC00AD6767 /* AragServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AragServer.cpp; path = ../src/AragServer.cpp; sourceTree = SOURCE_ROOT; };
 		172DA39F1A4C89DC00AD6767 /* AragServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AragServer.h; path = ../src/AragServer.h; sourceTree = SOURCE_ROOT; };
@@ -208,17 +211,19 @@
 			children = (
 				17B04E5C1A637EEB009CF9F8 /* HLLMap.cpp */,
 				17B04E5D1A637EEB009CF9F8 /* HLLMap.h */,
+				17B04E5F1A6386AD009CF9F8 /* IMapCommon.h */,
 				17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */,
 				17ED913B1A50EDFC0035DFE6 /* InMemoryData.h */,
 				1784BB411A513D13008F7DCE /* ListMap.cpp */,
 				1784BB421A513D13008F7DCE /* ListMap.h */,
+				171EF7621A674D8C0033EFD1 /* PubSubMap.cpp */,
+				171EF7631A674D8C0033EFD1 /* PubSubMap.h */,
 				1737FA7A1A5321610099D0A6 /* SetMap.cpp */,
 				1737FA7B1A5321610099D0A6 /* SetMap.h */,
 				175BFA4D1A54728F001751CE /* SortedSetMap.cpp */,
 				175BFA4E1A54728F001751CE /* SortedSetMap.h */,
 				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
 				17ED913E1A50EF830035DFE6 /* StringMap.h */,
-				17B04E5F1A6386AD009CF9F8 /* IMapCommon.h */,
 			);
 			name = Structures;
 			sourceTree = "<group>";
@@ -279,6 +284,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				171EF7641A674D8C0033EFD1 /* PubSubMap.cpp in Sources */,
 				1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */,
 				175BFA4F1A54728F001751CE /* SortedSetMap.cpp in Sources */,
 				172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */,

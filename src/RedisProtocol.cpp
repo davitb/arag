@@ -84,7 +84,7 @@ void RedisProtocol::parse(const std::string& request, vector<RedisArray>& comman
             vector<pair<string, int>> tokens = { make_pair("PING", RedisProtocol::DataType::SIMPLE_STRING) };
             return commands.push_back(tokens);
         }
-        throw invalid_argument("parseArray: invalid array: " + request);
+        throw invalid_argument("parseArray: invalid array: "/* + request*/);
     }
     
     size_t ind = 0;
