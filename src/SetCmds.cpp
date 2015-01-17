@@ -30,6 +30,8 @@ string SAddCommand::execute(InMemoryData& data, SessionContext& ctx)
             numAdded += setMap.add(key, mTokens[i].first);
         }
         
+        FIRE_EVENT(EventPublisher::Event::sadd, key);
+        
         return RedisProtocol::serializeNonArray(to_string(numAdded), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -137,6 +139,11 @@ string SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                     numRemoved += setMap.rem(key, mTokens[i].first);
                 }
                 
+                if (!setMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::srem, key);
+                
                 return RedisProtocol::serializeNonArray(to_string(numRemoved),
                                                         RedisProtocol::DataType::INTEGER);
             }
@@ -145,6 +152,12 @@ string SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
             {
                 string randMember = setMap.getRandMember(key);
                 setMap.rem(key, randMember);
+                
+                if (!setMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::spop, key);
+                
                 return RedisProtocol::serializeNonArray(randMember, RedisProtocol::DataType::BULK_STRING);
             }
         }
@@ -209,7 +222,13 @@ string SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
                     diffKeys.push_back(mTokens[i].first);
                 }
                 
+                if (setMap.keyExists(destKey)) {
+                    FIRE_EVENT(EventPublisher::Event::del, destKey);
+                }
+                
                 int num = setMap.diff(destKey, sourceKey, diffKeys);
+
+                FIRE_EVENT(EventPublisher::Event::sunionostore, destKey);
                 
                 return RedisProtocol::serializeNonArray(to_string(num), RedisProtocol::DataType::INTEGER);
             }
@@ -272,7 +291,13 @@ string SInterCommand::execute(InMemoryData& data, SessionContext& ctx)
                     keys.push_back(mTokens[i].first);
                 }
                 
+                if (!setMap.keyExists(destKey)) {
+                    FIRE_EVENT(EventPublisher::Event::del, destKey);
+                }
+                
                 int num = setMap.inter(destKey, keys);
+                
+                FIRE_EVENT(EventPublisher::Event::sinterstore, destKey);
                 
                 return RedisProtocol::serializeNonArray(to_string(num), RedisProtocol::DataType::INTEGER);
             }
@@ -335,7 +360,13 @@ string SUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
                     keys.push_back(mTokens[i].first);
                 }
                 
+                if (!setMap.keyExists(destKey)) {
+                    FIRE_EVENT(EventPublisher::Event::del, destKey);
+                }
+                
                 int num = setMap.uni(destKey, keys);
+                
+                FIRE_EVENT(EventPublisher::Event::sunionostore, destKey);
                 
                 return RedisProtocol::serializeNonArray(to_string(num), RedisProtocol::DataType::INTEGER);
             }
@@ -366,6 +397,9 @@ string SMoveCommand::execute(InMemoryData& data, SessionContext& ctx)
         string member = mTokens[3].first;
         
         int ret = setMap.move(source, dest, member);
+        
+        FIRE_EVENT(EventPublisher::Event::srem, source);
+        FIRE_EVENT(EventPublisher::Event::sadd, dest);
         
         return RedisProtocol::serializeNonArray(to_string(ret), RedisProtocol::DataType::INTEGER);
     }

@@ -338,6 +338,10 @@ int SortedSetMap::rem(const std::string &key, const std::string &val)
     
     sset.mSkipList.erase(Item(val, iter->second));
     sset.mMap.erase(iter);
+    
+    if (sset.mSkipList.size() == 0) {
+        sset.mMap.erase(key);
+    }
     return 1;
 }
 
@@ -458,6 +462,10 @@ int SortedSetMap::remByRank(const std::string &key, int start, int stop)
     }
     else {
         sset.mSkipList.erase(first, last + 1);
+    }
+    
+    if (sset.mSkipList.size() == 0) {
+        sset.mMap.erase(key);
     }
     
     return num;

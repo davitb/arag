@@ -27,7 +27,11 @@ string DelCommand::execute(InMemoryData& db, SessionContext& ctx)
         int numRemoved = 0;
         
         for (int i = 1; i < mTokens.size(); ++i) {
-            numRemoved += db.delKey(mTokens[i].first);
+            int removed = db.delKey(mTokens[i].first);
+            if (removed != 0) {
+                FIRE_EVENT(EventPublisher::Event::del, mTokens[i].first);
+            }
+            numRemoved += removed;
         }
         
         return RedisProtocol::serializeNonArray(to_string(numRemoved), RedisProtocol::DataType::INTEGER);

@@ -33,7 +33,7 @@ string DiscardCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     try {
 
-        ctx.abortTransaction();
+        ctx.finishTransaction();
         
         return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
@@ -88,7 +88,13 @@ ExecCommand::ExecCommand()
 
 string ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
+    string response = redis_const::NULL_BULK_STRING;
+    
     try {
+        
+        if (!ctx.isInTransaction() || ctx.isTransactionAborted()) {
+            throw runtime_error("Transaction has been aborted");
+        }
         
         ctx.setTransactionState(SessionContext::TransactionState::NO_TRANSACTION);
         
@@ -96,16 +102,16 @@ string ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
         vector<string> responses;
         
         for (auto cmdIter = cmds.begin(); cmdIter != cmds.end(); ++cmdIter) {
-
             Command::executeEndToEnd(*cmdIter, ctx.getSessionID(), &responses);
         }
         
-        ctx.abortTransaction();
-
-        return RedisProtocol::serializeArrayWithPreparedItems(responses);
+        response = RedisProtocol::serializeArrayWithPreparedItems(responses);
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
     }
+    
+    ctx.finishTransaction();
+
+    return response;
 }
 

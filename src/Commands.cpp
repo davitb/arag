@@ -385,10 +385,6 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             }
         }
         
-        if (!cmd->isKeyTypeValid(selectedDB)) {
-            throw invalid_argument("Wrong key operation");
-        }
-
         if (sessionCtx.isInTransaction() &&
             cmd->getSpecialType() != Command::SpecialType::BYPASS_TRANSACTION_STATE) {
             
@@ -398,6 +394,10 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
                           pResponeList,
                           RedisProtocol::serializeNonArray("QUEUED", RedisProtocol::DataType::SIMPLE_STRING));
             return;
+        }
+
+        if (!cmd->isKeyTypeValid(selectedDB)) {
+            throw invalid_argument("Wrong key operation");
         }
         
         string res = cmd->execute(selectedDB, sessionCtx);

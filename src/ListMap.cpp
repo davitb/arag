@@ -115,6 +115,10 @@ string ListMap::pop(const std::string &key, Position pos)
         }
     }
 
+    if (l.size() == 0) {
+        mListMap.erase(key);
+    }
+    
     return val;
 }
 

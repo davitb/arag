@@ -33,6 +33,8 @@ string LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 for (int i = 2; i < mTokens.size(); ++i) {
                     len = listMap.push(key, mTokens[i].first, ListMap::Position::BACK);
                 }
+                
+                FIRE_EVENT(EventPublisher::Event::rpush, key);
                 break;
             }
                 
@@ -41,6 +43,7 @@ string LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 if (listMap.keyExists(key)) {
                     string value = mTokens[2].first;
                     len = listMap.push(key, value, ListMap::Position::BACK);
+                    FIRE_EVENT(EventPublisher::Event::rpush, key);
                 }
                 break;
             }
@@ -50,6 +53,8 @@ string LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 for (int i = 2; i < mTokens.size(); ++i) {
                     len = listMap.push(key, mTokens[i].first, ListMap::Position::FRONT);
                 }
+                
+                FIRE_EVENT(EventPublisher::Event::lpush, key);
                 break;
             }
 
@@ -58,7 +63,9 @@ string LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 if (listMap.keyExists(key)) {
                     string value = mTokens[2].first;
                     len = listMap.push(key, value, ListMap::Position::FRONT);
+                    FIRE_EVENT(EventPublisher::Event::lpush, key);                    
                 }
+            
                 break;
             }
         }
@@ -141,14 +148,26 @@ string LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
         {
             case RPOP:
             {
-                return RedisProtocol::serializeNonArray(listMap.pop(key, ListMap::Position::BACK),
-                                                        RedisProtocol::DataType::BULK_STRING);
+                string res = listMap.pop(key, ListMap::Position::BACK);
+                
+                if (!listMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::rpop, key);
+                
+                return RedisProtocol::serializeNonArray(res, RedisProtocol::DataType::BULK_STRING);
             }
                 
             case LPOP:
             {
-                return RedisProtocol::serializeNonArray(listMap.pop(key, ListMap::Position::FRONT),
-                                                        RedisProtocol::DataType::BULK_STRING);
+                string res = listMap.pop(key, ListMap::Position::FRONT);
+
+                if (!listMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::lpop, key);
+
+                return RedisProtocol::serializeNonArray(res, RedisProtocol::DataType::BULK_STRING);
             }
 
             case RPOPLPUSH:
@@ -159,8 +178,13 @@ string LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 string dest = mTokens[2].first;
                 
                 string val = listMap.pop(key, ListMap::Position::BACK);
+                if (!listMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::rpop, key);
                 
                 listMap.push(dest, val, ListMap::Position::FRONT);
+                FIRE_EVENT(EventPublisher::Event::lpush, key);
                 
                 return RedisProtocol::serializeNonArray(val, RedisProtocol::DataType::BULK_STRING);
             }
@@ -239,6 +263,8 @@ string LSetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         listMap.setVal(key, index, val);
         
+        FIRE_EVENT(EventPublisher::Event::lset, key);
+        
         return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
     catch (std::exception& e) {
@@ -269,6 +295,11 @@ string LTrimCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         listMap.trim(key, start, stop);
+        
+        if (!listMap.keyExists(key)) {
+            FIRE_EVENT(EventPublisher::Event::del, key);
+        }
+        FIRE_EVENT(EventPublisher::Event::ltrim, key);
         
         return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
@@ -304,6 +335,8 @@ string LInsertCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         int len = listMap.insert(key, pos, pivot, val);
+        
+        FIRE_EVENT(EventPublisher::Event::linsert, key);
         
         return RedisProtocol::serializeNonArray(to_string(len), RedisProtocol::DataType::INTEGER);
     }

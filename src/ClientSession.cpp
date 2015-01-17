@@ -35,7 +35,7 @@ void ClientSession::doRead()
         
             string cmdLine = string(mBuffer.begin(), length);
             
-//            cout << "SessionID: " << mCtx.getSessionID() << " ";
+            cout << "SessionID: " << mCtx.getSessionID() << " ";
             cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
 
             // If the request is more than default MAX_REQUEST_LEN - read the remaining here

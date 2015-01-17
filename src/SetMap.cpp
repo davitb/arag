@@ -34,7 +34,11 @@ int SetMap::add(const std::string &key, const std::string &val)
 
 int SetMap::rem(const std::string &key, const std::string &val)
 {
-    return (int)mSetMap[key].erase(val);
+    int res = (int)mSetMap[key].erase(val);
+    if (mSetMap[key].size() == 0) {
+        mSetMap.erase(key);
+    }
+    return res;
 }
 
 int SetMap::isMember(const std::string &key, const std::string &val)

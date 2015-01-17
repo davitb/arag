@@ -34,6 +34,8 @@ string ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
             numAdded += setMap.insert(key, mTokens[i + 1].first, Utils::convertToDouble(mTokens[i].first));
         }
         
+        FIRE_EVENT(EventPublisher::Event::zadd, key);
+        
         return RedisProtocol::serializeNonArray(to_string(numAdded), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -215,6 +217,8 @@ string ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         string ret = Utils::dbl2str(setMap.incrBy(key, member, by));
         
+        FIRE_EVENT(EventPublisher::Event::zincr, key);
+        
         return RedisProtocol::serializeNonArray(ret, RedisProtocol::DataType::BULK_STRING);
     }
     catch (std::exception& e) {
@@ -252,6 +256,11 @@ string ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                     numRemoved += setMap.rem(key, mTokens[i].first);
                 }
                 
+                if (!setMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::zrem, key);
+                
                 return RedisProtocol::serializeNonArray(to_string(numRemoved), RedisProtocol::DataType::INTEGER);
             }
                 
@@ -263,7 +272,7 @@ string ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
         
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return RedisProtocol::serializeNonArray("Unknown error", RedisProtocol::DataType::ERROR);
     }
 }
 
@@ -346,13 +355,25 @@ string ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
         {
             case UNION:
             {
+                if (!setMap.keyExists(dest)) {
+                    FIRE_EVENT(EventPublisher::Event::del, dest);
+                }
+                
                 numAdded = setMap.uni(dest, keys, weights, aggregate);
+                
+                FIRE_EVENT(EventPublisher::Event::zunionstore, dest);
                 break;
             }
                 
             case INTERSECT:
             {
+                if (!setMap.keyExists(dest)) {
+                    FIRE_EVENT(EventPublisher::Event::del, dest);
+                }
+                
                 numAdded = setMap.intersect(dest, keys, weights, aggregate);
+                
+                FIRE_EVENT(EventPublisher::Event::zinterstore, dest);
                 break;
             }
         }
@@ -522,6 +543,12 @@ string ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
                 double max = Utils::convertToDoubleByLimit(mTokens[3].first, true);
                 
                 numRemoved = setMap.remByScore(key, min, max);
+                
+                if (!setMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::zrembyscore, key);
+                
                 break;
             }
                 
@@ -533,6 +560,12 @@ string ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
                 Utils::normalizeIndexes(start, stop, setMap.size(key));
                 
                 numRemoved = setMap.remByRank(key, start, stop);
+                
+                if (!setMap.keyExists(key)) {
+                    FIRE_EVENT(EventPublisher::Event::del, key);
+                }
+                FIRE_EVENT(EventPublisher::Event::zrembyrank, key);
+                
                 break;
             }
                 

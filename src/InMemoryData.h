@@ -12,6 +12,7 @@
 #include "HLLMap.h"
 #include "PubSubMap.h"
 #include "Utils.h"
+#include "EventPublisher.h"
 #include <iostream>
 
 namespace arag
@@ -94,8 +95,14 @@ public:
     
     void flush(int index);
     
+    EventPublisher& getEventPublisher()
+    {
+        return mEventPublisher;
+    }
+    
 private:
     std::vector<InMemoryData> mDatabases;
+    EventPublisher mEventPublisher;
 };
 
 

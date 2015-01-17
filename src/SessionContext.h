@@ -1,8 +1,10 @@
 #ifndef __arag__SessionContext__
 #define __arag__SessionContext__
 
+#include "EventPublisher.h"
 #include <string>
 #include <list>
+#include <unordered_map>
 
 namespace arag
 {
@@ -10,7 +12,7 @@ namespace arag
 class ClientSession;
 class Command;
     
-class SessionContext
+class SessionContext : ISubscriber
 {
 public:
     
@@ -26,6 +28,8 @@ public:
     };
         
     SessionContext();
+    
+    ~SessionContext();
     
     void setDatabaseIndex(int index);
 
@@ -55,53 +59,32 @@ public:
         return mSessionID;
     }
     
-    bool isInTransaction() const
-    {
-        return mTransactionInfo.transactionState == IN_TRANSACTION;
-    }
-    
-    void setTransactionState(TransactionState trans)
-    {
-        mTransactionInfo.transactionState = trans;
-    }
-    
-    void addToTransactionQueue(std::shared_ptr<Command> cmd)
-    {
-        mTransactionInfo.transactionQue.push_back(cmd);
-    }
-    
-    const std::list<std::shared_ptr<Command>>& getTransactionQueue()
-    {
-        return mTransactionInfo.transactionQue;
-    }
-    
-    void clearTransactionQueue()
-    {
-        mTransactionInfo.transactionQue.clear();
-    }
+    bool isInTransaction() const;
 
-    void watchKey(const std::string& key)
+    bool isTransactionAborted() const
     {
-        mTransactionInfo.watchedKeys.push_back(key);
+        return mTransactionInfo.bTransactionAborted;
     }
     
-    const std::list<std::string>& getWatchedKeys()
-    {
-        return mTransactionInfo.watchedKeys;
-    }
+    void setTransactionState(TransactionState trans);
     
-    void clearWatchedKeys()
-    {
-        mTransactionInfo.watchedKeys.clear();
-    }
+    void addToTransactionQueue(std::shared_ptr<Command> cmd);
     
-    void abortTransaction()
-    {
-        mTransactionInfo.bTransactionAborted = true;
-        mTransactionInfo.transactionState = NO_TRANSACTION;
-        clearTransactionQueue();
-        clearWatchedKeys();
-    }
+    const std::list<std::shared_ptr<Command>>& getTransactionQueue();
+    
+    void clearTransactionQueue();
+
+    void watchKey(const std::string& key);
+    
+    const std::unordered_map<std::string, bool>& getWatchedKeys();
+    
+    void clearWatchedKeys();
+
+    void finishTransaction();
+    
+    void markTransactionAborted();
+    
+    virtual void notify(EventPublisher::Event event, const std::string& key, int db);    
     
 private:
     struct TransactionInfo
@@ -109,7 +92,8 @@ private:
         TransactionState transactionState;
         std::list<std::shared_ptr<Command>> transactionQue;
         bool bTransactionAborted;
-        std::list<std::string> watchedKeys;
+        std::unordered_map<std::string, bool> watchedKeys;
+        bool bIsSubscribed;
     };
     
     bool mIsAuthenticated;

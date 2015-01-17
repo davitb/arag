@@ -42,6 +42,8 @@ string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 
                 map.set(field, val);
+                
+                FIRE_EVENT(EventPublisher::Event::hset, key);
                 break;
             }
                 
@@ -55,6 +57,8 @@ string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                     ret = 1;
                     map.set(field, val);
                 }
+                
+                FIRE_EVENT(EventPublisher::Event::hset, key);
                 break;
             }
                 
@@ -69,6 +73,8 @@ string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 for (int i = 2; i < size; i += 2) {
                     map.set(mTokens[i].first, mTokens[i + 1].first);
                 }
+                
+                FIRE_EVENT(EventPublisher::Event::hset, key);
                 
                 return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
             }
@@ -158,6 +164,11 @@ string HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
             numDeleted += map.delKey(mTokens[i].first);
         }
         
+        if (map.keyExists(key) == 0) {
+            FIRE_EVENT(EventPublisher::Event::del, key);
+        }
+        FIRE_EVENT(EventPublisher::Event::hdel, key);
+        
         return RedisProtocol::serializeNonArray(to_string(numDeleted), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -245,15 +256,24 @@ string HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
             case INCRBY:
             {
                 int by = Utils::convertToInt(mTokens[3].first);
-                return RedisProtocol::serializeNonArray(to_string(map.incrBy(field, by)),
+                
+                int res = map.incrBy(field, by);
+                
+                FIRE_EVENT(EventPublisher::Event::hincrby, key);
+                
+                return RedisProtocol::serializeNonArray(to_string(res),
                                                         RedisProtocol::DataType::INTEGER);
             }
                 
             case INCRBYFLOAT:
             {
                 double by = Utils::convertToDouble(mTokens[3].first);
-                return RedisProtocol::serializeNonArray(map.incrBy(field, by),
-                                                        RedisProtocol::DataType::BULK_STRING);
+                
+                string res = map.incrBy(field, by);
+                
+                FIRE_EVENT(EventPublisher::Event::hincrbyfloat, key);
+                
+                return RedisProtocol::serializeNonArray(res, RedisProtocol::DataType::INTEGER);
             }
         }
     }

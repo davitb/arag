@@ -41,6 +41,8 @@ string SetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         map.set(key, val, expType, exp, policy);
         
+        FIRE_EVENT(EventPublisher::set, key);
+        
         return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
     }
     catch (std::exception& e) {
@@ -105,8 +107,11 @@ string AppendCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         string key = mTokens[1].first;
         string val = mTokens[2].first;
+        int res = map.append(key, val);
 
-        return RedisProtocol::serializeNonArray(to_string(map.append(key, val)),
+        FIRE_EVENT(EventPublisher::Event::append, key);
+        
+        return RedisProtocol::serializeNonArray(to_string(res),
                                                 RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -129,8 +134,12 @@ string IncrCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         string key = mTokens[1].first;
         
-        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, 1)),
-                                                RedisProtocol::DataType::INTEGER);
+        string resp = RedisProtocol::serializeNonArray(to_string(map.incrBy(key, 1)),
+                                                       RedisProtocol::DataType::INTEGER);
+        
+        FIRE_EVENT(EventPublisher::Event::incrby, key);
+        
+        return resp;
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -153,8 +162,12 @@ string IncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
         string key = mTokens[1].first;
         int by = Utils::convertToInt(mTokens[2].first);
         
-        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, by)),
-                                                RedisProtocol::DataType::INTEGER);
+        string resp = RedisProtocol::serializeNonArray(to_string(map.incrBy(key, by)),
+                                                       RedisProtocol::DataType::INTEGER);
+        
+        FIRE_EVENT(EventPublisher::Event::incrby, key);
+        
+        return resp;
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -177,7 +190,12 @@ string IncrByFloatCommand::execute(InMemoryData& data, SessionContext& ctx)
         string key = mTokens[1].first;
         double by = Utils::convertToDouble(mTokens[2].first);
         
-        return RedisProtocol::serializeNonArray(map.incrBy(key, by), RedisProtocol::DataType::BULK_STRING);
+        string resp = RedisProtocol::serializeNonArray(map.incrBy(key, by),
+                                                       RedisProtocol::DataType::BULK_STRING);
+        
+        FIRE_EVENT(EventPublisher::Event::incrbyfloat, key);
+        
+        return resp;
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -199,8 +217,12 @@ string DecrCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         string key = mTokens[1].first;
         
-        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, -1)),
-                                                RedisProtocol::DataType::INTEGER);
+        string resp = RedisProtocol::serializeNonArray(to_string(map.incrBy(key, -1)),
+                                                       RedisProtocol::DataType::INTEGER);
+        
+        FIRE_EVENT(EventPublisher::Event::incrbyfloat, key);
+        
+        return resp;
     }
     catch (std::exception& e) {
         return redis_const::NULL_BULK_STRING;
@@ -223,7 +245,11 @@ string DecrByCommand::execute(InMemoryData& data, SessionContext& ctx)
         string key = mTokens[1].first;
         int by = Utils::convertToInt(mTokens[2].first);
         
-        return RedisProtocol::serializeNonArray(to_string(map.incrBy(key, by * -1)),
+        int res = map.incrBy(key, by * -1);
+        
+        FIRE_EVENT(EventPublisher::Event::incrby, key);
+        
+        return RedisProtocol::serializeNonArray(to_string(res),
                                                 RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -307,6 +333,8 @@ string SetRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         map.set(key, oldVal);
         
+        FIRE_EVENT(EventPublisher::setrange, key);
+        
         return RedisProtocol::serializeNonArray(to_string(finalLen), RedisProtocol::DataType::INTEGER);
     }
     catch (std::exception& e) {
@@ -372,6 +400,7 @@ string MSetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         for (int i = 1; i < size; i += 2) {
             map.set(mTokens[i].first, mTokens[i + 1].first);
+            FIRE_EVENT(EventPublisher::set, mTokens[i].first);
         }
         
         // Need to return different values and types depending on command type (MSET or MSETNX)
