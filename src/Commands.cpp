@@ -11,9 +11,12 @@
 #include "KeyCmds.h"
 #include "HLLCmds.h"
 #include "PubSubCmds.h"
+#include "TransactionCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
+#include "AragServer.h"
 #include <iostream>
+#include <regex>
 
 using namespace std;
 using namespace arag;
@@ -30,7 +33,7 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
 
         // Connection Commands
         sNameToCommand["PING"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::PING));
-        sNameToCommand["ECHO"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::ECHO));
+        sNameToCommand["ECHO"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::ECHO_CMD));
         sNameToCommand["SELECT"] = shared_ptr<Command>(new SelectCommand());
 
         // Server Commands
@@ -229,6 +232,13 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["UNSUBSCRIBE"] = shared_ptr<Command>(new UnsubscribeCommand());
         sNameToCommand["PSUBSCRIBE"] = shared_ptr<Command>(new PSubscribeCommand());
         sNameToCommand["PUNSUBSCRIBE"] = shared_ptr<Command>(new PUnsubscribeCommand());
+        
+        // Transactions Commands
+        sNameToCommand["MULTI"] = shared_ptr<Command>(new MultiCommand());
+        sNameToCommand["WATCH"] = shared_ptr<Command>(new WatchCommand());
+        sNameToCommand["UNWATCH"] = shared_ptr<Command>(new UnwatchCommand());
+        sNameToCommand["DISCARD"] = shared_ptr<Command>(new DiscardCommand());
+        sNameToCommand["EXEC"] = shared_ptr<Command>(new ExecCommand());
     }
     
     string upperCaseCmd = cmdName;
@@ -256,20 +266,14 @@ void Command::getCommand(const string& cmdline, vector<shared_ptr<Command>>& com
         throw invalid_argument("Invalid Command");
     }
     
-    //cout << endl << "Stream of commands:" << endl;
     for (int i = 0; i < parsedCommands.size(); ++i) {
         RedisProtocol::RedisArray& tokens = parsedCommands[i];
-//        for (auto elem : tokens) {
-//            cout << elem.first << " ";
-//        }
-//        cout << endl;
         shared_ptr<Command> pCmd = getCommandByName(tokens[0].first);
         
         pCmd->setTokens(tokens);
         
         commands.push_back(pCmd);
     }
-//    cout << "End of stream of commands:" << endl;
 }
 
 shared_ptr<Command> Command::getCommand(const string &cmdline)
@@ -283,7 +287,8 @@ shared_ptr<Command> Command::getCommand(const string &cmdline)
 
 Command::Command()
 {
-    mType = Type::NORMAL;
+    mType = Type::EXTERNAL;
+    mSpecialType = SpecialType::NORMAL;
 }
 
 bool Command::isKeyTypeValid(InMemoryData& db)
@@ -344,6 +349,96 @@ void Command::setCommandContext(Command::Context ctx)
 {
     mCtx = ctx;
 }
+
+static void writeResponse(ClientSession& session,
+                          std::vector<std::string>* pResponeList,
+                          const string& resp)
+{
+    if (pResponeList) {
+        pResponeList->push_back(resp);
+    }
+    else {
+        session.writeResponse(resp);
+    }
+}
+
+void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
+                                     int sessionID,
+                                     std::vector<std::string>* pResponeList)
+{
+    ClientSession& session = Arag::instance().getClientSession(sessionID);
+    SessionContext& sessionCtx = session.getContext();
+    int selectedDBIndex = sessionCtx.getDatabaseIndex();
+    InMemoryData& selectedDB = Database::instance().get(selectedDBIndex);
+    
+    try {
+        // Execute the command
+
+        // Check if this is an internal operation and execute it
+        if (cmd->getType() == Command::Type::INTERNAL) {
+            ResultType rt = cmd->processInternalCommand();
+            if (rt == ResultType::STOP) {
+                throw runtime_error("Stop Request");
+            }
+            if (rt == ResultType::SKIP) {
+                return;
+            }
+        }
+        
+        if (!cmd->isKeyTypeValid(selectedDB)) {
+            throw invalid_argument("Wrong key operation");
+        }
+
+        if (sessionCtx.isInTransaction() &&
+            cmd->getSpecialType() != Command::SpecialType::BYPASS_TRANSACTION_STATE) {
+            
+            sessionCtx.addToTransactionQueue(cmd);
+
+            writeResponse(session,
+                          pResponeList,
+                          RedisProtocol::serializeNonArray("QUEUED", RedisProtocol::DataType::SIMPLE_STRING));
+            return;
+        }
+        
+        string res = cmd->execute(selectedDB, sessionCtx);
+        
+        if (res.length() != 0 && cmd->getType() != Command::Type::INTERNAL) {
+            writeResponse(session, pResponeList, res);
+        }
+    }
+    catch (invalid_argument& e) {
+        if (cmd->getType() != Command::Type::INTERNAL) {
+            writeResponse(session, pResponeList, redis_const::ERR_GENERIC);
+        }
+    }
+    catch (exception& e) {
+        throw runtime_error("Stopping");
+    }
+}
+
+Command::ResultType Command::processInternalCommand()
+{
+    const std::string cmd = getCommandName();
+    
+    if (cmd == command_const::CMD_INTERNAL_STOP || cmd == command_const::CMD_EXTERNAL_EXIT) {
+        cout << "Stopping the thread" << endl;
+        return ResultType::STOP;
+    }
+    else
+        if (cmd == command_const::CMD_INTERNAL_CLEANUP) {
+            cout << "Trigerring cleanup" << endl;
+            try {
+                //mData.cleanup();
+            }
+            catch (exception& e) {
+                cout << "exception occured: " << e.what() << endl;
+            }
+            return ResultType::SKIP;
+        }
+    
+    return ResultType::CONTINUE;
+}
+
 
 //----------------------------------------------------------------------------
 

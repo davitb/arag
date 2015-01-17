@@ -30,33 +30,14 @@ public:
         TRIGGER_CLEANUP_LIMIT = 2000
     };
     
-    // There can be two types of operations.
-    enum RequestType
-    {
-        INTERNAL,
-        EXTERNAL
-    };
-    
-    // Internal operations will return intent.
-    enum ResultType
-    {
-        // Skip further execution
-        SKIP,
-        // Stop the thread
-        STOP,
-        // Continue with execution
-        CONTINUE
-    };
-    
     class Request
     {
     public:
         
         shared_ptr<Command> mCommand;
-        RequestType mType;
         int mSessionID;
 
-        Request(shared_ptr<Command> cmd, RequestType type, int sessionID);
+        Request(shared_ptr<Command> cmd, int sessionID);
     };
     
 private:
@@ -77,10 +58,6 @@ private:
     void processingThread(ProcessingUnit& punit);
 
     void enqueueRequest(ProcessingUnit& punit, Request req);
-    
-    void enqueueCleanup();
-    
-    ResultType processInternalCommand(std::string cmd);
     
     Request extractNextRequest(std::list<Request>& que);
     

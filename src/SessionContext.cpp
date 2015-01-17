@@ -9,6 +9,7 @@ SessionContext::SessionContext()
     mDatabaseIndex = 0;
     mIsAuthenticated = false;
     mSessionID = Utils::genRandom(0, INT_MAX);
+    mTransactionInfo.transactionState = NO_TRANSACTION;
 }
 
 void SessionContext::setDatabaseIndex(int index)

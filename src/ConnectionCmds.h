@@ -13,7 +13,7 @@ public:
     enum CmdType
     {
         PING,
-        ECHO
+        ECHO_CMD
     };
     
     PingCommand(CmdType type) { mCmdType = type; }
@@ -32,22 +32,8 @@ private:
     CmdType mCmdType;
 };
 
-class SelectCommand: public Command
-{
-public:
+    COMMAND_CLASS(SelectCommand, 2, 2);
     
-    DEEP_CLONE(SelectCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
 };
 
 #endif /* defined(__arag__ConnectionCmds__) */

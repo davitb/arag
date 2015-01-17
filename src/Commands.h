@@ -16,6 +16,41 @@ virtual class* clone() const \
     return new class(*this);\
 }\
 
+#define COMMAND_CLASS(className, minArg, maxArg) \
+class className: public Command \
+{\
+public:\
+    \
+    DEEP_CLONE(className)\
+    \
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);\
+    \
+private:\
+    enum Consts\
+    {\
+        MIN_ARG_NUM = minArg,\
+        MAX_ARG_NUM = maxArg\
+    };\
+};\
+
+#define COMMAND_CLASS_WITH_CONSTRUCTOR(className, minArg, maxArg) \
+class className: public Command \
+{\
+    public:\
+    className();\
+    \
+    DEEP_CLONE(className)\
+    \
+    virtual std::string execute(InMemoryData& data, SessionContext& ctx);\
+    \
+    private:\
+    enum Consts\
+    {\
+        MIN_ARG_NUM = minArg,\
+        MAX_ARG_NUM = maxArg\
+    };\
+};\
+
 
 namespace arag
 {
@@ -34,13 +69,28 @@ namespace command_const
 class Command
 {
 public:
+
+    // Internal operations will return intent.
+    enum ResultType
+    {
+        // Skip further execution
+        SKIP,
+        // Stop the thread
+        STOP,
+        // Continue with execution
+        CONTINUE
+    };
     
     enum Type
     {
+        INTERNAL,
+        EXTERNAL,
+    };
+    
+    enum SpecialType
+    {
         NORMAL,
-        TRANSACTION_START,
-        TRANSACTION_END,
-        WAITING_FOR_EVENT
+        BYPASS_TRANSACTION_STATE
     };
     
     class Context
@@ -70,6 +120,10 @@ public:
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx) = 0;
     
+    static void executeEndToEnd(std::shared_ptr<Command> cmd,
+                                int sessionID,
+                                std::vector<std::string>* pResponeList = nullptr);
+    
     std::string getCommandName() const;
     
     static void getCommand(const std::string& cmdline,
@@ -91,6 +145,11 @@ public:
         mType = t;
     }
 
+    SpecialType getSpecialType() const
+    {
+        return mSpecialType;
+    }
+    
 protected:
     
     void setTokens(const std::vector<std::pair<std::string, int>>& tokens);
@@ -108,6 +167,11 @@ protected:
     std::vector<std::pair<std::string, int>> mTokens;
     Context mCtx;
     Type mType;
+    SpecialType mSpecialType;
+    
+private:
+    
+    Command::ResultType processInternalCommand();
 };
 
 class InternalCommand: public Command

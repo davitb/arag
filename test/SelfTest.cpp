@@ -320,9 +320,7 @@ void SelfTest::testMultiThreading()
         cmdLine += "$2\r\nk1\r\n";
         cmdLine += "$" + lenIstr + "\r\n" + istr + "\r\n";
         
-        RequestProcessor::Request req(Command::getCommand(cmdLine),
-                                      RequestProcessor::RequestType::EXTERNAL,
-                                      SessionContext::FAKE_SESSION);
+        RequestProcessor::Request req(Command::getCommand(cmdLine), SessionContext::FAKE_SESSION);
         rp.enqueueRequest(req);
     }
     
@@ -345,9 +343,7 @@ void SelfTest::testMultiThreading()
         cmdLine += "$" + lenKstr + "\r\nk" + istr + "\r\n";
         cmdLine += "$" + lenIstr + "\r\n" + istr + "\r\n";
         
-        RequestProcessor::Request req(Command::getCommand(cmdLine),
-                                      RequestProcessor::RequestType::EXTERNAL,
-                                      SessionContext::FAKE_SESSION);
+        RequestProcessor::Request req(Command::getCommand(cmdLine), SessionContext::FAKE_SESSION);
         rp.enqueueRequest(req);
         
         if (i == numRequests / 2) {

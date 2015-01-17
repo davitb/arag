@@ -46,7 +46,10 @@ public:
     static std::string serializeNonArray(const std::string& response, const DataType type);
 
     // Serializes given vector of {value, dataType} into Redis ARRAY
-    static std::string serializeArray(const std::vector<std::pair<std::string, int>>& response);    
+    static std::string serializeArray(const std::vector<std::pair<std::string, int>>& response);
+
+    // Serializes given prepared values into Redis ARRAY    
+    static std::string serializeArrayWithPreparedItems(const std::vector<std::string>& response);
 };
 
 };

@@ -35,7 +35,7 @@ void ClientSession::doRead()
         
             string cmdLine = string(mBuffer.begin(), length);
             
-            cout << "SessionID: " << mCtx.getSessionID() << " ";
+//            cout << "SessionID: " << mCtx.getSessionID() << " ";
             cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
 
             // If the request is more than default MAX_REQUEST_LEN - read the remaining here
@@ -53,9 +53,7 @@ void ClientSession::doRead()
             vector<shared_ptr<Command>> cmds;
             Command::getCommand(cmdLine, cmds);
             for (int i = 0; i < cmds.size(); ++i) {
-                RequestProcessor::Request req(cmds[i],
-                                              RequestProcessor::RequestType::EXTERNAL,
-                                              mCtx.getSessionID());
+                RequestProcessor::Request req(cmds[i], mCtx.getSessionID());
                 
                 // Enqueue the request to Request Processor
                 mRP.get().enqueueRequest(req);
@@ -80,7 +78,7 @@ void ClientSession::writeResponse(const std::string &str)
         return;
     }
     
-    //cout << "write result: " << str << endl;
+    cout << std::regex_replace(str, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
     
     try {
         // This callback function will be called when async write is done
@@ -98,7 +96,7 @@ void ClientSession::writeResponse(const std::string &str)
     }
 }
 
-SessionContext ClientSession::getContext()
+SessionContext& ClientSession::getContext()
 {
     return mCtx;
 }

@@ -5,318 +5,94 @@
 
 namespace arag
 {
+ 
+    COMMAND_CLASS(SetCommand, 3, 6);
     
-class SetCommand: public Command
-{
-public:
+    COMMAND_CLASS(GetCommand, 2, 2);
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    COMMAND_CLASS(AppendCommand, 3, 5);
     
-    DEEP_CLONE(SetCommand)
+    COMMAND_CLASS(GetRangeCommand, 4, 4);
     
-private:
-    enum Consts
+    COMMAND_CLASS(GetSetCommand, 3, 5);
+    
+    COMMAND_CLASS(IncrCommand, 2, 2);
+    
+    COMMAND_CLASS(MGetCommand, 2, INT_MAX);
+    
+    COMMAND_CLASS(BitCountCommand, 2, 4);
+    
+    COMMAND_CLASS(BitOpCommand, 4, INT_MAX);
+    
+    COMMAND_CLASS(BitPosCommand, 3, 5);
+    
+    COMMAND_CLASS(GetBitCommand, 3, 3);
+    
+    COMMAND_CLASS(StrlenCommand, 2, 2);
+    
+    COMMAND_CLASS(IncrByCommand, 3, 3);
+    
+    COMMAND_CLASS(IncrByFloatCommand, 3, 3);
+    
+    COMMAND_CLASS(DecrCommand, 2, 2);
+    
+    COMMAND_CLASS(DecrByCommand, 3, 3);
+    
+    
+    class SetRangeCommand: public Command
     {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 6
-    };
-};
-
-class GetCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(GetCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class AppendCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(AppendCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
-    };
-};
-
-class GetRangeCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(GetRangeCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4
-    };
-};
-
-class SetRangeCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(SetRangeCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4,
-        MAX_VALUE = 512 * 1024 * 1024
-    };
-};
-
-class GetSetCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(GetSetCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
-    };
-};
-
-class IncrCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(IncrCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class MGetCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(MGetCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
-
-class MSetCommand: public Command
-{
-public:
-    
-    MSetCommand(bool msetNX) { mNX = msetNX; };
-    
-    DEEP_CLONE(MSetCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = INT_MAX
+    public:
+        
+        DEEP_CLONE(SetRangeCommand)
+        
+        virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+        
+    private:
+        enum Consts
+        {
+            MIN_ARG_NUM = 4,
+            MAX_ARG_NUM = 4,
+            MAX_VALUE = 512 * 1024 * 1024
+        };
     };
     
-private:
-    bool mNX;
-};
-
-class BitCountCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(BitCountCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
+    class MSetCommand: public Command
     {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 4
+    public:
+        
+        MSetCommand(bool msetNX) { mNX = msetNX; };
+        
+        DEEP_CLONE(MSetCommand)
+        
+        virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+        
+    private:
+        enum Consts
+        {
+            MIN_ARG_NUM = 3,
+            MAX_ARG_NUM = INT_MAX
+        };
+        
+    private:
+        bool mNX;
     };
-};
-
-class BitOpCommand: public Command
-{
-public:
     
-    DEEP_CLONE(BitOpCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
+    class SetBitCommand: public Command
     {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = INT_MAX
+    public:
+        
+        DEEP_CLONE(SetBitCommand)
+        
+        virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+        
+        enum Consts
+        {
+            MIN_ARG_NUM = 4,
+            MAX_ARG_NUM = 4,
+            MAX_OFFSET = INT_MAX
+        };
     };
-};
-
-class BitPosCommand: public Command
-{
-public:
     
-    DEEP_CLONE(BitPosCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 5
-    };
-};
-
-class GetBitCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(GetBitCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
-class SetBitCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(SetBitCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4,
-        MAX_OFFSET = INT_MAX
-    };
-};
-
-class StrlenCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(StrlenCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class IncrByCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(IncrByCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
-class IncrByFloatCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(IncrByFloatCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
-class DecrCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(DecrCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
-class DecrByCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(DecrByCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
 };
 
 #endif

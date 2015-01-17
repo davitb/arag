@@ -24,7 +24,7 @@ string PingCommand::execute(InMemoryData& data, SessionContext& ctx)
                 return RedisProtocol::serializeNonArray("PONG", RedisProtocol::DataType::SIMPLE_STRING);
             }
                 
-            case ECHO:
+            case ECHO_CMD:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
                     throw invalid_argument("Invalid args");

@@ -168,3 +168,15 @@ string RedisProtocol::serializeArray(const vector<pair<string, int>>& response)
     
     return out;
 }
+
+string RedisProtocol::serializeArrayWithPreparedItems(const vector<string>& response)
+{
+    string out;
+    
+    out = "*" + to_string(response.size()) + CRLF;
+    for (auto resp : response) {
+        out += resp;
+    }
+    
+    return out;
+}

@@ -13,12 +13,9 @@ using namespace arag;
 //-----------------------------------------------------------------
 
 RequestProcessor::Request::Request(shared_ptr<Command> cmd,
-                                   RequestType type,
                                    int sessionID)
-                                    : mCommand(cmd)
+                                    : mCommand(cmd), mSessionID(sessionID)
 {
-    mType = type;
-    mSessionID = sessionID;
 }
 
 //-----------------------------------------------------------------
@@ -46,9 +43,9 @@ void RequestProcessor::stopThreads()
     
     for (int i = 0; i < mPunits.size(); ++i) {
         shared_ptr<Command> stopCmd = std::make_shared<InternalCommand>(command_const::CMD_INTERNAL_STOP);
-        RequestProcessor::Request req(stopCmd,
-                                      RequestType::INTERNAL,
-                                      SessionContext::Consts::FAKE_SESSION);
+        stopCmd->setType(Command::Type::INTERNAL);
+        
+        RequestProcessor::Request req(stopCmd, SessionContext::Consts::FAKE_SESSION);
         enqueueRequest(mPunits[i], req);
         mPunits[i].thd.join();
     }
@@ -87,75 +84,15 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         punit.cond.wait(lock, [&punit] { return !punit.que.empty(); });
         
         Request req = extractNextRequest(punit.que);
-        ClientSession& session = Arag::instance().getClientSession(req.mSessionID);
-        SessionContext sessionCtx = session.getContext();
-        int selectedDBIndex = sessionCtx.getDatabaseIndex();
-        InMemoryData& selectedDB = Database::instance().get(selectedDBIndex);
         
         lock.unlock();
-        
+
         try {
-            // Create appropriate command
-            Command& cmd = *req.mCommand.get();
-            
-            // Check if this is an internal operation and execute it
-            if (req.mType == RequestType::INTERNAL) {
-                ResultType rt = processInternalCommand(cmd.getCommandName());
-                if (rt == ResultType::STOP) {
-                    break;
-                }
-                if (rt == ResultType::SKIP) {
-                    continue;
-                }
-            }
-            
-            // Execute the command
-            
-            if (!cmd.isKeyTypeValid(selectedDB)) {
-                throw invalid_argument("Wrong key operation");
-            }
-            
-            string res = cmd.execute(selectedDB, sessionCtx);
-            
-            if (res.length() != 0 && req.mType != RequestType::INTERNAL) {
-                session.writeResponse(res);
-            }
+            Command::executeEndToEnd(req.mCommand, req.mSessionID);
         }
-        catch (exception& e) {
-            //cout << "exception occured: " << e.what() << endl;
-            //cout << "command: " << cmdLine << endl;
-            
-            if (req.mType != RequestType::INTERNAL) {
-                session.writeResponse(redis_const::ERR_GENERIC);
-            }
+        catch (std::exception& e) {
+            cout << e.what() << endl;
+            break;
         }
     }
 }
-
-RequestProcessor::ResultType RequestProcessor::processInternalCommand(std::string cmd)
-{
-    if (cmd == command_const::CMD_INTERNAL_STOP || cmd == command_const::CMD_EXTERNAL_EXIT) {
-        cout << "Stopping the thread" << endl;
-        return ResultType::STOP;
-    }
-    else
-    if (cmd == command_const::CMD_INTERNAL_CLEANUP) {
-        cout << "Trigerring cleanup" << endl;
-        try {
-            //mData.cleanup();
-        }
-        catch (exception& e) {
-            cout << "exception occured: " << e.what() << endl;
-        }
-        return ResultType::SKIP;
-    }
-    
-    return ResultType::CONTINUE;
-}
-
-void RequestProcessor::enqueueCleanup()
-{
-//    Request req(command_const::CMD_INTERNAL_CLEANUP, RequestType::INTERNAL);
-//    enqueueRequest(req);
-}
-

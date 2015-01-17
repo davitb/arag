@@ -26,7 +26,7 @@ public:
     // Start to listen for commands
     void start();
     
-    SessionContext getContext();
+    SessionContext& getContext();
 
     // Write response to socket
     void writeResponse(const std::string& resp);
