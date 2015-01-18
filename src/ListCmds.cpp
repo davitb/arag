@@ -344,3 +344,116 @@ string LInsertCommand::execute(InMemoryData& data, SessionContext& ctx)
         return redis_const::NULL_BULK_STRING;
     }
 }
+
+//-------------------------------------------------------------------------
+
+string BLCommand::execute(InMemoryData& data, SessionContext& ctx)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        int timeout = Utils::convertToInt(mTokens[mTokens.size() - 1].first);
+        string res;
+        list<string> watchKeys;
+        
+        ListMap& listMap = data.getListMap();
+
+        if (timeout != 0 && (mTimestamp + timeout < time(0))) {
+            return RedisProtocol::serializeArray({
+                make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::BULK_STRING)
+            });
+        }
+        
+        for (int i = 1; i < mTokens.size() - 1; ++i) {
+            const std::string& key = mTokens[i].first;
+            if (listMap.keyExists(key) && listMap.len(key) != 0) {
+                
+                // Found a non-empty list. Pop it up and return.
+                
+                switch (mCmdType)
+                {
+                    case BLPOP:
+                        res = listMap.pop(key, ListMap::Position::FRONT);
+                        break;
+                        
+                    case BRPOP:
+                        res = listMap.pop(key, ListMap::Position::BACK);
+                        break;
+                }
+                
+                RedisProtocol::RedisArray arr = {
+                    make_pair(key, RedisProtocol::DataType::BULK_STRING),
+                    make_pair(res, RedisProtocol::DataType::BULK_STRING)
+                };
+                return RedisProtocol::serializeArray(arr);
+            }
+            watchKeys.push_back(key);
+        }
+        
+        ctx.setPendingtBLCommand(std::shared_ptr<Command>(this->clone()),
+                                 timeout,
+                                 watchKeys);
+        
+        return "";
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+string BRPopLPushCommand::execute(InMemoryData& data, SessionContext& ctx)
+{
+    vector<string> out;
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw invalid_argument("Invalid args");
+        }
+        
+        const std::string& source = mTokens[1].first;
+        const std::string& dest = mTokens[2].first;
+        int timeout = Utils::convertToInt(mTokens[3].first);
+        list<string> watchKeys;
+        
+        ListMap& listMap = data.getListMap();
+        
+        if (timeout != 0 && (mTimestamp + timeout < time(0))) {
+            return RedisProtocol::serializeArray({
+                make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::BULK_STRING)
+            });
+        }
+        
+        if (listMap.keyExists(source) && listMap.len(source) != 0) {
+            // Found a non-empty list. Pop it up and return.
+            string val = listMap.pop(source, ListMap::Position::BACK);
+            if (!listMap.keyExists(source)) {
+                FIRE_EVENT(EventPublisher::Event::del, source);
+            }
+            FIRE_EVENT(EventPublisher::Event::rpop, source);
+            
+            listMap.push(dest, val, ListMap::Position::FRONT);
+            FIRE_EVENT(EventPublisher::Event::lpush, dest);
+            
+            return RedisProtocol::serializeNonArray(val, RedisProtocol::DataType::BULK_STRING);
+        }
+
+        watchKeys.push_back(source);
+        
+        ctx.setPendingtBLCommand(std::shared_ptr<Command>(this->clone()),
+                                 timeout,
+                                 watchKeys);
+        
+        return "";
+    }
+    catch (std::exception& e) {
+        return redis_const::NULL_BULK_STRING;
+    }
+}

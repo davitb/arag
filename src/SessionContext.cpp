@@ -1,6 +1,7 @@
 #include "SessionContext.h"
 #include "Utils.h"
 #include "InMemoryData.h"
+#include "AragServer.h"
 
 using namespace arag;
 using namespace std;
@@ -15,10 +16,7 @@ SessionContext::SessionContext()
 
 SessionContext::~SessionContext()
 {
-    if (mTransactionInfo.bIsSubscribed) {
-        EventPublisher& pub = Database::instance().getEventPublisher();
-        pub.unsubscribe(this);
-    }
+    unsubscribeFromNotifications(true);
 }
 
 void SessionContext::setDatabaseIndex(int index)
@@ -86,7 +84,7 @@ void SessionContext::clearTransactionQueue()
     mTransactionInfo.transactionQue.clear();
 }
 
-const std::unordered_map<std::string, bool>& SessionContext::getWatchedKeys()
+const std::list<std::string>& SessionContext::getWatchedKeys()
 {
     return mTransactionInfo.watchedKeys;
 }
@@ -106,32 +104,99 @@ void SessionContext::markTransactionAborted()
 
 void SessionContext::watchKey(const std::string &key)
 {
-    mTransactionInfo.watchedKeys[key] = true;
+    mTransactionInfo.watchedKeys.push_back(key);
     
-    if (!mTransactionInfo.bIsSubscribed) {
-        EventPublisher& pub = Database::instance().getEventPublisher();
-        pub.subscribe(this);
-        mTransactionInfo.bIsSubscribed = true;
-    }
+    subscribeToNotifications();
 }
 
 void SessionContext::clearWatchedKeys()
 {
     mTransactionInfo.bTransactionAborted = false;
     mTransactionInfo.watchedKeys.clear();
-    if (mTransactionInfo.bIsSubscribed) {
+    unsubscribeFromNotifications();
+}
+
+void SessionContext::subscribeToNotifications()
+{
+    if (!mIsSubscribed) {
+        EventPublisher& pub = Database::instance().getEventPublisher();
+        pub.subscribe(this);
+        mIsSubscribed = true;
+    }
+}
+
+void SessionContext::unsubscribeFromNotifications(bool force)
+{
+    bool condition = (mIsSubscribed) &&
+                    ((force) || (mTransactionInfo.watchedKeys.empty() && mPendingBLCmd.watchedKeys.empty()));
+    
+    if (condition) {
         EventPublisher& pub = Database::instance().getEventPublisher();
         pub.unsubscribe(this);
-        mTransactionInfo.bIsSubscribed = false;
+        mIsSubscribed = false;
     }
 }
 
 void SessionContext::notify(EventPublisher::Event event, const std::string& key, int db)
 {
-    auto item = mTransactionInfo.watchedKeys.find(key);
+    auto item = std::find(mTransactionInfo.watchedKeys.begin(),
+                          mTransactionInfo.watchedKeys.end(),
+                          key);
     if (item != mTransactionInfo.watchedKeys.end()) {
         if (!isInTransaction()) {
             markTransactionAborted();
         }
     }
+    
+    item = std::find(mPendingBLCmd.watchedKeys.begin(),
+                     mPendingBLCmd.watchedKeys.end(),
+                     key);
+    if (item != mPendingBLCmd.watchedKeys.end()) {
+        std::shared_ptr<Command> pendingCmd = mPendingBLCmd.cmd;
+        RequestProcessor::Request req(pendingCmd, mSessionID);
+        
+        // Enqueue the request to Request Processor
+        Arag::instance().getRequestProcessor().enqueueRequest(req);
+
+        clearPendingBLCommand();
+    }
 }
+
+void SessionContext::setPendingtBLCommand(std::shared_ptr<Command> cmd,
+                                          int timeout,
+                                          const std::list<std::string>& blKeys)
+{
+    clearPendingBLCommand();
+    
+    mPendingBLCmd.cmd = cmd;
+    mPendingBLCmd.timeout = timeout;
+    mPendingBLCmd.watchedKeys = blKeys;
+    mPendingBLCmd.timestamp = (int)time(0);
+    
+    subscribeToNotifications();
+}
+
+void SessionContext::checkPendingBLCommand()
+{
+    if (mPendingBLCmd.watchedKeys.empty()) {
+        return;
+    }
+    
+    int currTimestamp = (int)time(0);
+    int finalTimestamp = mPendingBLCmd.timestamp + mPendingBLCmd.timeout;
+    
+    if (mPendingBLCmd.timeout != 0 && finalTimestamp <= currTimestamp) {
+        clearPendingBLCommand();
+    }
+}
+
+void SessionContext::clearPendingBLCommand()
+{
+    mPendingBLCmd.cmd.reset();
+    mPendingBLCmd.timeout = 0;
+    mPendingBLCmd.watchedKeys.clear();
+    mPendingBLCmd.timestamp = 0;
+    
+    unsubscribeFromNotifications();
+}
+

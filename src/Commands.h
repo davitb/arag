@@ -171,6 +171,7 @@ protected:
     Context mCtx;
     Type mType;
     SpecialType mSpecialType;
+    int mTimestamp;
     
 private:
     

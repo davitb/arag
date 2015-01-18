@@ -88,70 +88,42 @@ private:
     CmdType mCmdType;
 };
 
-class LRangeCommand: public Command
+class BLCommand: public Command
 {
 public:
     
-    DEEP_CLONE(LRangeCommand)
+    enum CmdType
+    {
+        BLPOP,
+        BRPOP
+    };
+    
+    BLCommand(CmdType type) { mCmdType = type; }
+    
+    DEEP_CLONE(BLCommand)
     
     virtual std::string execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
     {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = INT_MAX
     };
+    
+    CmdType mCmdType;
 };
 
-class LSetCommand: public Command
-{
-public:
+COMMAND_CLASS(BRPopLPushCommand, 4, 4);
     
-    DEEP_CLONE(LSetCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4
-    };
-};
+COMMAND_CLASS(LRangeCommand, 4, 4);
 
-class LTrimCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(LTrimCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4
-    };
-};
+COMMAND_CLASS(LSetCommand, 4, 4);
 
-class LInsertCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(LInsertCommand)
-    
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 5,
-        MAX_ARG_NUM = 5
-    };
-};
-    
+COMMAND_CLASS(LTrimCommand, 4, 4);
+
+COMMAND_CLASS(LInsertCommand, 4, 4);
+
 };
 
 #endif /* defined(__arag__ListCmds__) */

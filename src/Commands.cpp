@@ -146,6 +146,13 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["LTRIM"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
         sNameToCommand["LINSERT"] = shared_ptr<Command>(new LInsertCommand());
         sNameToCommand["LINSERT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["BLPOP"] = shared_ptr<Command>(new BLCommand(BLCommand::BLPOP));
+        sNameToCommand["BLPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["BRPOP"] = shared_ptr<Command>(new BLCommand(BLCommand::BRPOP));
+        sNameToCommand["BRPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["BRPOPLPUSH"] = shared_ptr<Command>(new BRPopLPushCommand());
+        sNameToCommand["BRPOPLPUSH"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+
         
         // Set Commands
         sNameToCommand["SADD"] = shared_ptr<Command>(new SAddCommand());
@@ -245,6 +252,7 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
     std::transform(upperCaseCmd.begin(), upperCaseCmd.end(), upperCaseCmd.begin(), ::toupper);
     
     if (sNameToCommand.count(upperCaseCmd) == 0) {
+        cout << "command: " + cmdName << endl;
         throw invalid_argument("Invalid command: " + cmdName);
     }
     
@@ -289,6 +297,7 @@ Command::Command()
 {
     mType = Type::EXTERNAL;
     mSpecialType = SpecialType::NORMAL;
+    mTimestamp = (int)time(0);
 }
 
 bool Command::isKeyTypeValid(InMemoryData& db)
@@ -395,6 +404,9 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
                           RedisProtocol::serializeNonArray("QUEUED", RedisProtocol::DataType::SIMPLE_STRING));
             return;
         }
+        
+        // Process a pending Blocking List command if any
+        sessionCtx.checkPendingBLCommand();
 
         if (!cmd->isKeyTypeValid(selectedDB)) {
             throw invalid_argument("Wrong key operation");

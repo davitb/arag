@@ -17,7 +17,7 @@ using asio::ip::tcp;
 Arag::Arag()
 : mAcceptor(Arag::ioServiceInstance(), tcp::endpoint(tcp::v4(), PORT_NUM)), mSocket(Arag::ioServiceInstance())
 {
-    shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket), mProcessor);
+    shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket));
     mSessions[SessionContext::FAKE_SESSION] = session;
 }
 
@@ -63,7 +63,7 @@ void Arag::doAccept()
     // Accept new connections and start a session when it's established
     mAcceptor.async_accept(mSocket, [this](std::error_code ec) {
         if (!ec) {
-            shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket), mProcessor);
+            shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket));
             mSessions[session->getContext().getSessionID()] = session;
             session->start();
 //            std::make_shared<ClientSession>(std::move(mSocket), mProcessor)->start();
@@ -100,4 +100,9 @@ void Arag::removeSession(int sessionID)
 {
     lock_guard<mutex> lock(mSessionMapLock);
     mSessions.erase(sessionID);
+}
+
+RequestProcessor& Arag::getRequestProcessor()
+{
+    return mProcessor;
 }

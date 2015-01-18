@@ -8,8 +8,8 @@ using namespace std;
 using namespace arag;
 using asio::ip::tcp;
 
-ClientSession::ClientSession(tcp::socket socket, RequestProcessor& rp)
-            : mSocket(std::move(socket)), mRP(rp)
+ClientSession::ClientSession(tcp::socket socket)
+            : mSocket(std::move(socket))
 {
 }
 
@@ -35,9 +35,11 @@ void ClientSession::doRead()
         
             string cmdLine = string(mBuffer.begin(), length);
             
-            cout << "SessionID: " << mCtx.getSessionID() << " ";
-            cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
-
+            if (cmdLine.length() < 1000) {
+                cout << "SessionID: " << mCtx.getSessionID() << " ";
+                cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
+            }
+            
             // If the request is more than default MAX_REQUEST_LEN - read the remaining here
             size_t available = 0;
 //            while ((available = mSocket.available()) > 0) {
@@ -56,7 +58,7 @@ void ClientSession::doRead()
                 RequestProcessor::Request req(cmds[i], mCtx.getSessionID());
                 
                 // Enqueue the request to Request Processor
-                mRP.get().enqueueRequest(req);
+                Arag::instance().getRequestProcessor().enqueueRequest(req);
             }
         }
         catch (std::exception& e) {

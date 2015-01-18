@@ -21,7 +21,7 @@ public:
         MAX_REQUEST_LEN = 64 * 1024 // 64KB
     };
     
-    ClientSession(asio::ip::tcp::socket socket, RequestProcessor& rp);
+    ClientSession(asio::ip::tcp::socket socket);
     
     // Start to listen for commands
     void start();
@@ -39,7 +39,6 @@ private:
 private:
     asio::ip::tcp::socket mSocket;
     std::array<char, MAX_REQUEST_LEN> mBuffer;
-    std::reference_wrapper<RequestProcessor> mRP;
     SessionContext mCtx;
 };
     

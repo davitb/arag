@@ -34,6 +34,8 @@ public:
     ClientSession& getClientSession(int sessionID);
     
     void removeSession(int sessionID);
+    
+    RequestProcessor& getRequestProcessor();
 
 private:
     

@@ -59,6 +59,11 @@ public:
         return mSessionID;
     }
     
+    virtual void notify(EventPublisher::Event event, const std::string& key, int db);
+    
+    // Transaction related functions
+    // --------------------------------------------------------
+    
     bool isInTransaction() const;
 
     bool isTransactionAborted() const
@@ -76,7 +81,7 @@ public:
 
     void watchKey(const std::string& key);
     
-    const std::unordered_map<std::string, bool>& getWatchedKeys();
+    const std::list<std::string>& getWatchedKeys();
     
     void clearWatchedKeys();
 
@@ -84,7 +89,25 @@ public:
     
     void markTransactionAborted();
     
-    virtual void notify(EventPublisher::Event event, const std::string& key, int db);    
+    
+    // BlockingList related functions
+    // --------------------------------------------------------
+    
+    /*
+        Sets the pending BL command.
+     */
+    void setPendingtBLCommand(std::shared_ptr<Command> cmd,
+                      int timeout,
+                      const std::list<std::string>& blKeys);
+
+    /*
+        This functon is called every time a new command is sent within this client context.
+        If there was a pending BL command - it checks if it's timed out.
+        If it's not timed out - the function just returns.
+        If it's timed out - the pending command is forgotten since based on Redis documentation -
+        Client has already sent the response.
+     */
+    void checkPendingBLCommand();
     
 private:
     struct TransactionInfo
@@ -92,8 +115,15 @@ private:
         TransactionState transactionState;
         std::list<std::shared_ptr<Command>> transactionQue;
         bool bTransactionAborted;
-        std::unordered_map<std::string, bool> watchedKeys;
-        bool bIsSubscribed;
+        std::list<std::string> watchedKeys;
+    };
+    
+    struct PendingBLCommand
+    {
+        std::shared_ptr<Command> cmd;
+        int timeout;
+        int timestamp;
+        std::list<std::string> watchedKeys;
     };
     
     bool mIsAuthenticated;
@@ -102,6 +132,16 @@ private:
     int mSessionID;
     std::string mIPAddress;
     TransactionInfo mTransactionInfo;
+    PendingBLCommand mPendingBLCmd;
+    bool mIsSubscribed;
+    
+private:
+    
+    void subscribeToNotifications();
+    
+    void unsubscribeFromNotifications(bool force = false);
+    
+    void clearPendingBLCommand();
 };
 
 };
