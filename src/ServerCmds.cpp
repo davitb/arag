@@ -36,7 +36,7 @@ private:
     stringstream ss;
 };
 
-string InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -57,16 +57,16 @@ string InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
         out.addSection("Server");
         out.addProperty("redis_version", redis_const::REDIS_VERSION);
         
-        return RedisProtocol::serializeNonArray(out.serialize(), RedisProtocol::DataType::BULK_STRING);
+        return CommandResultPtr(new CommandResult(out.serialize(), RedisProtocol::DataType::BULK_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string FlushCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr FlushCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -82,19 +82,19 @@ string FlushCommand::execute(InMemoryData& data, SessionContext& ctx)
             {
                 Database::instance().flush(ctx.getDatabaseIndex());
                 
-                return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+                return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
             }
                 
             case FLUSHALL:
             {
                 Database::instance().flush(Database::FLUSH_ALL);
                 
-                return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+                return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
             }
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
@@ -125,9 +125,8 @@ private:
     stringstream ss;
 };
 
-string ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -150,7 +149,7 @@ string ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
             
             ctx.setClientName(name);
             
-            return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+            return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
         }
         else
         if (subCommand == "GETNAME") {
@@ -158,10 +157,10 @@ string ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
             string name = mTokens[2].first;
             
             if (name == "") {
-                return redis_const::NULL_BULK_STRING;
+                return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
             }
             
-            return RedisProtocol::serializeNonArray(name, RedisProtocol::DataType::BULK_STRING);
+            return CommandResultPtr(new CommandResult(name, RedisProtocol::DataType::BULK_STRING));
         }
         else
         if (subCommand == "LIST") {
@@ -174,23 +173,22 @@ string ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
                 bldr.addRow(s);
             }
             
-            return RedisProtocol::serializeNonArray(bldr.serialize(), RedisProtocol::DataType::BULK_STRING);
+            return CommandResultPtr(new CommandResult(bldr.serialize(), RedisProtocol::DataType::BULK_STRING));
         }
         else {
             throw invalid_argument("SubCommand not supported");
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 
 //-------------------------------------------------------------------------
 
-string ConfigCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ConfigCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -215,7 +213,7 @@ string ConfigCommand::execute(InMemoryData& data, SessionContext& ctx)
             
             vector<pair<string, int>> res;
             
-            return RedisProtocol::serializeArray(res);
+            return CommandResultPtr(new CommandResult(res));
         }
         else
         if (subCommand == "SET") {
@@ -232,21 +230,20 @@ string ConfigCommand::execute(InMemoryData& data, SessionContext& ctx)
             
             // FIXME: Need to support configuration to fulfill values here
             
-            return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+            return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
         }
 
-        return redis_const::NULL_BULK_STRING;        
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));        
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string SingleArgumentCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr SingleArgumentCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -262,12 +259,12 @@ string SingleArgumentCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 int size = db.size();
                 
-                return RedisProtocol::serializeNonArray(to_string(size), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(size), RedisProtocol::DataType::INTEGER));
             }
                 
             case LASTSAVE:
             {
-                return RedisProtocol::serializeNonArray("0", RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult("0", RedisProtocol::DataType::INTEGER));
             }
 
             case TIME:
@@ -280,13 +277,13 @@ string SingleArgumentCommand::execute(InMemoryData& data, SessionContext& ctx)
                     make_pair(to_string(msecs), RedisProtocol::DataType::BULK_STRING)
                 };
                 
-                return RedisProtocol::serializeArray(ret);
+                return CommandResultPtr(new CommandResult(ret));
             }
                 
         }
         
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }

@@ -14,7 +14,7 @@ public:
     
     DEEP_CLONE(ZAddCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -40,7 +40,7 @@ public:
     
     DEEP_CLONE(ZRangeCommand)
 
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -68,7 +68,7 @@ public:
     
     DEEP_CLONE(ZRangeByLexCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -96,7 +96,7 @@ public:
     
     DEEP_CLONE(ZCountCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -125,7 +125,7 @@ public:
     
     DEEP_CLONE(ZScoreCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -145,7 +145,7 @@ public:
     
     DEEP_CLONE(ZIncrByCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -173,7 +173,7 @@ public:
     
     DEEP_CLONE(ZRemCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -201,7 +201,7 @@ public:
     
     DEEP_CLONE(ZUnionCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -229,7 +229,7 @@ public:
     
     DEEP_CLONE(ZRangeByCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -258,7 +258,7 @@ public:
     
     DEEP_CLONE(ZRemByCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

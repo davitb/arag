@@ -14,7 +14,7 @@ public:
     
     DEEP_CLONE(PFAddCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -30,7 +30,7 @@ public:
     
     DEEP_CLONE(PFCountCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -46,7 +46,7 @@ public:
     
     DEEP_CLONE(PFMergeCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

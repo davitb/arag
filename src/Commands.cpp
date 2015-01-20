@@ -360,20 +360,20 @@ void Command::setCommandContext(Command::Context ctx)
 }
 
 static void writeResponse(ClientSession& session,
-                          std::vector<std::string>* pResponeList,
-                          const string& resp)
+                          CommandResult* pCmdResult,
+                          CommandResultPtr resp)
 {
-    if (pResponeList) {
-        pResponeList->push_back(resp);
+    if (pCmdResult) {
+        pCmdResult->appendToMultiArray(resp);
     }
     else {
-        session.writeResponse(resp);
+        session.writeResponse(resp->toRedisResponse());
     }
 }
 
 void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
                                      int sessionID,
-                                     std::vector<std::string>* pResponeList)
+                                     CommandResult* pCmdResult)
 {
     ClientSession& session = Arag::instance().getClientSession(sessionID);
     SessionContext& sessionCtx = session.getContext();
@@ -400,8 +400,8 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             sessionCtx.addToTransactionQueue(cmd);
 
             writeResponse(session,
-                          pResponeList,
-                          RedisProtocol::serializeNonArray("QUEUED", RedisProtocol::DataType::SIMPLE_STRING));
+                          pCmdResult,
+                          CommandResultPtr(new CommandResult("QUEUED", RedisProtocol::DataType::SIMPLE_STRING)));
             return;
         }
         
@@ -412,15 +412,17 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             throw invalid_argument("Wrong key operation");
         }
         
-        string res = cmd->execute(selectedDB, sessionCtx);
+        CommandResultPtr res = cmd->execute(selectedDB, sessionCtx);
         
-        if (res.length() != 0 && cmd->getType() != Command::Type::INTERNAL) {
-            writeResponse(session, pResponeList, res);
+        if (!res->isEmpty() && cmd->getType() != Command::Type::INTERNAL) {
+            writeResponse(session, pCmdResult, res);
         }
     }
     catch (invalid_argument& e) {
         if (cmd->getType() != Command::Type::INTERNAL) {
-            writeResponse(session, pResponeList, redis_const::ERR_GENERIC);
+            writeResponse(session,
+                          pCmdResult,
+                          CommandResultPtr(new CommandResult(redis_const::ERR_GENERIC, RedisProtocol::ERROR)));
         }
     }
     catch (exception& e) {
@@ -458,4 +460,3 @@ InternalCommand::InternalCommand(std::string name)
 {
     mTokens.push_back(std::make_pair(name, 0));
 }
-

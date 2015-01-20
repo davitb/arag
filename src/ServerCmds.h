@@ -12,7 +12,7 @@ public:
     
     DEEP_CLONE(InfoCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
         
 private:
     enum Consts
@@ -36,7 +36,7 @@ public:
     
     DEEP_CLONE(FlushCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -55,7 +55,7 @@ public:
     
     DEEP_CLONE(ClientCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -72,7 +72,7 @@ public:
     
     DEEP_CLONE(ConfigCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -98,7 +98,7 @@ public:
 
     DEEP_CLONE(SingleArgumentCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

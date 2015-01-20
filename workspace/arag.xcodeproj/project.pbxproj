@@ -19,6 +19,9 @@
 		173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 173DCB9B1A4E688F00762A1B /* arag.cpp */; };
 		175BFA4F1A54728F001751CE /* SortedSetMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 175BFA4D1A54728F001751CE /* SortedSetMap.cpp */; };
 		176AB9BD1A6476E400185FBD /* PubSubCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 176AB9BB1A6476E400185FBD /* PubSubCmds.cpp */; };
+		1776F1851A6E016C006E5DE1 /* CommandResult.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1831A6E016C006E5DE1 /* CommandResult.cpp */; };
+		1776F1881A6E083F006E5DE1 /* ScriptCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1861A6E083F006E5DE1 /* ScriptCmds.cpp */; };
+		1776F18B1A6E0854006E5DE1 /* ScriptMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */; };
 		1784BB431A513D13008F7DCE /* ListMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB411A513D13008F7DCE /* ListMap.cpp */; };
 		1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB441A513DE7008F7DCE /* ListCmds.cpp */; };
 		17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */; };
@@ -76,6 +79,12 @@
 		175BFA4E1A54728F001751CE /* SortedSetMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SortedSetMap.h; sourceTree = "<group>"; };
 		176AB9BB1A6476E400185FBD /* PubSubCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PubSubCmds.cpp; sourceTree = "<group>"; };
 		176AB9BC1A6476E400185FBD /* PubSubCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PubSubCmds.h; sourceTree = "<group>"; };
+		1776F1831A6E016C006E5DE1 /* CommandResult.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandResult.cpp; sourceTree = "<group>"; };
+		1776F1841A6E016C006E5DE1 /* CommandResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandResult.h; sourceTree = "<group>"; };
+		1776F1861A6E083F006E5DE1 /* ScriptCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptCmds.cpp; sourceTree = "<group>"; };
+		1776F1871A6E083F006E5DE1 /* ScriptCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScriptCmds.h; sourceTree = "<group>"; };
+		1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptMap.cpp; sourceTree = "<group>"; };
+		1776F18A1A6E0854006E5DE1 /* ScriptMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScriptMap.h; sourceTree = "<group>"; };
 		1784BB411A513D13008F7DCE /* ListMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListMap.cpp; sourceTree = "<group>"; };
 		1784BB421A513D13008F7DCE /* ListMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListMap.h; sourceTree = "<group>"; };
 		1784BB441A513DE7008F7DCE /* ListCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListCmds.cpp; sourceTree = "<group>"; };
@@ -188,6 +197,8 @@
 		1761F8C51A53DCE100146F9B /* Commands */ = {
 			isa = PBXGroup;
 			children = (
+				1776F1831A6E016C006E5DE1 /* CommandResult.cpp */,
+				1776F1841A6E016C006E5DE1 /* CommandResult.h */,
 				17ED91351A50E76A0035DFE6 /* Commands.cpp */,
 				172DA3A11A4C89DC00AD6767 /* Commands.h */,
 				1737FA7D1A53BE6F0099D0A6 /* ConnectionCmds.cpp */,
@@ -202,6 +213,8 @@
 				1784BB451A513DE7008F7DCE /* ListCmds.h */,
 				176AB9BB1A6476E400185FBD /* PubSubCmds.cpp */,
 				176AB9BC1A6476E400185FBD /* PubSubCmds.h */,
+				1776F1861A6E083F006E5DE1 /* ScriptCmds.cpp */,
+				1776F1871A6E083F006E5DE1 /* ScriptCmds.h */,
 				17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */,
 				17B4EFEF1A5C6FAD00B2E5B0 /* ServerCmds.h */,
 				1737FA771A5321500099D0A6 /* SetCmds.cpp */,
@@ -234,6 +247,8 @@
 				175BFA4E1A54728F001751CE /* SortedSetMap.h */,
 				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
 				17ED913E1A50EF830035DFE6 /* StringMap.h */,
+				1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */,
+				1776F18A1A6E0854006E5DE1 /* ScriptMap.h */,
 			);
 			name = Structures;
 			sourceTree = "<group>";
@@ -304,12 +319,15 @@
 				17B4EFED1A5C4D6100B2E5B0 /* Config.cpp in Sources */,
 				17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */,
 				1737FA791A5321500099D0A6 /* SetCmds.cpp in Sources */,
+				1776F1851A6E016C006E5DE1 /* CommandResult.cpp in Sources */,
 				17B04E5E1A637EEB009CF9F8 /* HLLMap.cpp in Sources */,
 				173DCB9C1A4E688F00762A1B /* arag.cpp in Sources */,
 				17ED91331A50E6930035DFE6 /* StringCmds.cpp in Sources */,
 				17B04E621A63967A009CF9F8 /* HLLCmds.cpp in Sources */,
 				17B4EFF01A5C6FAD00B2E5B0 /* ServerCmds.cpp in Sources */,
 				1784BB431A513D13008F7DCE /* ListMap.cpp in Sources */,
+				1776F18B1A6E0854006E5DE1 /* ScriptMap.cpp in Sources */,
+				1776F1881A6E083F006E5DE1 /* ScriptCmds.cpp in Sources */,
 				1737FA7F1A53BE700099D0A6 /* ConnectionCmds.cpp in Sources */,
 				17A8D50C1A69A9D2003F68B8 /* TransactionCmds.cpp in Sources */,
 				17B4EFEA1A5C473500B2E5B0 /* SessionContext.cpp in Sources */,
@@ -415,7 +433,13 @@
 					../external/linenoise,
 					../external/skip_list,
 					../external/HyperLogLog/include,
+					"../external/lua-5.1.5/src",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"../external/lua-5.1/src",
+					"/Users/davitbaghdasaryan/Projects/cplusplus/arag/arag/external/lua-5.1.5/src",
+				);
+				OTHER_LDFLAGS = "-llua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -432,7 +456,13 @@
 					../external/linenoise,
 					../external/skip_list,
 					../external/HyperLogLog/include,
+					"../external/lua-5.1.5/src",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"../external/lua-5.1/src",
+					"/Users/davitbaghdasaryan/Projects/cplusplus/arag/arag/external/lua-5.1.5/src",
+				);
+				OTHER_LDFLAGS = "-llua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

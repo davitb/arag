@@ -12,7 +12,7 @@ namespace redis_const
 {
     static std::string CRLF = "\r\n";
     static std::string NULL_BULK_STRING = "$-1\r\n";
-    static std::string ERR_GENERIC = "-ERR unknown error\r\n";
+    static std::string ERR_GENERIC = "-ERR unknown error";
     static std::string REDIS_VERSION = "2.8.9";
 };
 
@@ -50,6 +50,9 @@ public:
 
     // Serializes given prepared values into Redis ARRAY    
     static std::string serializeArrayWithPreparedItems(const std::vector<std::string>& response);
+    
+    // Serializes given string value into Redis ARRAY
+    static std::string serializeArrayWithPreparedItems(const int size, const std::string& response);
 };
 
 };

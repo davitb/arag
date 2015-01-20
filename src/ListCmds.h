@@ -22,7 +22,7 @@ public:
     
     DEEP_CLONE(LPushCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -48,7 +48,7 @@ public:
     
     DEEP_CLONE(LGetCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -76,7 +76,7 @@ public:
     
     DEEP_CLONE(LRemCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -102,7 +102,7 @@ public:
     
     DEEP_CLONE(BLCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

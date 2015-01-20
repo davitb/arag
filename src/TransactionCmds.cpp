@@ -8,16 +8,16 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string MultiCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr MultiCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     try {
         
         ctx.setTransactionState(SessionContext::IN_TRANSACTION);
         
-        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
@@ -29,22 +29,22 @@ DiscardCommand::DiscardCommand()
     mSpecialType = SpecialType::BYPASS_TRANSACTION_STATE;
 }
 
-string DiscardCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr DiscardCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     try {
 
         ctx.finishTransaction();
         
-        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string WatchCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr WatchCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
 
@@ -57,25 +57,25 @@ string WatchCommand::execute(InMemoryData& db, SessionContext& ctx)
             ctx.watchKey(mTokens[i].first);
         }
         
-        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string UnwatchCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr UnwatchCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     try {
 
         ctx.clearWatchedKeys();
         
-        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
@@ -86,9 +86,9 @@ ExecCommand::ExecCommand()
     mSpecialType = SpecialType::BYPASS_TRANSACTION_STATE;
 }
 
-string ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
-    string response = redis_const::NULL_BULK_STRING;
+    CommandResultPtr response;
     
     try {
         
@@ -99,15 +99,15 @@ string ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
         ctx.setTransactionState(SessionContext::TransactionState::NO_TRANSACTION);
         
         const list<shared_ptr<Command>>& cmds = ctx.getTransactionQueue();
-        vector<string> responses;
+        
+        response = CommandResultPtr(new CommandResult(CommandResult::MULTI_RESPONSE));
         
         for (auto cmdIter = cmds.begin(); cmdIter != cmds.end(); ++cmdIter) {
-            Command::executeEndToEnd(*cmdIter, ctx.getSessionID(), &responses);
+            Command::executeEndToEnd(*cmdIter, ctx.getSessionID(), response.get());
         }
-        
-        response = RedisProtocol::serializeArrayWithPreparedItems(responses);
     }
     catch (std::exception& e) {
+        response = CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::NILL));
     }
     
     ctx.finishTransaction();

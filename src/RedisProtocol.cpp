@@ -180,3 +180,8 @@ string RedisProtocol::serializeArrayWithPreparedItems(const vector<string>& resp
     
     return out;
 }
+
+string RedisProtocol::serializeArrayWithPreparedItems(const int size, const string& response)
+{
+    return "*" + to_string(size) + CRLF + response;
+}

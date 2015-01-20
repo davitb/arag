@@ -14,7 +14,7 @@ public:
     
     DEEP_CLONE(DelCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts
@@ -32,7 +32,7 @@ public:
     
     DEEP_CLONE(ExistsCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
     enum Consts

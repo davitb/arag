@@ -8,6 +8,7 @@
 #include "InMemoryData.h"
 #include "SessionContext.h"
 #include "Config.h"
+#include "CommandResult.h"
 #include "SelfTest.h"
 
 #define FIRE_EVENT(event, key) \
@@ -26,7 +27,7 @@ public:\
     \
     DEEP_CLONE(className)\
     \
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);\
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);\
     \
 private:\
     enum Consts\
@@ -44,7 +45,7 @@ class className: public Command \
     \
     DEEP_CLONE(className)\
     \
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx);\
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);\
     \
     private:\
     enum Consts\
@@ -65,7 +66,7 @@ namespace command_const
     static const std::string CMD_INTERNAL_CLEANUP = "internal::cleanup";
     static const std::string CMD_INTERNAL_PREFIX = "internal::";
 };
-
+    
 /*
     Base class for all commands.
  */
@@ -121,11 +122,11 @@ public:
     
     virtual Command* clone() const = 0;
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx) = 0;
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx) = 0;
     
     static void executeEndToEnd(std::shared_ptr<Command> cmd,
                                 int sessionID,
-                                std::vector<std::string>* pResponeList = nullptr);
+                                CommandResult* pCmdResult = nullptr);
     
     std::string getCommandName() const;
     
@@ -186,7 +187,7 @@ public:
     
     DEEP_CLONE(InternalCommand)
     
-    virtual std::string execute(InMemoryData& data, SessionContext& ctx)
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx)
     {
         throw std::logic_error("This function should not be called");
     }

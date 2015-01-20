@@ -9,9 +9,8 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string PFAddCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr PFAddCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -31,18 +30,17 @@ string PFAddCommand::execute(InMemoryData& db, SessionContext& ctx)
             bAdded = 1;
         }
         
-        return RedisProtocol::serializeNonArray(to_string(bAdded), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(bAdded), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string PFCountCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr PFCountCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -64,18 +62,17 @@ string PFCountCommand::execute(InMemoryData& db, SessionContext& ctx)
             count = hll.count(keys);
         }
         
-        return RedisProtocol::serializeNonArray(to_string(count), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string PFMergeCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr PFMergeCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -93,10 +90,10 @@ string PFMergeCommand::execute(InMemoryData& db, SessionContext& ctx)
 
         hll.merge(destKey, keys);
         
-        return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 

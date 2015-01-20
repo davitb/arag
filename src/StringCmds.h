@@ -45,7 +45,7 @@ namespace arag
         
         DEEP_CLONE(SetRangeCommand)
         
-        virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+        virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
         
     private:
         enum Consts
@@ -64,7 +64,7 @@ namespace arag
         
         DEEP_CLONE(MSetCommand)
         
-        virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+        virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
         
     private:
         enum Consts
@@ -83,7 +83,7 @@ namespace arag
         
         DEEP_CLONE(SetBitCommand)
         
-        virtual std::string execute(InMemoryData& data, SessionContext& ctx);
+        virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
         
         enum Consts
         {

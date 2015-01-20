@@ -10,9 +10,8 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string DelCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr DelCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -34,18 +33,17 @@ string DelCommand::execute(InMemoryData& db, SessionContext& ctx)
             numRemoved += removed;
         }
         
-        return RedisProtocol::serializeNonArray(to_string(numRemoved), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(numRemoved), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -57,9 +55,9 @@ string ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         int ret = db.keyExists(key) ? 1 : 0;
         
-        return RedisProtocol::serializeNonArray(to_string(ret), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }

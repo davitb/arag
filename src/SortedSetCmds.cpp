@@ -10,7 +10,7 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -36,16 +36,16 @@ string ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         FIRE_EVENT(EventPublisher::Event::zadd, key);
         
-        return RedisProtocol::serializeNonArray(to_string(numAdded), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(numAdded), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -88,16 +88,16 @@ string ZRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return RedisProtocol::serializeArray(ret);
+        return CommandResultPtr(new CommandResult(ret));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZScoreCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZScoreCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -117,30 +117,30 @@ string ZScoreCommand::execute(InMemoryData& data, SessionContext& ctx)
             case SCORE:
             {
                 string score = Utils::dbl2str(setMap.score(key, member));
-                return RedisProtocol::serializeNonArray(score, RedisProtocol::DataType::BULK_STRING);
+                return CommandResultPtr(new CommandResult(score, RedisProtocol::DataType::BULK_STRING));
             }
                 
             case RANK:
             {
                 int rank = setMap.rank(key, member, false);
-                return RedisProtocol::serializeNonArray(to_string(rank), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(rank), RedisProtocol::DataType::INTEGER));
             }
                 
             case REVRANK:
             {
                 int rank = setMap.rank(key, member, true);
-                return RedisProtocol::serializeNonArray(to_string(rank), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(rank), RedisProtocol::DataType::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -167,7 +167,7 @@ string ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 int count = setMap.count(key, min, max);
                 
-                return RedisProtocol::serializeNonArray(to_string(count), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
             }
                 
             case LEXCOUNT:
@@ -181,25 +181,25 @@ string ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 int count = setMap.lexCount(key, min, max);
                 
-                return RedisProtocol::serializeNonArray(to_string(count), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
             }
                 
             case CARD:
             {
                 int size = setMap.size(key);
-                return RedisProtocol::serializeNonArray(to_string(size), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(size), RedisProtocol::DataType::INTEGER));
             }
         }
         
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -219,16 +219,16 @@ string ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         FIRE_EVENT(EventPublisher::Event::zincr, key);
         
-        return RedisProtocol::serializeNonArray(ret, RedisProtocol::DataType::BULK_STRING);
+        return CommandResultPtr(new CommandResult(ret, RedisProtocol::DataType::BULK_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -261,7 +261,7 @@ string ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 FIRE_EVENT(EventPublisher::Event::zrem, key);
                 
-                return RedisProtocol::serializeNonArray(to_string(numRemoved), RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(numRemoved), RedisProtocol::DataType::INTEGER));
             }
                 
             default:
@@ -272,13 +272,13 @@ string ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
         
     }
     catch (std::exception& e) {
-        return RedisProtocol::serializeNonArray("Unknown error", RedisProtocol::DataType::ERROR);
+        return CommandResultPtr(new CommandResult("Unknown error", RedisProtocol::DataType::ERROR));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -378,16 +378,16 @@ string ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return RedisProtocol::serializeNonArray(to_string(numAdded), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(numAdded), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZRangeByCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZRangeByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -433,7 +433,7 @@ string ZRangeByCommand::execute(InMemoryData& data, SessionContext& ctx)
                                                                    offset, count,
                                                                    bWithScores,
                                                                    false);
-                return RedisProtocol::serializeArray(arr);
+                return CommandResultPtr(new CommandResult(arr));
             }
                 
             case REVRANGEBYSCORE:
@@ -446,19 +446,19 @@ string ZRangeByCommand::execute(InMemoryData& data, SessionContext& ctx)
                                                                    offset, count,
                                                                    bWithScores,
                                                                    true);
-                return RedisProtocol::serializeArray(arr);
+                return CommandResultPtr(new CommandResult(arr));
             }
                 
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZRangeByLexCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZRangeByLexCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -496,7 +496,7 @@ string ZRangeByLexCommand::execute(InMemoryData& data, SessionContext& ctx)
                                                                    min, max,
                                                                    offset, count,
                                                                    false);
-                return RedisProtocol::serializeArray(arr);
+                return CommandResultPtr(new CommandResult(arr));
             }
                 
             case REVRANGEBYLEX:
@@ -508,19 +508,19 @@ string ZRangeByLexCommand::execute(InMemoryData& data, SessionContext& ctx)
                                                                    min, max,
                                                                    offset, count,
                                                                    true);
-                return RedisProtocol::serializeArray(arr);
+                return CommandResultPtr(new CommandResult(arr));
             }
                 
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -579,9 +579,9 @@ string ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return RedisProtocol::serializeNonArray(to_string(numRemoved), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(numRemoved), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }

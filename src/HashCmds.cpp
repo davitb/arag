@@ -11,9 +11,8 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
-string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -76,22 +75,21 @@ string HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 FIRE_EVENT(EventPublisher::Event::hset, key);
                 
-                return RedisProtocol::serializeNonArray("OK", RedisProtocol::DataType::SIMPLE_STRING);
+                return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
             }
         }
-        
-        return RedisProtocol::serializeNonArray(to_string(ret), RedisProtocol::DataType::INTEGER);
+
+        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -103,19 +101,18 @@ string HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
         string field = mTokens[2].first;
         
         StringMap& map = data.getFromHashMap(key);
-        
-        return RedisProtocol::serializeNonArray(map.get(field), RedisProtocol::DataType::BULK_STRING);
+     
+        return CommandResultPtr(new CommandResult(map.get(field), RedisProtocol::DataType::BULK_STRING));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string HExistsCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr HExistsCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -136,19 +133,18 @@ string HExistsCommand::execute(InMemoryData& data, SessionContext& ctx)
             ret = 0;
         }
         
-        return RedisProtocol::serializeNonArray(to_string(ret), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 
 //-------------------------------------------------------------------------
 
-string HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -169,18 +165,17 @@ string HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         FIRE_EVENT(EventPublisher::Event::hdel, key);
         
-        return RedisProtocol::serializeNonArray(to_string(numDeleted), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(numDeleted), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -195,17 +190,17 @@ string HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx)
         {
             case GETALL:
             {
-                return RedisProtocol::serializeArray(map.getAll(StringMap::KEYS_AND_VALUES));
+                return CommandResultPtr(new CommandResult(map.getAll(StringMap::KEYS_AND_VALUES)));
             }
                 
             case KEYS:
             {
-                return RedisProtocol::serializeArray(map.getAll(StringMap::KEYS));
+                return CommandResultPtr(new CommandResult(map.getAll(StringMap::KEYS)));
             }
 
             case VALS:
             {
-                return RedisProtocol::serializeArray(map.getAll(StringMap::VALUES));
+                return CommandResultPtr(new CommandResult(map.getAll(StringMap::VALUES)));
             }
 
             case MGET:
@@ -219,27 +214,25 @@ string HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx)
                 for (int i = 0; i < numOfKeys; ++i) {
                     keys[i] = mTokens[i + 2].first;
                 }
-                
-                return RedisProtocol::serializeArray(map.mget(keys));
+
+                return CommandResultPtr(new CommandResult(map.mget(keys)));
             }
 
             case LEN:
             {
-                return RedisProtocol::serializeNonArray(to_string(map.size()),
-                                                        RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(map.size()), RedisProtocol::DataType::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
+CommandResultPtr HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
     
     try {
@@ -261,8 +254,7 @@ string HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 FIRE_EVENT(EventPublisher::Event::hincrby, key);
                 
-                return RedisProtocol::serializeNonArray(to_string(res),
-                                                        RedisProtocol::DataType::INTEGER);
+                return CommandResultPtr(new CommandResult(to_string(res), RedisProtocol::DataType::INTEGER));
             }
                 
             case INCRBYFLOAT:
@@ -272,12 +264,12 @@ string HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
                 string res = map.incrBy(field, by);
                 
                 FIRE_EVENT(EventPublisher::Event::hincrbyfloat, key);
-                
-                return RedisProtocol::serializeNonArray(res, RedisProtocol::DataType::INTEGER);
+
+                return CommandResultPtr(new CommandResult(res, RedisProtocol::DataType::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }

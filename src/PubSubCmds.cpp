@@ -8,84 +8,84 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
-static string prepareResponse(const string& type,
+static CommandResult::ResultArray prepareResponse(const string& type,
                               const string& channel,
                               const string& num,
                               int bInteger = true)
 {
-    RedisProtocol::RedisArray arr = {
+    CommandResult::ResultArray arr = {
         make_pair(type, RedisProtocol::DataType::BULK_STRING),
         make_pair(channel, RedisProtocol::DataType::BULK_STRING),
         bInteger ? make_pair(num, RedisProtocol::DataType::INTEGER) :
         make_pair(num, RedisProtocol::DataType::BULK_STRING)
     };
     
-    return RedisProtocol::serializeArray(arr);
+    return arr;
 }
 
-static string prepareResponseWithPattern(const string& type,
+static CommandResult::ResultArray prepareResponseWithPattern(const string& type,
                               const string& pattern,
                               const string& channel,
                               const string& msg)
 {
-    RedisProtocol::RedisArray arr = {
+    CommandResult::ResultArray arr = {
         make_pair(type, RedisProtocol::DataType::BULK_STRING),
         make_pair(pattern, RedisProtocol::DataType::BULK_STRING),
         make_pair(channel, RedisProtocol::DataType::BULK_STRING),
         make_pair(msg, RedisProtocol::DataType::BULK_STRING)
     };
     
-    return RedisProtocol::serializeArray(arr);
+    return arr;
 }
 
-static string prepareResponseWithNill(const string& type)
+static CommandResult::ResultArray prepareResponseWithNill(const string& type)
 {
-    RedisProtocol::RedisArray arr = {
+    CommandResult::ResultArray arr = {
         make_pair(type, RedisProtocol::DataType::BULK_STRING),
         make_pair("", RedisProtocol::DataType::NILL),
         make_pair("0", RedisProtocol::DataType::INTEGER)
     };
     
-    return RedisProtocol::serializeArray(arr);
+    return arr;
 }
 
-static string subscribe(const RedisProtocol::RedisArray& tokens,
+static CommandResultPtr subscribe(const RedisProtocol::RedisArray& tokens,
                         PubSubMap& pubSub,
                         SessionContext& ctx,
                         const string& type,
                         bool pattern)
 {
-    string response;
+    CommandResultPtr response(new CommandResult(CommandResult::MULTI_ARRAY_RESPONSE));
     for (int i = 1; i < tokens.size(); ++i) {
         int sid = ctx.getSessionID();
         
         pubSub.addSubscriber(tokens[i].first, sid, pattern);
         
-        response += prepareResponse(type,
+        response->appendToArray(prepareResponse(type,
                                     tokens[i].first,
-                                    to_string(pubSub.getSubscribersNum(sid)));
+                                    to_string(pubSub.getSubscribersNum(sid))));
     }
     
     return response;
 }
 
-static string unsubscribe(const RedisProtocol::RedisArray& tokens,
+static CommandResultPtr unsubscribe(const RedisProtocol::RedisArray& tokens,
                           PubSubMap& pubSub,
                           SessionContext& ctx,
                           const string& type)
 {
-    string response;
+    CommandResultPtr response(new CommandResult(CommandResult::MULTI_ARRAY_RESPONSE));
     
     if (tokens.size() == 1) {
         // Unscubscribe from all channels
         vector<string> channels = pubSub.unsubscribeFromAllChannels(ctx.getSessionID());
         if (channels.size() == 0) {
-            return prepareResponseWithNill(type);
+            return CommandResultPtr(new CommandResult(prepareResponseWithNill(type)));
         }
         for (int i = 0; i < channels.size(); ++i) {
-            response += prepareResponse(type,
+            response->appendToArray(prepareResponse(type,
                                         channels[i],
-                                        to_string((int)channels.size() - i - 1));
+                                        to_string((int)channels.size() - i - 1)));
         }
         return response;
     }
@@ -95,9 +95,9 @@ static string unsubscribe(const RedisProtocol::RedisArray& tokens,
         
         pubSub.removeSubscriber(tokens[i].first, sid);
         
-        response += prepareResponse(type,
+        response->appendToArray(prepareResponse(type,
                                     tokens[i].first,
-                                    to_string(pubSub.getSubscribersNum(sid)));
+                                    to_string(pubSub.getSubscribersNum(sid))));
     }
     
     return response;
@@ -105,7 +105,7 @@ static string unsubscribe(const RedisProtocol::RedisArray& tokens,
 
 //-------------------------------------------------------------------------
 
-string SubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr SubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -118,13 +118,13 @@ string SubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
         return subscribe(mTokens, db.getPubSubMap(), ctx, "subscribe", false);
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string PSubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr PSubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -137,13 +137,13 @@ string PSubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
         return subscribe(mTokens, db.getPubSubMap(), ctx, "psubscribe", true);
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -171,16 +171,17 @@ string PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
                     
                     if (subscrs.second.first == true) {
                         // This is a pattern based channel
-                        response = prepareResponseWithPattern("pmessage",
-                                                              subscrs.second.second,
-                                                              channel,
-                                                              message);
+                        CommandResult res = prepareResponseWithPattern("pmessage",
+                                                                       subscrs.second.second,
+                                                                       channel,
+                                                                       message);
+                        response = res.toRedisResponse();
                     }
                     else {
-                        response = prepareResponse("message",
+                        response = CommandResult(prepareResponse("message",
                                                    channel,
                                                    message,
-                                                   false);
+                                                   false)).toRedisResponse();
                     }
                     
                     session.writeResponse(response);
@@ -194,17 +195,17 @@ string PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
             }
         }
         
-        return RedisProtocol::serializeNonArray(to_string(num), RedisProtocol::DataType::INTEGER);
+        return CommandResultPtr(new CommandResult(to_string(num), RedisProtocol::DataType::INTEGER));
     }
     catch (std::exception& e) {
         cout << e.what() << endl;
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string UnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr UnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -217,13 +218,13 @@ string UnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
         return unsubscribe(mTokens, db.getPubSubMap(), ctx, "unsubscribe");
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
 
 //-------------------------------------------------------------------------
 
-string PUnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
+CommandResultPtr PUnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
 {
     vector<string> out;
     size_t cmdNum = mTokens.size();
@@ -236,6 +237,6 @@ string PUnsubscribeCommand::execute(InMemoryData& db, SessionContext& ctx)
         return unsubscribe(mTokens, db.getPubSubMap(), ctx, "punsubscribe");
     }
     catch (std::exception& e) {
-        return redis_const::NULL_BULK_STRING;
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
     }
 }
