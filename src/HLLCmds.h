@@ -6,56 +6,12 @@
 namespace arag
 {
     
-//----------------------------------------------------------------
+    COMMAND_CLASS(PFAddCommand, 3, INT_MAX);
+    
+    COMMAND_CLASS(PFCountCommand, 2, INT_MAX);
 
-class PFAddCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(PFAddCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
+    COMMAND_CLASS(PFMergeCommand, 3, INT_MAX);
 
-class PFCountCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(PFCountCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
-
-class PFMergeCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(PFMergeCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
-    
 };
 
 

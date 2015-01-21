@@ -30,10 +30,11 @@ CommandResultPtr PFAddCommand::execute(InMemoryData& db, SessionContext& ctx)
             bAdded = 1;
         }
         
-        return CommandResultPtr(new CommandResult(to_string(bAdded), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(bAdded),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -62,10 +63,11 @@ CommandResultPtr PFCountCommand::execute(InMemoryData& db, SessionContext& ctx)
             count = hll.count(keys);
         }
         
-        return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(count),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -90,10 +92,10 @@ CommandResultPtr PFMergeCommand::execute(InMemoryData& db, SessionContext& ctx)
 
         hll.merge(destKey, keys);
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 

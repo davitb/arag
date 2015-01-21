@@ -12,6 +12,12 @@ class Utils
 {
 public:
     
+    enum Format
+    {
+        HEX,
+        BASE64_SAFE
+    };
+    
     static void printVector(const std::vector<std::string>& vec);
     
     static int convertToInt(std::string val);
@@ -46,6 +52,10 @@ public:
     static void getTimeOfDay(long& secs, long& msecs);
     
     static bool checkPattern(const std::string& str, std::string patt);
+    
+    static std::string sha1(const std::string& source, Format format = HEX);
+    
+    static std::string toHexString(unsigned char* data, unsigned int len);
 };
 
 };

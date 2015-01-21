@@ -31,10 +31,11 @@ CommandResultPtr SAddCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         FIRE_EVENT(EventPublisher::Event::sadd, key);
         
-        return CommandResultPtr(new CommandResult(to_string(numAdded), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(numAdded),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -56,7 +57,7 @@ CommandResultPtr SMembersCommand::execute(InMemoryData& data, SessionContext& ct
         return CommandResultPtr(new CommandResult(setMap.getMembers(key)));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -97,10 +98,11 @@ CommandResultPtr SCardCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -141,7 +143,7 @@ CommandResultPtr SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 FIRE_EVENT(EventPublisher::Event::srem, key);
                 
                 return CommandResultPtr(new CommandResult(to_string(numRemoved),
-                                                        RedisProtocol::DataType::INTEGER));
+                                                        RedisProtocol::INTEGER));
             }
                 
             case POP:
@@ -154,14 +156,16 @@ CommandResultPtr SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 FIRE_EVENT(EventPublisher::Event::spop, key);
                 
-                return CommandResultPtr(new CommandResult(randMember, RedisProtocol::DataType::BULK_STRING));
+                return CommandResultPtr(new CommandResult(randMember,
+                                                          RedisProtocol::BULK_STRING));
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -197,7 +201,7 @@ CommandResultPtr SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
                 vector<std::pair<std::string, int>> retArray;
                 
                 for (auto val : newSet) {
-                    retArray.push_back(make_pair(val, RedisProtocol::DataType::BULK_STRING));
+                    retArray.push_back(make_pair(val, RedisProtocol::BULK_STRING));
                 }
                 
                 return CommandResultPtr(new CommandResult(retArray));
@@ -225,14 +229,16 @@ CommandResultPtr SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
 
                 FIRE_EVENT(EventPublisher::Event::sunionostore, destKey);
                 
-                return CommandResultPtr(new CommandResult(to_string(num), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(num),
+                                                          RedisProtocol::INTEGER));
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -266,7 +272,7 @@ CommandResultPtr SInterCommand::execute(InMemoryData& data, SessionContext& ctx)
                 vector<std::pair<std::string, int>> retArray;
                 
                 for (auto val : newSet) {
-                    retArray.push_back(make_pair(val, RedisProtocol::DataType::BULK_STRING));
+                    retArray.push_back(make_pair(val, RedisProtocol::BULK_STRING));
                 }
                 
                 return CommandResultPtr(new CommandResult(retArray));
@@ -293,14 +299,16 @@ CommandResultPtr SInterCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 FIRE_EVENT(EventPublisher::Event::sinterstore, destKey);
                 
-                return CommandResultPtr(new CommandResult(to_string(num), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(num),
+                                                          RedisProtocol::INTEGER));
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -334,7 +342,7 @@ CommandResultPtr SUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
                 vector<std::pair<std::string, int>> retArray;
                 
                 for (auto val : newSet) {
-                    retArray.push_back(make_pair(val, RedisProtocol::DataType::BULK_STRING));
+                    retArray.push_back(make_pair(val, RedisProtocol::BULK_STRING));
                 }
                 
                 return CommandResultPtr(new CommandResult(retArray));
@@ -361,14 +369,16 @@ CommandResultPtr SUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 FIRE_EVENT(EventPublisher::Event::sunionostore, destKey);
                 
-                return CommandResultPtr(new CommandResult(to_string(num), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(num),
+                                                          RedisProtocol::INTEGER));
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -394,10 +404,11 @@ CommandResultPtr SMoveCommand::execute(InMemoryData& data, SessionContext& ctx)
         FIRE_EVENT(EventPublisher::Event::srem, source);
         FIRE_EVENT(EventPublisher::Event::sadd, dest);
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -418,7 +429,8 @@ CommandResultPtr SRandMemberCommand::execute(InMemoryData& data, SessionContext&
         
         if (cmdNum == Consts::MIN_ARG_NUM) {
             string member = setMap.getRandMember(key);
-            return CommandResultPtr(new CommandResult(member, RedisProtocol::DataType::BULK_STRING));
+            return CommandResultPtr(new CommandResult(member,
+                                                      RedisProtocol::BULK_STRING));
         }
         
         int count = Utils::convertToInt(mTokens[2].first);
@@ -426,7 +438,8 @@ CommandResultPtr SRandMemberCommand::execute(InMemoryData& data, SessionContext&
         vector<pair<string, int>> res;
         if (count < 0) {
             for (int i = 1; i <= abs(count); ++i) {
-                res.push_back(make_pair(setMap.getRandMember(key), RedisProtocol::DataType::BULK_STRING));
+                res.push_back(make_pair(setMap.getRandMember(key),
+                                        RedisProtocol::BULK_STRING));
             }
         }
         else {
@@ -436,6 +449,6 @@ CommandResultPtr SRandMemberCommand::execute(InMemoryData& data, SessionContext&
         return CommandResultPtr(new CommandResult(res));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }

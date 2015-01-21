@@ -75,14 +75,15 @@ CommandResultPtr HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 FIRE_EVENT(EventPublisher::Event::hset, key);
                 
-                return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+                return CommandResult::redisOKResult();
             }
         }
 
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING,
+                                                  RedisProtocol::NILL));
     }
 }
 
@@ -102,10 +103,11 @@ CommandResultPtr HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         StringMap& map = data.getFromHashMap(key);
      
-        return CommandResultPtr(new CommandResult(map.get(field), RedisProtocol::DataType::BULK_STRING));
+        return CommandResultPtr(new CommandResult(map.get(field),
+                                                  RedisProtocol::BULK_STRING));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -133,10 +135,11 @@ CommandResultPtr HExistsCommand::execute(InMemoryData& data, SessionContext& ctx
             ret = 0;
         }
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -165,10 +168,11 @@ CommandResultPtr HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         FIRE_EVENT(EventPublisher::Event::hdel, key);
         
-        return CommandResultPtr(new CommandResult(to_string(numDeleted), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(numDeleted),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -220,12 +224,13 @@ CommandResultPtr HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx
 
             case LEN:
             {
-                return CommandResultPtr(new CommandResult(to_string(map.size()), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(map.size()),
+                                                          RedisProtocol::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -254,7 +259,8 @@ CommandResultPtr HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx
                 
                 FIRE_EVENT(EventPublisher::Event::hincrby, key);
                 
-                return CommandResultPtr(new CommandResult(to_string(res), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(res),
+                                                          RedisProtocol::INTEGER));
             }
                 
             case INCRBYFLOAT:
@@ -265,11 +271,12 @@ CommandResultPtr HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx
                 
                 FIRE_EVENT(EventPublisher::Event::hincrbyfloat, key);
 
-                return CommandResultPtr(new CommandResult(res, RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(res,
+                                                          RedisProtocol::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }

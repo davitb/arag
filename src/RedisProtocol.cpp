@@ -12,19 +12,19 @@ RedisProtocol::DataType getDataType(char ch)
     switch (ch)
     {
         case '+':
-            return RedisProtocol::DataType::SIMPLE_STRING;
+            return RedisProtocol::SIMPLE_STRING;
             
         case '$':
-            return RedisProtocol::DataType::BULK_STRING;
+            return RedisProtocol::BULK_STRING;
             
         case ':':
-            return RedisProtocol::DataType::INTEGER;
+            return RedisProtocol::INTEGER;
 
         case '-':
-            return RedisProtocol::DataType::ERROR;
+            return RedisProtocol::ERROR;
             
         case '*':
-            return RedisProtocol::DataType::ARRAY;
+            return RedisProtocol::ARRAY;
     }
     
     throw invalid_argument("RedisProtocol::serialize: Unknown type");
@@ -81,7 +81,7 @@ void RedisProtocol::parse(const std::string& request, vector<RedisArray>& comman
     if (request[0] != '*' || len < 4) {
         if (request == "PING\r\n") {
             // FIXME: This is a workaround for INLINE PING command that is issued by redis-benchmark
-            vector<pair<string, int>> tokens = { make_pair("PING", RedisProtocol::DataType::SIMPLE_STRING) };
+            vector<pair<string, int>> tokens = { make_pair("PING", RedisProtocol::SIMPLE_STRING) };
             return commands.push_back(tokens);
         }
         throw invalid_argument("parseArray: invalid array: "/* + request*/);

@@ -7,25 +7,7 @@ namespace arag
 {
     
 //----------------------------------------------------------------
-    
-class ZAddCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(ZAddCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
 
-//----------------------------------------------------------------
-    
 class ZRangeCommand: public Command
 {
 public:
@@ -39,7 +21,7 @@ public:
     ZRangeCommand(CmdType type) {mCmdType = type; }
     
     DEEP_CLONE(ZRangeCommand)
-
+    
     virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
     
 private:
@@ -105,7 +87,7 @@ private:
         MAX_ARG_NUM = 4
     };
     
-    CmdType mCmdType;    
+    CmdType mCmdType;
 };
 
 //----------------------------------------------------------------
@@ -120,7 +102,7 @@ public:
         RANK,
         REVRANK
     };
-
+    
     ZScoreCommand(CmdType type) {mCmdType = type; }
     
     DEEP_CLONE(ZScoreCommand)
@@ -135,24 +117,6 @@ private:
     };
     
     CmdType mCmdType;
-};
-
-//----------------------------------------------------------------
-    
-class ZIncrByCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(ZIncrByCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 4,
-        MAX_ARG_NUM = 4
-    };
 };
 
 //----------------------------------------------------------------
@@ -186,7 +150,7 @@ private:
 };
 
 //----------------------------------------------------------------
-    
+
 class ZUnionCommand: public Command
 {
 public:
@@ -212,7 +176,7 @@ private:
     
     CmdType mCmdType;
 };
-    
+
 //----------------------------------------------------------------
 
 class ZRangeByCommand: public Command
@@ -269,7 +233,12 @@ private:
     
     CmdType mCmdType;
 };
-  
+
+    
+COMMAND_CLASS(ZAddCommand, 4, INT_MAX);
+
+COMMAND_CLASS(ZIncrByCommand, 4, 4);
+    
 };
 
 

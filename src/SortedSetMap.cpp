@@ -105,9 +105,9 @@ SortedSetMap::RedisArray SortedSetMap::range(const std::string &key, int start, 
         
     for (int i = start; i <= end; ++i) {
         const Item& item = sset.mSkipList[i];
-        ret.push_back(make_pair(item.val, RedisProtocol::DataType::BULK_STRING));
+        ret.push_back(make_pair(item.val, RedisProtocol::BULK_STRING));
         if (bWithScores) {
-            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::DataType::BULK_STRING));
+            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::BULK_STRING));
         }
     }
     
@@ -126,9 +126,9 @@ SortedSetMap::RedisArray SortedSetMap::revRange(const std::string &key, int star
     
     for (int i = start; i >= end; --i) {
         const Item& item = sset.mSkipList[i];
-        ret.push_back(make_pair(item.val, RedisProtocol::DataType::BULK_STRING));
+        ret.push_back(make_pair(item.val, RedisProtocol::BULK_STRING));
         if (bWithScores) {
-            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::DataType::BULK_STRING));
+            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::BULK_STRING));
         }
     }
     
@@ -231,9 +231,9 @@ SortedSetMap::RedisArray SortedSetMap::rangeByScore(const std::string &key,
     function<void(RedisArray&, const Item&, bool)> fAddToArray;
     // A function that adds items to RedisArray
     fAddToArray = [] (RedisArray& ret, const Item& item, bool bWithScores) {
-        ret.push_back(make_pair(item.val, RedisProtocol::DataType::BULK_STRING));
+        ret.push_back(make_pair(item.val, RedisProtocol::BULK_STRING));
         if (bWithScores) {
-            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::DataType::BULK_STRING));
+            ret.push_back(make_pair(Utils::dbl2str(item.score), RedisProtocol::BULK_STRING));
         }
     };
     
@@ -283,7 +283,7 @@ SortedSetMap::RedisArray SortedSetMap::rangeByLex(const std::string &key,
     function<void(RedisArray&, const Item&, bool)> fAddToArray;
     // A function that adds items to RedisArray
     fAddToArray = [] (RedisArray& ret, const Item& item, bool bWithScores) {
-        ret.push_back(make_pair(item.val, RedisProtocol::DataType::BULK_STRING));
+        ret.push_back(make_pair(item.val, RedisProtocol::BULK_STRING));
     };
     
     if (!bReverse) {

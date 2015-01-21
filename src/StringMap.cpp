@@ -161,10 +161,10 @@ vector<pair<string, int>> StringMap::mget(const vector<string>& keys)
     vector<pair<string, int>> vals;
     for (string key: keys) {
         try {
-            vals.push_back(make_pair(get(key), (int)RedisProtocol::DataType::BULK_STRING));
+            vals.push_back(make_pair(get(key), (int)RedisProtocol::BULK_STRING));
         }
         catch (std::exception& e) {
-            vals.push_back(make_pair("", (int)RedisProtocol::DataType::NILL));
+            vals.push_back(make_pair("", (int)RedisProtocol::NILL));
         }
     }
     
@@ -176,10 +176,10 @@ vector<pair<string, int>> StringMap::getAll(int getAllType)
     vector<pair<string, int>> vals;
     for (auto elem = map.begin(); elem != map.end(); ++elem) {
         if (getAllType == KEYS_AND_VALUES || getAllType == KEYS) {
-            vals.push_back(make_pair(elem->first, (int)RedisProtocol::DataType::BULK_STRING));
+            vals.push_back(make_pair(elem->first, (int)RedisProtocol::BULK_STRING));
         }
         if (getAllType == KEYS_AND_VALUES || getAllType == VALUES) {
-            vals.push_back(make_pair(elem->second.strVal, (int)RedisProtocol::DataType::BULK_STRING));
+            vals.push_back(make_pair(elem->second.strVal, (int)RedisProtocol::BULK_STRING));
         }
     }
 

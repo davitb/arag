@@ -22,6 +22,8 @@
 		1776F1851A6E016C006E5DE1 /* CommandResult.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1831A6E016C006E5DE1 /* CommandResult.cpp */; };
 		1776F1881A6E083F006E5DE1 /* ScriptCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1861A6E083F006E5DE1 /* ScriptCmds.cpp */; };
 		1776F18B1A6E0854006E5DE1 /* ScriptMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */; };
+		1776F1901A6ED228006E5DE1 /* sha1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F18F1A6ED228006E5DE1 /* sha1.cpp */; };
+		1776F1931A6ED763006E5DE1 /* LuaInterpreter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1776F1911A6ED763006E5DE1 /* LuaInterpreter.cpp */; };
 		1784BB431A513D13008F7DCE /* ListMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB411A513D13008F7DCE /* ListMap.cpp */; };
 		1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1784BB441A513DE7008F7DCE /* ListCmds.cpp */; };
 		17A13AD41A4CF79E000B0EA6 /* RedisProtocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */; };
@@ -85,6 +87,9 @@
 		1776F1871A6E083F006E5DE1 /* ScriptCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScriptCmds.h; sourceTree = "<group>"; };
 		1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptMap.cpp; sourceTree = "<group>"; };
 		1776F18A1A6E0854006E5DE1 /* ScriptMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScriptMap.h; sourceTree = "<group>"; };
+		1776F18F1A6ED228006E5DE1 /* sha1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sha1.cpp; path = ../external/sha1/sha1.cpp; sourceTree = "<group>"; };
+		1776F1911A6ED763006E5DE1 /* LuaInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaInterpreter.cpp; sourceTree = "<group>"; };
+		1776F1921A6ED763006E5DE1 /* LuaInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaInterpreter.h; sourceTree = "<group>"; };
 		1784BB411A513D13008F7DCE /* ListMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListMap.cpp; sourceTree = "<group>"; };
 		1784BB421A513D13008F7DCE /* ListMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListMap.h; sourceTree = "<group>"; };
 		1784BB441A513DE7008F7DCE /* ListCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListCmds.cpp; sourceTree = "<group>"; };
@@ -170,6 +175,8 @@
 				17B4EFEC1A5C4D6100B2E5B0 /* Config.h */,
 				17A8D5131A6A1851003F68B8 /* EventPublisher.cpp */,
 				17A8D5141A6A1851003F68B8 /* EventPublisher.h */,
+				1776F1911A6ED763006E5DE1 /* LuaInterpreter.cpp */,
+				1776F1921A6ED763006E5DE1 /* LuaInterpreter.h */,
 				17A13AD21A4CF79E000B0EA6 /* RedisProtocol.cpp */,
 				17A13AD31A4CF79E000B0EA6 /* RedisProtocol.h */,
 				172DA3A41A4C89DC00AD6767 /* RequestProcessor.cpp */,
@@ -177,8 +184,7 @@
 				17B4EFE81A5C473500B2E5B0 /* SessionContext.cpp */,
 				17B4EFE91A5C473500B2E5B0 /* SessionContext.h */,
 				1761F8C61A53DD1000146F9B /* Structures */,
-				1702B4461A4DFD8700E6093C /* Utils.cpp */,
-				1702B4471A4DFD8700E6093C /* Utils.h */,
+				1776F18C1A6ED18B006E5DE1 /* Utils */,
 			);
 			name = src;
 			path = ../src;
@@ -241,16 +247,26 @@
 				1784BB421A513D13008F7DCE /* ListMap.h */,
 				171EF7621A674D8C0033EFD1 /* PubSubMap.cpp */,
 				171EF7631A674D8C0033EFD1 /* PubSubMap.h */,
+				1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */,
+				1776F18A1A6E0854006E5DE1 /* ScriptMap.h */,
 				1737FA7A1A5321610099D0A6 /* SetMap.cpp */,
 				1737FA7B1A5321610099D0A6 /* SetMap.h */,
 				175BFA4D1A54728F001751CE /* SortedSetMap.cpp */,
 				175BFA4E1A54728F001751CE /* SortedSetMap.h */,
 				17ED913D1A50EF830035DFE6 /* StringMap.cpp */,
 				17ED913E1A50EF830035DFE6 /* StringMap.h */,
-				1776F1891A6E0854006E5DE1 /* ScriptMap.cpp */,
-				1776F18A1A6E0854006E5DE1 /* ScriptMap.h */,
 			);
 			name = Structures;
+			sourceTree = "<group>";
+		};
+		1776F18C1A6ED18B006E5DE1 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				1776F18F1A6ED228006E5DE1 /* sha1.cpp */,
+				1702B4461A4DFD8700E6093C /* Utils.cpp */,
+				1702B4471A4DFD8700E6093C /* Utils.h */,
+			);
+			name = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -312,6 +328,7 @@
 				171EF7641A674D8C0033EFD1 /* PubSubMap.cpp in Sources */,
 				1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */,
 				175BFA4F1A54728F001751CE /* SortedSetMap.cpp in Sources */,
+				1776F1931A6ED763006E5DE1 /* LuaInterpreter.cpp in Sources */,
 				172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */,
 				1737FA7C1A5321610099D0A6 /* SetMap.cpp in Sources */,
 				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
@@ -329,6 +346,7 @@
 				1776F18B1A6E0854006E5DE1 /* ScriptMap.cpp in Sources */,
 				1776F1881A6E083F006E5DE1 /* ScriptCmds.cpp in Sources */,
 				1737FA7F1A53BE700099D0A6 /* ConnectionCmds.cpp in Sources */,
+				1776F1901A6ED228006E5DE1 /* sha1.cpp in Sources */,
 				17A8D50C1A69A9D2003F68B8 /* TransactionCmds.cpp in Sources */,
 				17B4EFEA1A5C473500B2E5B0 /* SessionContext.cpp in Sources */,
 				17ED913C1A50EDFC0035DFE6 /* InMemoryData.cpp in Sources */,
@@ -433,12 +451,10 @@
 					../external/linenoise,
 					../external/skip_list,
 					../external/HyperLogLog/include,
-					"../external/lua-5.1.5/src",
-				);
-				LIBRARY_SEARCH_PATHS = (
 					"../external/lua-5.1/src",
-					"/Users/davitbaghdasaryan/Projects/cplusplus/arag/arag/external/lua-5.1.5/src",
+					../external/sha1,
 				);
+				LIBRARY_SEARCH_PATHS = "../external/lua-5.1/src";
 				OTHER_LDFLAGS = "-llua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -456,12 +472,10 @@
 					../external/linenoise,
 					../external/skip_list,
 					../external/HyperLogLog/include,
-					"../external/lua-5.1.5/src",
-				);
-				LIBRARY_SEARCH_PATHS = (
 					"../external/lua-5.1/src",
-					"/Users/davitbaghdasaryan/Projects/cplusplus/arag/arag/external/lua-5.1.5/src",
+					../external/sha1,
 				);
+				LIBRARY_SEARCH_PATHS = "../external/lua-5.1/src";
 				OTHER_LDFLAGS = "-llua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

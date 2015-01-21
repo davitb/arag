@@ -14,10 +14,10 @@ CommandResultPtr MultiCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         ctx.setTransactionState(SessionContext::IN_TRANSACTION);
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -35,10 +35,10 @@ CommandResultPtr DiscardCommand::execute(InMemoryData& db, SessionContext& ctx)
 
         ctx.finishTransaction();
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -57,10 +57,10 @@ CommandResultPtr WatchCommand::execute(InMemoryData& db, SessionContext& ctx)
             ctx.watchKey(mTokens[i].first);
         }
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -72,10 +72,10 @@ CommandResultPtr UnwatchCommand::execute(InMemoryData& db, SessionContext& ctx)
 
         ctx.clearWatchedKeys();
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -107,7 +107,7 @@ CommandResultPtr ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
         }
     }
     catch (std::exception& e) {
-        response = CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::NILL));
+        response = CommandResult::redisNULLResult();
     }
     
     ctx.finishTransaction();

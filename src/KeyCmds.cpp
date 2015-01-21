@@ -33,10 +33,11 @@ CommandResultPtr DelCommand::execute(InMemoryData& db, SessionContext& ctx)
             numRemoved += removed;
         }
         
-        return CommandResultPtr(new CommandResult(to_string(numRemoved), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(numRemoved),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -55,9 +56,10 @@ CommandResultPtr ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         int ret = db.keyExists(key) ? 1 : 0;
         
-        return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(ret),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }

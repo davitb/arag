@@ -90,3 +90,20 @@ void CommandResult::appendToMultiArray(const CommandResultPtr& cmd)
 {
     mMultiResult.push_back(cmd);
 }
+
+CommandResultPtr CommandResult::redisNULLResult()
+{
+    return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING,
+                                              RedisProtocol::NILL));
+}
+
+CommandResultPtr CommandResult::redisOKResult()
+{
+    return CommandResultPtr(new CommandResult("OK",
+                                              RedisProtocol::SIMPLE_STRING));
+}
+
+CommandResultPtr CommandResult::redisErrorResult(const std::string& err)
+{
+    return CommandResultPtr(new CommandResult(err, RedisProtocol::ERROR));
+}

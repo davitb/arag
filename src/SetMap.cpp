@@ -58,7 +58,7 @@ vector<pair<string, int>> SetMap::getMembers(const string& key)
     unordered_set<string>& s = mSetMap[key];
     
     for (auto iter = s.begin(); iter != s.end(); ++iter) {
-        members.push_back(make_pair(*iter, RedisProtocol::DataType::BULK_STRING));
+        members.push_back(make_pair(*iter, RedisProtocol::BULK_STRING));
     }
     
     return members;
@@ -90,7 +90,7 @@ vector<pair<string, int>> SetMap::getRandMembers(const std::string &key, const i
     if (n >= size) {
         auto iter = s.begin();
         for (int i = 0; i < size; ++i) {
-            res[i] = make_pair(*iter++, RedisProtocol::DataType::BULK_STRING);
+            res[i] = make_pair(*iter++, RedisProtocol::BULK_STRING);
         }
         return res;
     }
@@ -100,7 +100,7 @@ vector<pair<string, int>> SetMap::getRandMembers(const std::string &key, const i
     std::advance(iter, rand);
     
     for (int i = 0; i < n; ++i) {
-        res[i] = make_pair(*iter++, RedisProtocol::DataType::BULK_STRING);
+        res[i] = make_pair(*iter++, RedisProtocol::BULK_STRING);
     }
     
     return res;

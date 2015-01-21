@@ -10,8 +10,14 @@ namespace arag
 
 namespace redis_const
 {
-    static std::string CRLF = "\r\n";
+    static const std::string CRLF = "\r\n";
     static std::string NULL_BULK_STRING = "$-1\r\n";
+    static std::string OK = "OK";
+    static std::string QUEUED = "QUEUED";
+    static std::string KEY_DOESNT_EXIST = "Key doesn't exist";
+    static std::string UNKNOWN_ERROR = "Unknown error";
+    static std::string INVALID_ARGUMENT = "Error: Invalid argument";
+    static const std::string ERR_NO_SCRIPT = "NOSCRIPT No matching script. Please use EVAL.";
     static std::string ERR_GENERIC = "-ERR unknown error";
     static std::string REDIS_VERSION = "2.8.9";
 };

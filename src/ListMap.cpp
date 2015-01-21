@@ -199,12 +199,12 @@ vector<pair<string, int>> ListMap::getRange(const std::string &key, int start, i
     }
     
     if (start == end) {
-        range.push_back(make_pair(*itStart, RedisProtocol::DataType::BULK_STRING));
+        range.push_back(make_pair(*itStart, RedisProtocol::BULK_STRING));
     }
     else
     if (start < end) {
         for_each(itStart, itEnd, [&range](const string& str) {
-            range.push_back(make_pair(str, RedisProtocol::DataType::BULK_STRING));
+            range.push_back(make_pair(str, RedisProtocol::BULK_STRING));
         });
     }
     

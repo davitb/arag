@@ -1,6 +1,31 @@
 #ifndef __arag__ScriptMap__
 #define __arag__ScriptMap__
 
-#include <stdio.h>
+#include <unordered_map>
+#include <string>
+
+namespace arag
+{
+    
+class ScriptMap
+{
+public:
+    typedef std::unordered_map<std::string, std::string> ScriptMapType;
+ 
+    bool exists(const std::string& script);
+ 
+    void flush();
+    
+    std::string get(const std::string& hash);
+    
+    std::string set(const std::string& script);
+    
+private:
+    
+    ScriptMapType mScriptMap;
+};
+    
+};
+
 
 #endif /* defined(__arag__ScriptMap__) */

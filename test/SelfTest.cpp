@@ -32,7 +32,7 @@ vector<string> constructCommands(const vector<vector<string>>& cmds)
 
     for (auto cmd: cmds) {
         for (auto arg: cmd) {
-            arr.push_back(make_pair(arg, RedisProtocol::DataType::SIMPLE_STRING));
+            arr.push_back(make_pair(arg, RedisProtocol::SIMPLE_STRING));
         }
         finalCmds.push_back(RedisProtocol::serializeArray(arr));
         arr = vector<pair<string, int>>();
@@ -102,10 +102,10 @@ void SelfTest::testParser()
     vector<pair<string, int>> arr;
     assert(RedisProtocol::serializeArray(arr) == "*0\r\n");
     
-    arr.push_back(make_pair("simple", RedisProtocol::DataType::SIMPLE_STRING));
-    arr.push_back(make_pair("123", RedisProtocol::DataType::INTEGER));
-    arr.push_back(make_pair("bulk", RedisProtocol::DataType::BULK_STRING));
-    arr.push_back(make_pair("error", RedisProtocol::DataType::ERROR));
+    arr.push_back(make_pair("simple", RedisProtocol::SIMPLE_STRING));
+    arr.push_back(make_pair("123", RedisProtocol::INTEGER));
+    arr.push_back(make_pair("bulk", RedisProtocol::BULK_STRING));
+    arr.push_back(make_pair("error", RedisProtocol::ERROR));
     
     assert(RedisProtocol::serializeArray(arr) == "*4\r\n+simple\r\n:123\r\n$4\r\nbulk\r\n-error\r\n");
     
@@ -115,10 +115,10 @@ void SelfTest::testParser()
     vector<pair<string, int>> tokens;
     
     str = "*4\r\n+simple\r\n:123\r\n$4\r\nbulk\r\n-error\r\n";
-    tokens = { make_pair("simple", (int)RedisProtocol::DataType::SIMPLE_STRING),
-               make_pair("123", (int)RedisProtocol::DataType::INTEGER),
-               make_pair("bulk", (int)RedisProtocol::DataType::BULK_STRING),
-               make_pair("error", (int)RedisProtocol::DataType::ERROR)
+    tokens = { make_pair("simple", (int)RedisProtocol::SIMPLE_STRING),
+               make_pair("123", (int)RedisProtocol::INTEGER),
+               make_pair("bulk", (int)RedisProtocol::BULK_STRING),
+               make_pair("error", (int)RedisProtocol::ERROR)
     };
     
     assert(RedisProtocol::parse(str) == tokens);

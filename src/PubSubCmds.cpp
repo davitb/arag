@@ -14,10 +14,10 @@ static CommandResult::ResultArray prepareResponse(const string& type,
                               int bInteger = true)
 {
     CommandResult::ResultArray arr = {
-        make_pair(type, RedisProtocol::DataType::BULK_STRING),
-        make_pair(channel, RedisProtocol::DataType::BULK_STRING),
-        bInteger ? make_pair(num, RedisProtocol::DataType::INTEGER) :
-        make_pair(num, RedisProtocol::DataType::BULK_STRING)
+        make_pair(type, RedisProtocol::BULK_STRING),
+        make_pair(channel, RedisProtocol::BULK_STRING),
+        bInteger ? make_pair(num, RedisProtocol::INTEGER) :
+        make_pair(num, RedisProtocol::BULK_STRING)
     };
     
     return arr;
@@ -29,10 +29,10 @@ static CommandResult::ResultArray prepareResponseWithPattern(const string& type,
                               const string& msg)
 {
     CommandResult::ResultArray arr = {
-        make_pair(type, RedisProtocol::DataType::BULK_STRING),
-        make_pair(pattern, RedisProtocol::DataType::BULK_STRING),
-        make_pair(channel, RedisProtocol::DataType::BULK_STRING),
-        make_pair(msg, RedisProtocol::DataType::BULK_STRING)
+        make_pair(type, RedisProtocol::BULK_STRING),
+        make_pair(pattern, RedisProtocol::BULK_STRING),
+        make_pair(channel, RedisProtocol::BULK_STRING),
+        make_pair(msg, RedisProtocol::BULK_STRING)
     };
     
     return arr;
@@ -41,9 +41,9 @@ static CommandResult::ResultArray prepareResponseWithPattern(const string& type,
 static CommandResult::ResultArray prepareResponseWithNill(const string& type)
 {
     CommandResult::ResultArray arr = {
-        make_pair(type, RedisProtocol::DataType::BULK_STRING),
-        make_pair("", RedisProtocol::DataType::NILL),
-        make_pair("0", RedisProtocol::DataType::INTEGER)
+        make_pair(type, RedisProtocol::BULK_STRING),
+        make_pair("", RedisProtocol::NILL),
+        make_pair("0", RedisProtocol::INTEGER)
     };
     
     return arr;
@@ -118,7 +118,7 @@ CommandResultPtr SubscribeCommand::execute(InMemoryData& db, SessionContext& ctx
         return subscribe(mTokens, db.getPubSubMap(), ctx, "subscribe", false);
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -137,7 +137,7 @@ CommandResultPtr PSubscribeCommand::execute(InMemoryData& db, SessionContext& ct
         return subscribe(mTokens, db.getPubSubMap(), ctx, "psubscribe", true);
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -195,11 +195,11 @@ CommandResultPtr PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(num), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(num), RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
         cout << e.what() << endl;
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -218,7 +218,7 @@ CommandResultPtr UnsubscribeCommand::execute(InMemoryData& db, SessionContext& c
         return unsubscribe(mTokens, db.getPubSubMap(), ctx, "unsubscribe");
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -237,6 +237,6 @@ CommandResultPtr PUnsubscribeCommand::execute(InMemoryData& db, SessionContext& 
         return unsubscribe(mTokens, db.getPubSubMap(), ctx, "punsubscribe");
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }

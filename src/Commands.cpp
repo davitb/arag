@@ -12,6 +12,7 @@
 #include "HLLCmds.h"
 #include "PubSubCmds.h"
 #include "TransactionCmds.h"
+#include "ScriptCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include "AragServer.h"
@@ -32,8 +33,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand[CMD_INTERNAL_CLEANUP] = shared_ptr<Command>(new InternalCommand(CMD_INTERNAL_CLEANUP));
 
         // Connection Commands
-        sNameToCommand["PING"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::PING));
-        sNameToCommand["ECHO"] = shared_ptr<Command>(new PingCommand(PingCommand::CmdType::ECHO_CMD));
+        sNameToCommand["PING"] = shared_ptr<Command>(new PingCommand(PingCommand::PING));
+        sNameToCommand["ECHO"] = shared_ptr<Command>(new PingCommand(PingCommand::ECHO_CMD));
         sNameToCommand["SELECT"] = shared_ptr<Command>(new SelectCommand());
 
         // Server Commands
@@ -48,181 +49,181 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         
         // String Commands
         sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());
-        sNameToCommand["SET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["SET"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["GET"] = shared_ptr<Command>(new GetCommand());
-        sNameToCommand["GET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["GET"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["GETSET"] = shared_ptr<Command>(new GetSetCommand());
-        sNameToCommand["GETSET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["GETSET"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["APPEND"] = shared_ptr<Command>(new AppendCommand());
-        sNameToCommand["APPEND"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["APPEND"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["INCR"] = shared_ptr<Command>(new IncrCommand());
-        sNameToCommand["INCR"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["INCR"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["GETRANGE"] = shared_ptr<Command>(new GetRangeCommand());
-        sNameToCommand["GETRANGE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["GETRANGE"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["SETRANGE"] = shared_ptr<Command>(new SetRangeCommand());
-        sNameToCommand["SETRANGE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["SETRANGE"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["MGET"] = shared_ptr<Command>(new MGetCommand());
-        sNameToCommand["MGET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["MGET"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["MSET"] = shared_ptr<Command>(new MSetCommand(false));
-        sNameToCommand["MSET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["MSET"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["MSETNX"] = shared_ptr<Command>(new MSetCommand(true));
-        sNameToCommand["MSETNX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["MSETNX"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["BITCOUNT"] = shared_ptr<Command>(new BitCountCommand());
-        sNameToCommand["BITCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["BITCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["BITOP"] = shared_ptr<Command>(new BitOpCommand());
-        sNameToCommand["BITOP"]->setCommandContext(Command::Context(2, InMemoryData::ContainerType::STRING));
+        sNameToCommand["BITOP"]->setCommandContext(Command::Context(2, InMemoryData::STRING));
         sNameToCommand["BITPOS"] = shared_ptr<Command>(new BitPosCommand());
-        sNameToCommand["BITPOS"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["BITPOS"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["GETBIT"] = shared_ptr<Command>(new GetBitCommand());
-        sNameToCommand["GETBIT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["GETBIT"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["SETBIT"] = shared_ptr<Command>(new SetBitCommand());
-        sNameToCommand["SETBIT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["SETBIT"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["STRLEN"] = shared_ptr<Command>(new StrlenCommand());
-        sNameToCommand["STRLEN"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["STRLEN"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["INCRBY"] = shared_ptr<Command>(new IncrByCommand());
-        sNameToCommand["INCRBY"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["INCRBY"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["INCRBYFLOAT"] = shared_ptr<Command>(new IncrByFloatCommand());
-        sNameToCommand["INCRBYFLOAT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["INCRBYFLOAT"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["DECR"] = shared_ptr<Command>(new DecrCommand());
-        sNameToCommand["DECR"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["DECR"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         sNameToCommand["DECRBY"] = shared_ptr<Command>(new DecrByCommand());
-        sNameToCommand["DECRBY"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::STRING));
+        sNameToCommand["DECRBY"]->setCommandContext(Command::Context(1, InMemoryData::STRING));
         
         // Hash Commands
-        sNameToCommand["HSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::CmdType::SET));
-        sNameToCommand["HSET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HSETNX"] = shared_ptr<Command>(new HSetCommand(HSetCommand::CmdType::SETNX));
-        sNameToCommand["HSETNX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HMSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::CmdType::MSET));
-        sNameToCommand["HMSET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
+        sNameToCommand["HSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::SET));
+        sNameToCommand["HSET"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HSETNX"] = shared_ptr<Command>(new HSetCommand(HSetCommand::SETNX));
+        sNameToCommand["HSETNX"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HMSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::MSET));
+        sNameToCommand["HMSET"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
         sNameToCommand["HGET"] = shared_ptr<Command>(new HGetCommand());
-        sNameToCommand["HGET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
+        sNameToCommand["HGET"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
         sNameToCommand["HEXISTS"] = shared_ptr<Command>(new HExistsCommand());
-        sNameToCommand["HEXISTS"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
+        sNameToCommand["HEXISTS"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
         sNameToCommand["HDEL"] = shared_ptr<Command>(new HDelCommand());
-        sNameToCommand["HDEL"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HGETALL"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::GETALL));
-        sNameToCommand["HGETALL"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HKEYS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::KEYS));
-        sNameToCommand["HKEYS"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HVALS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::VALS));
-        sNameToCommand["HVALS"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HMGET"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::MGET));
-        sNameToCommand["HMGET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HLEN"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::CmdType::LEN));
-        sNameToCommand["HLEN"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
-        sNameToCommand["HINCRBY"] = shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::CmdType::INCRBY));
-        sNameToCommand["HINCRBY"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
+        sNameToCommand["HDEL"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HGETALL"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::GETALL));
+        sNameToCommand["HGETALL"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HKEYS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::KEYS));
+        sNameToCommand["HKEYS"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HVALS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::VALS));
+        sNameToCommand["HVALS"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HMGET"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::MGET));
+        sNameToCommand["HMGET"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HLEN"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::LEN));
+        sNameToCommand["HLEN"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
+        sNameToCommand["HINCRBY"] = shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::INCRBY));
+        sNameToCommand["HINCRBY"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
         sNameToCommand["HINCRBYFLOAT"] =
-            shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::CmdType::INCRBYFLOAT));
-        sNameToCommand["HINCRBYFLOAT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::HASH));
+            shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::INCRBYFLOAT));
+        sNameToCommand["HINCRBYFLOAT"]->setCommandContext(Command::Context(1, InMemoryData::HASH));
         
         // List Commands
-        sNameToCommand["RPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::RPUSH));
-        sNameToCommand["RPUSH"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["RPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::RPUSHX));
-        sNameToCommand["RPUSHX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["LPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::LPUSH));
-        sNameToCommand["LPUSH"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["LPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::CmdType::LPUSHX));
-        sNameToCommand["LPUSHX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["LLEN"] = shared_ptr<Command>(new LGetCommand(LGetCommand::CmdType::LEN));
-        sNameToCommand["LLEN"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["LINDEX"] = shared_ptr<Command>(new LGetCommand(LGetCommand::CmdType::INDEX));
-        sNameToCommand["LINDEX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["LPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::LPOP));
-        sNameToCommand["LPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["RPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::RPOP));
-        sNameToCommand["RPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["LREM"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::REM));
-        sNameToCommand["LREM"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["RPOPLPUSH"] = shared_ptr<Command>(new LRemCommand(LRemCommand::CmdType::RPOPLPUSH));
-        sNameToCommand["RPOPLPUSH"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["RPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::RPUSH));
+        sNameToCommand["RPUSH"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["RPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::RPUSHX));
+        sNameToCommand["RPUSHX"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["LPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::LPUSH));
+        sNameToCommand["LPUSH"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["LPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::LPUSHX));
+        sNameToCommand["LPUSHX"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["LLEN"] = shared_ptr<Command>(new LGetCommand(LGetCommand::LEN));
+        sNameToCommand["LLEN"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["LINDEX"] = shared_ptr<Command>(new LGetCommand(LGetCommand::INDEX));
+        sNameToCommand["LINDEX"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["LPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::LPOP));
+        sNameToCommand["LPOP"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["RPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::RPOP));
+        sNameToCommand["RPOP"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["LREM"] = shared_ptr<Command>(new LRemCommand(LRemCommand::REM));
+        sNameToCommand["LREM"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["RPOPLPUSH"] = shared_ptr<Command>(new LRemCommand(LRemCommand::RPOPLPUSH));
+        sNameToCommand["RPOPLPUSH"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["LRANGE"] = shared_ptr<Command>(new LRangeCommand());
-        sNameToCommand["LRANGE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["LRANGE"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["LSET"] = shared_ptr<Command>(new LSetCommand());
-        sNameToCommand["LSET"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["LSET"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["LTRIM"] = shared_ptr<Command>(new LTrimCommand());
-        sNameToCommand["LTRIM"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["LTRIM"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["LINSERT"] = shared_ptr<Command>(new LInsertCommand());
-        sNameToCommand["LINSERT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["LINSERT"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["BLPOP"] = shared_ptr<Command>(new BLCommand(BLCommand::BLPOP));
-        sNameToCommand["BLPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["BLPOP"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["BRPOP"] = shared_ptr<Command>(new BLCommand(BLCommand::BRPOP));
-        sNameToCommand["BRPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["BRPOP"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["BRPOPLPUSH"] = shared_ptr<Command>(new BRPopLPushCommand());
-        sNameToCommand["BRPOPLPUSH"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["BRPOPLPUSH"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
 
         
         // Set Commands
         sNameToCommand["SADD"] = shared_ptr<Command>(new SAddCommand());
-        sNameToCommand["SADD"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SET));
+        sNameToCommand["SADD"]->setCommandContext(Command::Context(1, InMemoryData::SET));
         sNameToCommand["SMEMBERS"] = shared_ptr<Command>(new SMembersCommand());
-        sNameToCommand["SMEMBERS"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SCARD"] = shared_ptr<Command>(new SCardCommand(SCardCommand::CmdType::CARD));
-        sNameToCommand["SCARD"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SISMEMBER"] = shared_ptr<Command>(new SCardCommand(SCardCommand::CmdType::ISMEMBER));
-        sNameToCommand["SISMEMBER"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SPOP"] = shared_ptr<Command>(new SRemCommand(SRemCommand::CmdType::POP));
-        sNameToCommand["SPOP"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SREM"] = shared_ptr<Command>(new SRemCommand(SRemCommand::CmdType::REM));
-        sNameToCommand["SREM"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SDIFF"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::CmdType::DIFF));
-        sNameToCommand["SDIFF"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SDIFFSTORE"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::CmdType::DIFFSTORE));
-        sNameToCommand["SDIFFSTORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SINTER"] = shared_ptr<Command>(new SInterCommand(SInterCommand::CmdType::INTER));
-        sNameToCommand["SINTER"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SINTERSTORE"] = shared_ptr<Command>(new SInterCommand(SInterCommand::CmdType::INTERSTORE));
-        sNameToCommand["SINTERSTORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SUNION"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::CmdType::UNION));
-        sNameToCommand["SUNION"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
-        sNameToCommand["SUNIONSTORE"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::CmdType::UNIONSTORE));
-        sNameToCommand["SUNIONSTORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["SMEMBERS"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SCARD"] = shared_ptr<Command>(new SCardCommand(SCardCommand::CARD));
+        sNameToCommand["SCARD"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SISMEMBER"] = shared_ptr<Command>(new SCardCommand(SCardCommand::ISMEMBER));
+        sNameToCommand["SISMEMBER"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SPOP"] = shared_ptr<Command>(new SRemCommand(SRemCommand::POP));
+        sNameToCommand["SPOP"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SREM"] = shared_ptr<Command>(new SRemCommand(SRemCommand::REM));
+        sNameToCommand["SREM"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SDIFF"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::DIFF));
+        sNameToCommand["SDIFF"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SDIFFSTORE"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::DIFFSTORE));
+        sNameToCommand["SDIFFSTORE"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SINTER"] = shared_ptr<Command>(new SInterCommand(SInterCommand::INTER));
+        sNameToCommand["SINTER"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SINTERSTORE"] = shared_ptr<Command>(new SInterCommand(SInterCommand::INTERSTORE));
+        sNameToCommand["SINTERSTORE"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SUNION"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::UNION));
+        sNameToCommand["SUNION"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
+        sNameToCommand["SUNIONSTORE"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::UNIONSTORE));
+        sNameToCommand["SUNIONSTORE"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["SMOVE"] = shared_ptr<Command>(new SMoveCommand());
-        sNameToCommand["SMOVE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["SMOVE"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         sNameToCommand["SRANDMEMBER"] = shared_ptr<Command>(new SRandMemberCommand());
-        sNameToCommand["SRANDMEMBER"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::LIST));
+        sNameToCommand["SRANDMEMBER"]->setCommandContext(Command::Context(1, InMemoryData::LIST));
         
         // Sorted Set Commands
         sNameToCommand["ZADD"] = shared_ptr<Command>(new ZAddCommand());
-        sNameToCommand["ZADD"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::CmdType::RANGE));
-        sNameToCommand["ZRANGE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREVRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::CmdType::REVRANGE));
-        sNameToCommand["ZREVRANGE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
+        sNameToCommand["ZADD"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::RANGE));
+        sNameToCommand["ZRANGE"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREVRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::REVRANGE));
+        sNameToCommand["ZREVRANGE"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
         sNameToCommand["ZINCRBY"] = shared_ptr<Command>(new ZIncrByCommand());
-        sNameToCommand["ZINCRBY"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZSCORE"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::CmdType::SCORE));
-        sNameToCommand["ZSCORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::CmdType::RANK));
-        sNameToCommand["ZRANK"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREVRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::CmdType::REVRANK));
-        sNameToCommand["ZREVRANK"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::COUNT));
-        sNameToCommand["ZCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZLEXCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::LEXCOUNT));
-        sNameToCommand["ZLEXCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZCARD"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CmdType::CARD));
-        sNameToCommand["ZCARD"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand(ZRemCommand::CmdType::REM));
-        sNameToCommand["ZREM"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZUNIONSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::CmdType::UNION));
-        sNameToCommand["ZINTERSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::CmdType::INTERSECT));
-        sNameToCommand["ZRANGEBYSCORE"] = shared_ptr<Command>(new ZRangeByCommand(ZRangeByCommand::CmdType::RANGEBYSCORE));
-        sNameToCommand["ZRANGEBYSCORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREVRANGEBYSCORE"] = shared_ptr<Command>(new ZRangeByCommand(ZRangeByCommand::CmdType::REVRANGEBYSCORE));
-        sNameToCommand["ZREVRANGEBYSCORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREMRANGEBYSCORE"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::CmdType::REMRANGEBYSCORE));
-        sNameToCommand["ZREMRANGEBYSCORE"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREMRANGEBYRANK"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::CmdType::REMRANGEBYRANK));
-        sNameToCommand["ZREMRANGEBYRANK"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREMRANGEBYLEX"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::CmdType::REMRANGEBYLEX));
-        sNameToCommand["ZREMRANGEBYLEX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::CmdType::RANGEBYLEX));
-        sNameToCommand["ZRANGEBYLEX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
-        sNameToCommand["ZREVRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::CmdType::REVRANGEBYLEX));
-        sNameToCommand["ZREVRANGEBYLEX"]->setCommandContext(Command::Context(1, InMemoryData::ContainerType::SORTEDSET));
+        sNameToCommand["ZINCRBY"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZSCORE"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::SCORE));
+        sNameToCommand["ZSCORE"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::RANK));
+        sNameToCommand["ZRANK"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREVRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::REVRANK));
+        sNameToCommand["ZREVRANK"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::COUNT));
+        sNameToCommand["ZCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZLEXCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::LEXCOUNT));
+        sNameToCommand["ZLEXCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZCARD"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CARD));
+        sNameToCommand["ZCARD"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand(ZRemCommand::REM));
+        sNameToCommand["ZREM"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZUNIONSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::UNION));
+        sNameToCommand["ZINTERSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::INTERSECT));
+        sNameToCommand["ZRANGEBYSCORE"] = shared_ptr<Command>(new ZRangeByCommand(ZRangeByCommand::RANGEBYSCORE));
+        sNameToCommand["ZRANGEBYSCORE"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREVRANGEBYSCORE"] = shared_ptr<Command>(new ZRangeByCommand(ZRangeByCommand::REVRANGEBYSCORE));
+        sNameToCommand["ZREVRANGEBYSCORE"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYSCORE"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::REMRANGEBYSCORE));
+        sNameToCommand["ZREMRANGEBYSCORE"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYRANK"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::REMRANGEBYRANK));
+        sNameToCommand["ZREMRANGEBYRANK"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYLEX"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::REMRANGEBYLEX));
+        sNameToCommand["ZREMRANGEBYLEX"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::RANGEBYLEX));
+        sNameToCommand["ZRANGEBYLEX"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
+        sNameToCommand["ZREVRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::REVRANGEBYLEX));
+        sNameToCommand["ZREVRANGEBYLEX"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
         
         // Key Commands
         sNameToCommand["DEL"] = shared_ptr<Command>(new DelCommand());
@@ -246,6 +247,11 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["UNWATCH"] = shared_ptr<Command>(new UnwatchCommand());
         sNameToCommand["DISCARD"] = shared_ptr<Command>(new DiscardCommand());
         sNameToCommand["EXEC"] = shared_ptr<Command>(new ExecCommand());
+        
+        // Scripting Commands
+        sNameToCommand["EVAL"] = shared_ptr<Command>(new EvalCommand());
+        sNameToCommand["EVALSHA"] = shared_ptr<Command>(new EvalSHACommand());
+        sNameToCommand["SCRIPT"] = shared_ptr<Command>(new ScriptCommand());
     }
     
     string upperCaseCmd = cmdName;
@@ -284,6 +290,15 @@ void Command::getCommand(const string& cmdline, vector<shared_ptr<Command>>& com
     }
 }
 
+shared_ptr<Command> Command::getCommand(const CommandResult::ResultArray& tokens)
+{
+    shared_ptr<Command> pCmd = getCommandByName(tokens[0].first);
+        
+    pCmd->setTokens(tokens);
+        
+    return pCmd;
+}
+
 shared_ptr<Command> Command::getCommand(const string &cmdline)
 {
     vector<shared_ptr<Command>> cmds;
@@ -300,6 +315,13 @@ Command::Command()
     mTimestamp = (int)time(0);
 }
 
+Command::~Command()
+{
+    mType = Type::EXTERNAL;
+    mSpecialType = SpecialType::NORMAL;
+    mTimestamp = (int)time(0);
+}
+
 bool Command::isKeyTypeValid(InMemoryData& db)
 {
     if (mCtx.mKeyArgIndex == -1) {
@@ -307,7 +329,7 @@ bool Command::isKeyTypeValid(InMemoryData& db)
     }
 
     InMemoryData::ContainerType type = db.getKeyType(mTokens[mCtx.mKeyArgIndex].first);
-    if (type == InMemoryData::ContainerType::NONE) {
+    if (type == InMemoryData::NONE) {
         return true;
     }
     
@@ -401,7 +423,8 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
 
             writeResponse(session,
                           pCmdResult,
-                          CommandResultPtr(new CommandResult("QUEUED", RedisProtocol::DataType::SIMPLE_STRING)));
+                          CommandResultPtr(new CommandResult(redis_const::QUEUED,
+                                                             RedisProtocol::SIMPLE_STRING)));
             return;
         }
         
@@ -422,7 +445,8 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
         if (cmd->getType() != Command::Type::INTERNAL) {
             writeResponse(session,
                           pCmdResult,
-                          CommandResultPtr(new CommandResult(redis_const::ERR_GENERIC, RedisProtocol::ERROR)));
+                          CommandResultPtr(new CommandResult(e.what(),
+                                                             RedisProtocol::ERROR)));
         }
     }
     catch (exception& e) {

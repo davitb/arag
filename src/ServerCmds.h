@@ -6,22 +6,6 @@
 namespace arag
 {
 
-class InfoCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(InfoCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-        
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 1,
-        MAX_ARG_NUM = 2
-    };
-};
-
 class FlushCommand: public Command
 {
 public:
@@ -48,41 +32,6 @@ private:
     CmdType mCmdType;
 };
 
-    
-class ClientCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(ClientCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 3
-    };
-};
-
-    
-class ConfigCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(ConfigCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 4
-    };
-};
-
-    
 class SingleArgumentCommand: public Command
 {
 public:
@@ -95,7 +44,7 @@ public:
     };
     
     SingleArgumentCommand(CmdType type) { mCmdType = type; }
-
+    
     DEEP_CLONE(SingleArgumentCommand)
     
     virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
@@ -109,7 +58,14 @@ private:
     
     CmdType mCmdType;
 };
-
+    
+    
+    COMMAND_CLASS(InfoCommand, 1, 2);
+    
+    COMMAND_CLASS(ClientCommand, 2, 3);
+    
+    COMMAND_CLASS(ConfigCommand, 2, 4);
+    
     
 };
 

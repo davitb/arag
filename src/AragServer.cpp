@@ -106,3 +106,8 @@ RequestProcessor& Arag::getRequestProcessor()
 {
     return mProcessor;
 }
+
+LuaInterpreter& Arag::getLuaInterpreter()
+{
+    return mLua;
+}

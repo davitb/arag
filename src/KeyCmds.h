@@ -5,43 +5,11 @@
 
 namespace arag
 {
-    
-//----------------------------------------------------------------
 
-class DelCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(DelCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
+    COMMAND_CLASS(DelCommand, 2, INT_MAX);
 
-//----------------------------------------------------------------
-
-class ExistsCommand: public Command
-{
-public:
+    COMMAND_CLASS(ExistsCommand, 2, 2);
     
-    DEEP_CLONE(ExistsCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 2,
-        MAX_ARG_NUM = 2
-    };
-};
-
 };
 
 

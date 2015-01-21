@@ -33,6 +33,16 @@ public:
     
     CommandResult(Type type);
     
+    const ResultSingle& getSingleResult() const
+    {
+        return mSingleResult;
+    }
+
+    const ResultMultiCommand& getMultiCommandResult() const
+    {
+        return mMultiResult;
+    }
+    
     void appendToArray(const ResultArray& resArr);
     
     void appendToMultiArray(const CommandResultPtr& cmd);
@@ -44,6 +54,12 @@ public:
     Type getType() const;
     
     int size();
+    
+    static CommandResultPtr redisNULLResult();
+    
+    static CommandResultPtr redisOKResult();
+
+    static CommandResultPtr redisErrorResult(const std::string& err);
     
 public:
     ResultSingle mSingleResult;

@@ -31,15 +31,17 @@ CommandResultPtr ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
         int numAdded = 0;
         
         for (int i = 2; i < mTokens.size(); i += 2) {
-            numAdded += setMap.insert(key, mTokens[i + 1].first, Utils::convertToDouble(mTokens[i].first));
+            numAdded += setMap.insert(key, mTokens[i + 1].first,
+                                      Utils::convertToDouble(mTokens[i].first));
         }
         
         FIRE_EVENT(EventPublisher::Event::zadd, key);
         
-        return CommandResultPtr(new CommandResult(to_string(numAdded), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(numAdded),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -91,7 +93,7 @@ CommandResultPtr ZRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
         return CommandResultPtr(new CommandResult(ret));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -117,24 +119,27 @@ CommandResultPtr ZScoreCommand::execute(InMemoryData& data, SessionContext& ctx)
             case SCORE:
             {
                 string score = Utils::dbl2str(setMap.score(key, member));
-                return CommandResultPtr(new CommandResult(score, RedisProtocol::DataType::BULK_STRING));
+                return CommandResultPtr(new CommandResult(score,
+                                                          RedisProtocol::BULK_STRING));
             }
                 
             case RANK:
             {
                 int rank = setMap.rank(key, member, false);
-                return CommandResultPtr(new CommandResult(to_string(rank), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(rank),
+                                                          RedisProtocol::INTEGER));
             }
                 
             case REVRANK:
             {
                 int rank = setMap.rank(key, member, true);
-                return CommandResultPtr(new CommandResult(to_string(rank), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(rank),
+                                                          RedisProtocol::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -167,7 +172,8 @@ CommandResultPtr ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 int count = setMap.count(key, min, max);
                 
-                return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(count),
+                                                          RedisProtocol::INTEGER));
             }
                 
             case LEXCOUNT:
@@ -181,19 +187,21 @@ CommandResultPtr ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 int count = setMap.lexCount(key, min, max);
                 
-                return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(count),
+                                                          RedisProtocol::INTEGER));
             }
                 
             case CARD:
             {
                 int size = setMap.size(key);
-                return CommandResultPtr(new CommandResult(to_string(size), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(size),
+                                                          RedisProtocol::INTEGER));
             }
         }
         
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -219,10 +227,10 @@ CommandResultPtr ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx
         
         FIRE_EVENT(EventPublisher::Event::zincr, key);
         
-        return CommandResultPtr(new CommandResult(ret, RedisProtocol::DataType::BULK_STRING));
+        return CommandResultPtr(new CommandResult(ret, RedisProtocol::BULK_STRING));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -261,7 +269,8 @@ CommandResultPtr ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 FIRE_EVENT(EventPublisher::Event::zrem, key);
                 
-                return CommandResultPtr(new CommandResult(to_string(numRemoved), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(numRemoved),
+                                                          RedisProtocol::INTEGER));
             }
                 
             default:
@@ -272,7 +281,8 @@ CommandResultPtr ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
         
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult("Unknown error", RedisProtocol::DataType::ERROR));
+        return CommandResultPtr(new CommandResult(redis_const::UNKNOWN_ERROR,
+                                                  RedisProtocol::ERROR));
     }
 }
 
@@ -378,10 +388,11 @@ CommandResultPtr ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(numAdded), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(numAdded),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -452,7 +463,7 @@ CommandResultPtr ZRangeByCommand::execute(InMemoryData& data, SessionContext& ct
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -514,7 +525,7 @@ CommandResultPtr ZRangeByLexCommand::execute(InMemoryData& data, SessionContext&
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -579,9 +590,10 @@ CommandResultPtr ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(numRemoved), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(numRemoved),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }

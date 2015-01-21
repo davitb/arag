@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "ClientSession.h"
 #include "SessionContext.h"
+#include "LuaInterpreter.h"
 #include "SelfTest.h"
 
 namespace arag
@@ -36,6 +37,8 @@ public:
     void removeSession(int sessionID);
     
     RequestProcessor& getRequestProcessor();
+    
+    LuaInterpreter& getLuaInterpreter();
 
 private:
     
@@ -49,6 +52,7 @@ private:
     
 private:
     RequestProcessor mProcessor;
+    LuaInterpreter mLua;
     std::unordered_map<int, std::shared_ptr<ClientSession>> mSessions;
     asio::ip::tcp::acceptor mAcceptor;
     asio::ip::tcp::socket mSocket;

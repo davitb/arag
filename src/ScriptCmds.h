@@ -1,14 +1,17 @@
-//
-//  ScriptCmds.h
-//  arag
-//
-//  Created by Davit Baghdasaryan on 1/19/15.
-//  Copyright (c) 2015 Home. All rights reserved.
-//
-
 #ifndef __arag__ScriptCmds__
 #define __arag__ScriptCmds__
 
-#include <stdio.h>
+#include "Commands.h"
+
+namespace arag
+{
+    
+    COMMAND_CLASS(EvalCommand, 3, INT_MAX);
+    
+    COMMAND_CLASS(EvalSHACommand, 3, INT_MAX);
+    
+    COMMAND_CLASS(ScriptCommand, 2, INT_MAX);
+};
+
 
 #endif /* defined(__arag__ScriptCmds__) */

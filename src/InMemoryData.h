@@ -11,6 +11,7 @@
 #include "SortedSetMap.h"
 #include "HLLMap.h"
 #include "PubSubMap.h"
+#include "ScriptMap.h"
 #include "Utils.h"
 #include "EventPublisher.h"
 #include <iostream>
@@ -49,6 +50,8 @@ public:
     HLLMap& getHyperLogLogMap() { return mHLLMap; }
 
     PubSubMap& getPubSubMap() { return mPubSubMap; }
+
+    ScriptMap& getScriptMap() { return mScriptMap; }
     
     int size();
     
@@ -73,6 +76,7 @@ private:
     SortedSetMap mSortedSetMap;
     PubSubMap mPubSubMap;
     HLLMap mHLLMap;
+    ScriptMap mScriptMap;
     int mCounter;
 };
 

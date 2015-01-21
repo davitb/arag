@@ -69,10 +69,11 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
-        return CommandResultPtr(new CommandResult(to_string(len), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(len),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -93,7 +94,8 @@ CommandResultPtr LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
         ListMap& listMap = data.getListMap();
         
         if (!listMap.keyExists(key)) {
-            return CommandResultPtr(new CommandResult("Error: key doesn't exist", RedisProtocol::DataType::ERROR));
+            return CommandResultPtr(new CommandResult(redis_const::KEY_DOESNT_EXIST,
+                                                      RedisProtocol::ERROR));
         }
         
         switch (mCmdType)
@@ -101,7 +103,7 @@ CommandResultPtr LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
             case LEN:
             {
                 return CommandResultPtr(new CommandResult(to_string(listMap.len(key)),
-                                     RedisProtocol::DataType::INTEGER));
+                                     RedisProtocol::INTEGER));
             }
                 
             case INDEX:
@@ -113,12 +115,12 @@ CommandResultPtr LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 string val = listMap.val(key, index);
                 
-                return CommandResultPtr(new CommandResult(val, RedisProtocol::DataType::BULK_STRING));
+                return CommandResultPtr(new CommandResult(val, RedisProtocol::BULK_STRING));
             }
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -138,7 +140,7 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
         ListMap& listMap = data.getListMap();
         
         if (!listMap.keyExists(key)) {
-            return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+            return CommandResult::redisNULLResult();
         }
         
         switch (mCmdType)
@@ -152,7 +154,7 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 FIRE_EVENT(EventPublisher::Event::rpop, key);
                 
-                return CommandResultPtr(new CommandResult(res, RedisProtocol::DataType::BULK_STRING));
+                return CommandResultPtr(new CommandResult(res, RedisProtocol::BULK_STRING));
             }
                 
             case LPOP:
@@ -164,7 +166,7 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 FIRE_EVENT(EventPublisher::Event::lpop, key);
 
-                return CommandResultPtr(new CommandResult(res, RedisProtocol::DataType::BULK_STRING));
+                return CommandResultPtr(new CommandResult(res, RedisProtocol::BULK_STRING));
             }
 
             case RPOPLPUSH:
@@ -183,7 +185,7 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 listMap.push(dest, val, ListMap::Position::FRONT);
                 FIRE_EVENT(EventPublisher::Event::lpush, key);
                 
-                return CommandResultPtr(new CommandResult(val, RedisProtocol::DataType::BULK_STRING));
+                return CommandResultPtr(new CommandResult(val, RedisProtocol::BULK_STRING));
             }
                 
             case REM:
@@ -197,12 +199,12 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 count = listMap.rem(key, val, count);
                 
-                return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::DataType::INTEGER));
+                return CommandResultPtr(new CommandResult(to_string(count), RedisProtocol::INTEGER));
             }
         }
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -224,13 +226,13 @@ CommandResultPtr LRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
         ListMap& listMap = data.getListMap();
         
         if (!listMap.keyExists(key)) {
-            return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+            return CommandResult::redisNULLResult();
         }
         
         return CommandResultPtr(new CommandResult(listMap.getRange(key, start, end)));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -252,17 +254,17 @@ CommandResultPtr LSetCommand::execute(InMemoryData& data, SessionContext& ctx)
         ListMap& listMap = data.getListMap();
         
         if (!listMap.keyExists(key)) {
-            return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+            return CommandResult::redisNULLResult();
         }
         
         listMap.setVal(key, index, val);
         
         FIRE_EVENT(EventPublisher::Event::lset, key);
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -284,7 +286,7 @@ CommandResultPtr LTrimCommand::execute(InMemoryData& data, SessionContext& ctx)
         ListMap& listMap = data.getListMap();
         
         if (!listMap.keyExists(key)) {
-            return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+            return CommandResult::redisNULLResult();
         }
         
         listMap.trim(key, start, stop);
@@ -294,10 +296,10 @@ CommandResultPtr LTrimCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         FIRE_EVENT(EventPublisher::Event::ltrim, key);
         
-        return CommandResultPtr(new CommandResult("OK", RedisProtocol::DataType::SIMPLE_STRING));
+        return CommandResult::redisOKResult();
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -323,17 +325,17 @@ CommandResultPtr LInsertCommand::execute(InMemoryData& data, SessionContext& ctx
         ListMap& listMap = data.getListMap();
         
         if (!listMap.keyExists(key)) {
-            return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+            return CommandResult::redisNULLResult();
         }
         
         int len = listMap.insert(key, pos, pivot, val);
         
         FIRE_EVENT(EventPublisher::Event::linsert, key);
         
-        return CommandResultPtr(new CommandResult(to_string(len), RedisProtocol::DataType::INTEGER));
+        return CommandResultPtr(new CommandResult(to_string(len), RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -357,7 +359,7 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
 
         if (timeout != 0 && (mTimestamp + timeout < time(0))) {
             return CommandResultPtr(new CommandResult({
-                make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::BULK_STRING)
+                make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::BULK_STRING)
             }));
         }
         
@@ -379,8 +381,8 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
                 }
                 
                 RedisProtocol::RedisArray arr = {
-                    make_pair(key, RedisProtocol::DataType::BULK_STRING),
-                    make_pair(res, RedisProtocol::DataType::BULK_STRING)
+                    make_pair(key, RedisProtocol::BULK_STRING),
+                    make_pair(res, RedisProtocol::BULK_STRING)
                 };
                 return CommandResultPtr(new CommandResult(arr));
             }
@@ -394,7 +396,7 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
         return CommandResultPtr(new CommandResult(CommandResult::NO_RESPONSE));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }
 
@@ -419,7 +421,7 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
         
         if (timeout != 0 && (mTimestamp + timeout < time(0))) {
             return CommandResultPtr(new CommandResult({
-                make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::BULK_STRING)
+                make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::BULK_STRING)
             }));
         }
         
@@ -434,7 +436,7 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
             listMap.push(dest, val, ListMap::Position::FRONT);
             FIRE_EVENT(EventPublisher::Event::lpush, dest);
             
-            return CommandResultPtr(new CommandResult(val, RedisProtocol::DataType::BULK_STRING));
+            return CommandResultPtr(new CommandResult(val, RedisProtocol::BULK_STRING));
         }
 
         watchKeys.push_back(source);
@@ -446,6 +448,6 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
         return CommandResultPtr(new CommandResult(CommandResult::NO_RESPONSE));
     }
     catch (std::exception& e) {
-        return CommandResultPtr(new CommandResult(redis_const::NULL_BULK_STRING, RedisProtocol::DataType::NILL));
+        return CommandResult::redisNULLResult();
     }
 }

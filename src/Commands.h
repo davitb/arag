@@ -106,7 +106,7 @@ public:
         Context()
         {
             mKeyArgIndex = -1;
-            mContainerType = InMemoryData::ContainerType::NONE;
+            mContainerType = InMemoryData::NONE;
         }
         
         Context(int k, InMemoryData::ContainerType t)
@@ -119,6 +119,8 @@ public:
 public:
     
     Command();
+    
+    virtual ~Command();
     
     virtual Command* clone() const = 0;
     
@@ -134,6 +136,8 @@ public:
                            std::vector<std::shared_ptr<Command>>& commands);
 
     static std::shared_ptr<Command> getCommand(const std::string& cmdline);
+    
+    static std::shared_ptr<Command> getCommand(const CommandResult::ResultArray& tokens);
     
     void setCommandContext(Context ctx);
     
