@@ -27,7 +27,7 @@ RedisProtocol::DataType getDataType(char ch)
             return RedisProtocol::ARRAY;
     }
     
-    throw EInvalidArgument("RedisProtocol::serialize: Unknown type");
+    throw EInvalidRequest();
 }
 
 // Parse str, extract string value from it and return its dataType and end position
@@ -43,7 +43,7 @@ string parseData(const string& str, size_t pos, size_t& newPos, RedisProtocol::D
     if (ch == '$') {
         size_t ind = str.find(CRLF, pos);
         if (ind == std::string::npos) {
-            throw EInvalidArgument("parseArray: invalid array");
+            throw EInvalidRequest();
         }
         
         // We will extract number of bytes but will ignore it for now
@@ -55,12 +55,12 @@ string parseData(const string& str, size_t pos, size_t& newPos, RedisProtocol::D
 
     ind = str.find(CRLF, pos);
     if (ind == std::string::npos) {
-        throw EInvalidArgument("parseArray: invalid array");
+        throw EInvalidRequest();
     }
 
     // Make sure that bulk array indicated the right size
     if (num != -1 && num != ind - pos) {
-        throw EInvalidArgument("parseArray: invalid array");
+        throw EInvalidRequest();
     }
     
     type = getDataType(ch);
@@ -84,7 +84,7 @@ void RedisProtocol::parse(const std::string& request, vector<RedisArray>& comman
             vector<pair<string, int>> tokens = { make_pair("PING", RedisProtocol::SIMPLE_STRING) };
             return commands.push_back(tokens);
         }
-        throw EInvalidArgument("parseArray: invalid array: "/* + request*/);
+        throw EInvalidRequest();
     }
     
     size_t ind = 0;
@@ -101,7 +101,7 @@ void RedisProtocol::parse(const std::string& request, vector<RedisArray>& comman
         // Extract next value
         data = parseData(request, ind, newPos, type);
         if (newPos > len) {
-            throw EInvalidArgument("RedisProtocol::parse: Invalid string");
+            throw EInvalidRequest();
         }
         tokens[i] = make_pair(data, type);
         ind = newPos;
@@ -151,7 +151,7 @@ string RedisProtocol::serializeNonArray(const string& response, const DataType t
             break;
             
         default:
-            throw EInvalidArgument("RedisProtocol::serialize: Unknown type");
+            throw EInvalidRequest();
     }
     
     return out;

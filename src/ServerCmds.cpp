@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "AragServer.h"
 #include <sstream>
+#include "Database.h"
 
 using namespace std;
 using namespace arag;

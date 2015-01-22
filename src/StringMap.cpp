@@ -5,7 +5,7 @@
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include <iostream>
-
+#include "Database.h"
 
 using namespace std;
 using namespace arag;
@@ -42,12 +42,12 @@ int StringMap::set(std::string key, std::string value,
         auto iter = map.find(key);
         if (iter == map.end()) {
             if (policy == SetKeyPolicy::ONLY_IF_ALREADY_EXISTS) {
-                throw EInvalidArgument("Wrong Key"); // WRONG_KEY
+                throw EWrongKeyType();
             }
         }
         else {
             if (policy == SetKeyPolicy::ONLY_IF_DOESNT_ALREADY_EXISTS) {
-                throw EInvalidArgument("Wrong Key"); // WRONG_KEY
+                throw EWrongKeyType();
             }
         }
     }
@@ -86,12 +86,12 @@ string StringMap::get(std::string key)
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
     if (iter == map.end()) {
-        throw EInvalidArgument("Wrong Key"); // WRONG_KEY
+        throw EWrongKeyType();
     }
     
     Item& item = iter->second;
     if (isExpired(item.timestamp, item.expType, item.exp)) {
-        throw EInvalidArgument("Key expired"); // WRONG_KEY
+        throw EWrongKeyType();
     }
     return iter->second.strVal;
 }

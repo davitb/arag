@@ -14,11 +14,11 @@ using namespace std;
 using namespace arag;
 using asio::ip::tcp;
 
+asio::io_service Arag::sIOS;
+
 Arag::Arag()
-: mAcceptor(Arag::ioServiceInstance(), tcp::endpoint(tcp::v4(), PORT_NUM)), mSocket(Arag::ioServiceInstance())
+: mAcceptor(sIOS, tcp::endpoint(tcp::v4(), PORT_NUM)), mSocket(sIOS)
 {
-    shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket));
-    mSessions[SessionContext::FAKE_SESSION] = session;
 }
 
 Arag::~Arag()
@@ -31,10 +31,9 @@ Arag& Arag::instance()
     return cs;
 }
 
-asio::io_service& Arag::ioServiceInstance()
+asio::io_service& Arag::ioService()
 {
-    static asio::io_service ios;
-    return ios;
+    return sIOS;
 }
 
 void Arag::startServer()
@@ -46,7 +45,7 @@ void Arag::startServer()
         doAccept();
     
         // Run the I/O service. This is a blocking call.
-        Arag::ioServiceInstance().run();
+        Arag::ioService().run();
     }
     catch (std::exception& e) {
         cout << "ERROR: " << e.what() << endl;
@@ -64,15 +63,18 @@ void Arag::doAccept()
     mAcceptor.async_accept(mSocket, [this](std::error_code ec) {
         if (!ec) {
             shared_ptr<ClientSession> session = std::make_shared<ClientSession>(std::move(mSocket));
+            // Remember the new session in the session map
             mSessions[session->getContext().getSessionID()] = session;
+            // Start listening to requests
             session->start();
-//            std::make_shared<ClientSession>(std::move(mSocket), mProcessor)->start();
         }
 
+        // Continue accpeting clients
         doAccept();
     });
 }
 
+// Return the copy of all sessions
 vector<SessionContext> Arag::getSessions()
 {
     lock_guard<mutex> lock(mSessionMapLock);

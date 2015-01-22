@@ -30,6 +30,7 @@
 		17A8D50C1A69A9D2003F68B8 /* TransactionCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A8D50A1A69A9D2003F68B8 /* TransactionCmds.cpp */; };
 		17A8D5151A6A1851003F68B8 /* EventPublisher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A8D5131A6A1851003F68B8 /* EventPublisher.cpp */; };
 		17AD40161A708CB600D11CE5 /* AragException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17AD40141A708CB600D11CE5 /* AragException.cpp */; };
+		17AD40191A7181D700D11CE5 /* Database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17AD40171A7181D700D11CE5 /* Database.cpp */; };
 		17B04E5E1A637EEB009CF9F8 /* HLLMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B04E5C1A637EEB009CF9F8 /* HLLMap.cpp */; };
 		17B04E621A63967A009CF9F8 /* HLLCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B04E601A63967A009CF9F8 /* HLLCmds.cpp */; };
 		17B4EFE71A5B902500B2E5B0 /* ClientSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFE51A5B902500B2E5B0 /* ClientSession.cpp */; };
@@ -103,6 +104,8 @@
 		17A8D5141A6A1851003F68B8 /* EventPublisher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventPublisher.h; sourceTree = "<group>"; };
 		17AD40141A708CB600D11CE5 /* AragException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AragException.cpp; sourceTree = "<group>"; };
 		17AD40151A708CB600D11CE5 /* AragException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AragException.h; sourceTree = "<group>"; };
+		17AD40171A7181D700D11CE5 /* Database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Database.cpp; sourceTree = "<group>"; };
+		17AD40181A7181D700D11CE5 /* Database.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Database.h; sourceTree = "<group>"; };
 		17B04E5C1A637EEB009CF9F8 /* HLLMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HLLMap.cpp; sourceTree = "<group>"; };
 		17B04E5D1A637EEB009CF9F8 /* HLLMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLLMap.h; sourceTree = "<group>"; };
 		17B04E5F1A6386AD009CF9F8 /* IMapCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMapCommon.h; sourceTree = "<group>"; };
@@ -243,6 +246,8 @@
 		1761F8C61A53DD1000146F9B /* Structures */ = {
 			isa = PBXGroup;
 			children = (
+				17AD40171A7181D700D11CE5 /* Database.cpp */,
+				17AD40181A7181D700D11CE5 /* Database.h */,
 				17B04E5C1A637EEB009CF9F8 /* HLLMap.cpp */,
 				17B04E5D1A637EEB009CF9F8 /* HLLMap.h */,
 				17B04E5F1A6386AD009CF9F8 /* IMapCommon.h */,
@@ -352,6 +357,7 @@
 				1776F18B1A6E0854006E5DE1 /* ScriptMap.cpp in Sources */,
 				1776F1881A6E083F006E5DE1 /* ScriptCmds.cpp in Sources */,
 				1737FA7F1A53BE700099D0A6 /* ConnectionCmds.cpp in Sources */,
+				17AD40191A7181D700D11CE5 /* Database.cpp in Sources */,
 				1776F1901A6ED228006E5DE1 /* sha1.cpp in Sources */,
 				17A8D50C1A69A9D2003F68B8 /* TransactionCmds.cpp in Sources */,
 				17B4EFEA1A5C473500B2E5B0 /* SessionContext.cpp in Sources */,

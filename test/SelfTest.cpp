@@ -8,6 +8,7 @@
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include "SessionContext.h"
+#include "Database.h"
 
 using namespace std;
 using namespace arag;

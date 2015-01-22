@@ -15,6 +15,10 @@ ClientSession::ClientSession(tcp::socket socket)
 
 void ClientSession::start()
 {
+    // Remember connection information in the context
+    mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
+                              mSocket.remote_endpoint().port());
+    
     // Read the incoming request
     doRead();
 }
@@ -27,6 +31,7 @@ void ClientSession::doRead()
     mSocket.async_read_some(asio::buffer(mBuffer), [this, self] (std::error_code ec, std::size_t length) {
 
         if (ec) {
+            // If the client is diconnected - remove it from global list
             Arag::instance().removeSession(mCtx.getSessionID());
             return;
         }
@@ -48,15 +53,13 @@ void ClientSession::doRead()
 //                asio::read(mSocket, asio::buffer(data));
 //                cmdLine += string(mBuffer.begin(), length) + string(&data[0]);
 //            }
-
-            mCtx.setConnectionDetails(mSocket.remote_endpoint().address().to_string(),
-                                      mSocket.remote_endpoint().port());
             
+            // Parse the incoming request into command(s) and then enqueue to RP's queue
             vector<shared_ptr<Command>> cmds;
             Command::getCommand(cmdLine, cmds);
             for (int i = 0; i < cmds.size(); ++i) {
+                // Create a request
                 RequestProcessor::Request req(cmds[i], mCtx.getSessionID());
-                
                 // Enqueue the request to Request Processor
                 Arag::instance().getRequestProcessor().enqueueRequest(req);
             }
@@ -64,7 +67,7 @@ void ClientSession::doRead()
         catch (std::exception& e) {
             cout << e.what() << endl;
             // Send ERROR back to the client
-            writeResponse(RedisProtocol::serializeNonArray(redis_const::ERR_GENERIC, RedisProtocol::ERROR));
+            writeResponse(RedisProtocol::serializeNonArray(e.what(), RedisProtocol::ERROR));
         }
         
         // Read the next request
@@ -76,6 +79,7 @@ void ClientSession::writeResponse(const std::string &str)
 {
     auto self(shared_from_this());
     
+    // If the response is empty - don't send it back
     if (str.length() == 0) {
         return;
     }
@@ -91,6 +95,7 @@ void ClientSession::writeResponse(const std::string &str)
             }
         };
         
+        // Send the response to client
         asio::async_write(mSocket, asio::buffer(str.c_str(), str.length()), writeFunction);
     }
     catch (std::exception& e) {

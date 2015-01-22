@@ -9,9 +9,12 @@ namespace arag
 {
 
 /*
- Represents a socket session.
- When an application connects to arag - an object of this class is created.
- */
+    ClientSession implementation.
+    1) An instance is created when a new connection is accepted by AragServer
+    2) Every instance keeps waiting for requests from connected client 
+       and writes responses back
+    3) Once a request is received it's parsed and enqueued to Request Processor queue
+*/
 class ClientSession : public std::enable_shared_from_this<ClientSession>
 {
 public:
@@ -23,17 +26,17 @@ public:
     
     ClientSession(asio::ip::tcp::socket socket);
     
-    // Start to listen for commands
+    // Start to listen for requests
     void start();
     
     SessionContext& getContext();
 
-    // Write response to socket
+    // Write response string to the socket
     void writeResponse(const std::string& resp);
     
 private:
     
-    // Read next command
+    // Read next request
     void doRead();
     
 private:

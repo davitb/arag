@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "InMemoryData.h"
 #include "AragServer.h"
+#include "Database.h"
 
 using namespace arag;
 using namespace std;

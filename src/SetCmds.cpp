@@ -3,6 +3,7 @@
 #include "SetCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
+#include "Database.h"
 
 using namespace std;
 using namespace arag;

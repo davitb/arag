@@ -6,6 +6,8 @@
 
 namespace arag
 {
+    
+// All exceptions raised in arag can be handled by this exception class
 class AragException : public std::exception
 {
 public:

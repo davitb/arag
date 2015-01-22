@@ -18,6 +18,7 @@
 #include "AragServer.h"
 #include <iostream>
 #include <regex>
+#include "Database.h"
 
 using namespace std;
 using namespace arag;

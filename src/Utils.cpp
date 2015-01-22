@@ -22,35 +22,37 @@ void Utils::printVector(const std::vector<std::string>& vec)
     cout << endl;
 }
 
-int Utils::convertToInt(std::string val)
+int Utils::convertToInt(const std::string& val)
 {
     try {
         size_t idx = 0;
         int intVal = std::stoi(val, &idx);
+        // If the string had redundant characters - return error
         if (idx != val.length()) {
             throw EInvalidArgument();
         }
         
         return intVal;
     }
-    catch (EInvalidArgument& e) {
+    catch (invalid_argument& e) {
     }
     
     throw EInvalidArgument();
 }
 
-double Utils::convertToDouble(std::string val)
+double Utils::convertToDouble(const std::string& val)
 {
     try {
         size_t idx = 0;
         double dval = std::stod(val, &idx);
+        // If the string had redundant characters - return error
         if (idx != val.length()) {
             throw EInvalidArgument();
         }
         
         return dval;
     }
-    catch (EInvalidArgument& e) {
+    catch (invalid_argument& e) {
     }
     
     throw EInvalidArgument();
@@ -59,6 +61,11 @@ double Utils::convertToDouble(std::string val)
 
 double Utils::convertToDoubleByLimit(std::string val, bool bUpperLimit)
 {
+    // '(' means exclude the first character
+    // '[' means include the first character
+    // '-inf' means the -infinite
+    // '+inf' means the +infinite
+    
     if (val[0] == '(') {
         val = val.substr(1, val.length() - 1);
         // We will treat this number as the lowest possible "double" that our system supports.
@@ -93,8 +100,14 @@ double Utils::convertToDoubleByLimit(std::string val, bool bUpperLimit)
 
 string Utils::convertToStringByLimit(std::string val, bool bUpperLimit)
 {
+    // '(' means exclude the first character
+    // '[' means include the first character
+    // '-' means the -infinite
+    // '+' means the +infinite
+    
     if (val[0] == '(') {
         val = val.substr(1, val.length() - 1);
+        // We treat char(1) as the epsilon value
         const char epslion = char(1);
         if (bUpperLimit) {
             val[val.size() - 1] -= epslion;
@@ -299,11 +312,12 @@ void Utils::getTimeOfDay(long &secs, long &msecs)
     msecs = t.tv_usec;
 }
 
-bool Utils::checkPattern(const std::string& str, std::string patt)
+bool Utils::checkPubSubPattern(const std::string& str, std::string patt)
 {
     string finalStr = str;
     size_t pos = 0;
     
+    // Replace '?' with '.' before matching
     while ((pos = patt.find('?')) != std::string::npos) {
         if (pos != 0 && patt[pos - 1] != '\\') {
             patt[pos] = '.';

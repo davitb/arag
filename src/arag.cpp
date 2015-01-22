@@ -12,6 +12,12 @@ using namespace arag;
 int main(int argc, char* argv[])
 {
     {
+//        try {
+//            throw EInvalidArgument();
+//        }
+//        catch (AragException& e) {
+//            cout << e.what();
+//        }
 //        return 1;
     }
     
