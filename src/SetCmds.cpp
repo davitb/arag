@@ -16,10 +16,10 @@ CommandResultPtr SAddCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         SetMap& setMap = data.getSetMap();
         
@@ -47,10 +47,10 @@ CommandResultPtr SMembersCommand::execute(InMemoryData& data, SessionContext& ct
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         SetMap& setMap = data.getSetMap();
         
@@ -69,10 +69,10 @@ CommandResultPtr SCardCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         SetMap& setMap = data.getSetMap();
 
@@ -89,10 +89,10 @@ CommandResultPtr SCardCommand::execute(InMemoryData& data, SessionContext& ctx)
             case ISMEMBER:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
-                string member = mTokens[2].first;
+                const string& member = mTokens[2].first;
                 ret = setMap.isMember(key, member);
                 break;
             }
@@ -114,10 +114,10 @@ CommandResultPtr SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         SetMap& setMap = data.getSetMap();
         
@@ -128,7 +128,7 @@ CommandResultPtr SRemCommand::execute(InMemoryData& data, SessionContext& ctx)
             case REM:
             {
                 if (cmdNum < Consts::MIN_ARG_NUM + 1) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 int numRemoved = 0;
@@ -177,7 +177,7 @@ CommandResultPtr SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         SetMap& setMap = data.getSetMap();
@@ -188,7 +188,7 @@ CommandResultPtr SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
         {
             case DIFF:
             {
-                string key = mTokens[1].first;
+                const string& key = mTokens[1].first;
                 
                 vector<string> diffKeys;
                 for (int i = 2; i < mTokens.size(); ++i) {
@@ -210,11 +210,11 @@ CommandResultPtr SDiffCommand::execute(InMemoryData& data, SessionContext& ctx)
             case DIFFSTORE:
             {
                 if (cmdNum < Consts::MIN_ARG_NUM + 1) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
-                string destKey = mTokens[1].first;
-                string sourceKey = mTokens[2].first;
+                const string& destKey = mTokens[1].first;
+                const string& sourceKey = mTokens[2].first;
                 
                 vector<string> diffKeys;
                 for (int i = 3; i < mTokens.size(); ++i) {
@@ -250,7 +250,7 @@ CommandResultPtr SInterCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         SetMap& setMap = data.getSetMap();
@@ -281,10 +281,10 @@ CommandResultPtr SInterCommand::execute(InMemoryData& data, SessionContext& ctx)
             case INTERSTORE:
             {
                 if (cmdNum < Consts::MIN_ARG_NUM + 1) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
-                string destKey = mTokens[1].first;
+                const string& destKey = mTokens[1].first;
                 
                 vector<string> keys;
                 for (int i = 2; i < mTokens.size(); ++i) {
@@ -320,7 +320,7 @@ CommandResultPtr SUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         SetMap& setMap = data.getSetMap();
@@ -351,10 +351,10 @@ CommandResultPtr SUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
             case UNIONSTORE:
             {
                 if (cmdNum < Consts::MIN_ARG_NUM + 1) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
-                string destKey = mTokens[1].first;
+                const string& destKey = mTokens[1].first;
                 
                 vector<string> keys;
                 for (int i = 2; i < mTokens.size(); ++i) {
@@ -390,14 +390,14 @@ CommandResultPtr SMoveCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         SetMap& setMap = data.getSetMap();
         
-        string source = mTokens[1].first;
-        string dest = mTokens[2].first;
-        string member = mTokens[3].first;
+        const string& source = mTokens[1].first;
+        const string& dest = mTokens[2].first;
+        const string& member = mTokens[3].first;
         
         int ret = setMap.move(source, dest, member);
         
@@ -420,12 +420,12 @@ CommandResultPtr SRandMemberCommand::execute(InMemoryData& data, SessionContext&
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         SetMap& setMap = data.getSetMap();
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         if (cmdNum == Consts::MIN_ARG_NUM) {
             string member = setMap.getRandMember(key);

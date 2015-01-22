@@ -28,15 +28,15 @@ int Utils::convertToInt(std::string val)
         size_t idx = 0;
         int intVal = std::stoi(val, &idx);
         if (idx != val.length()) {
-            throw invalid_argument("Must be a number");
+            throw EInvalidArgument();
         }
         
         return intVal;
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
     
-    throw invalid_argument("Must be a number");
+    throw EInvalidArgument();
 }
 
 double Utils::convertToDouble(std::string val)
@@ -45,15 +45,15 @@ double Utils::convertToDouble(std::string val)
         size_t idx = 0;
         double dval = std::stod(val, &idx);
         if (idx != val.length()) {
-            throw invalid_argument("Must be a double number");
+            throw EInvalidArgument();
         }
         
         return dval;
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
     
-    throw invalid_argument("Must be double number");
+    throw EInvalidArgument();
 }
 
 
@@ -61,7 +61,7 @@ double Utils::convertToDoubleByLimit(std::string val, bool bUpperLimit)
 {
     if (val[0] == '(') {
         val = val.substr(1, val.length() - 1);
-        // We will treat this number as the lowest possible double that our system supports.
+        // We will treat this number as the lowest possible "double" that our system supports.
         // Ideally we would use the predefined DBL_EPSILON from <cfloat> however it seems
         // that in order to properly use it we need to turn off optimization on compilers.
         // From other side, we don't really need to support such small numbers in our system.

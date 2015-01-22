@@ -67,7 +67,7 @@ vector<pair<string, int>> SetMap::getMembers(const string& key)
 string SetMap::getRandMember(const std::string &key)
 {
     if (size(key) == 0) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
 
     unordered_set<string>& s = mSetMap[key];

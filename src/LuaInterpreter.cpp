@@ -29,7 +29,7 @@ class LuaInterpreter::impl
 {
 public:
 
-    static int redisCall(lua_State *L)
+    static int redisCallImpl(lua_State* L, bool bForceExitLua)
     {
         if (spHandler) {
             int argc = lua_gettop(L);
@@ -40,19 +40,41 @@ public:
             }
             
             try {
-                CommandResultToLuaType(L, spHandler->onRedisCall(tokens));
+                CommandResultPtr result = spHandler->onRedisCall(tokens);
+                if (bForceExitLua) {
+                    if (result->getType() == CommandResult::SINGLE_RESPONSE) {
+                        if (result->getSingleResult().second == RedisProtocol::ERROR) {
+                            pushErrorToLua(L, string("Redis command failed with: ") +
+                                           result->getSingleResult().first);
+                            return 0;
+                        }
+                    }
+                }
+                CommandResultToLuaType(L, result);
+                
             }
             catch (exception& e) {
-                CommandResultToLuaType(L, CommandResult::redisErrorResult(e.what()));
+                if (bForceExitLua) {
+                    pushErrorToLua(L, string("Redis command failed with: ") + e.what());
+                    return 0;
+                }
+                else {
+                    CommandResultToLuaType(L, CommandResult::redisErrorResult(e.what()));
+                }
             }
             return 1;
         }
         return 0;
     }
     
+    static int redisCall(lua_State *L)
+    {
+        return redisCallImpl(L, false);
+    }
+    
     static int redisPCall(lua_State *L)
     {
-        return redisCall(L);
+        return redisCallImpl(L, true);
     }
 
     static int redisLog(lua_State *L)
@@ -374,14 +396,14 @@ public:
         
         int status = luaL_loadstring(lua, script.c_str());
         if (status != 0) {
-            throw invalid_argument("Script cannot be loaded");
+            throw EScriptFailed();
         }
         
         string s = script;
         spHandler = &handler;
         status = lua_pcall(lua, 0, LUA_MULTRET, 0);
         if (status != 0) {
-            throw invalid_argument("Script failed bad way");
+            throw EScriptFailed();
         }
 
         spHandler = nullptr;

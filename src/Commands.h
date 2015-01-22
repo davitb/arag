@@ -5,6 +5,7 @@
 #include <vector>
 #include <climits>
 #include <memory>
+#include "AragException.h"
 #include "InMemoryData.h"
 #include "SessionContext.h"
 #include "Config.h"

@@ -16,10 +16,10 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         ListMap& listMap = data.getListMap();
         int len = 0;
@@ -40,7 +40,7 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
             case RPUSHX:
             {
                 if (listMap.keyExists(key)) {
-                    string value = mTokens[2].first;
+                    const string& value = mTokens[2].first;
                     len = listMap.push(key, value, ListMap::Position::BACK);
                     FIRE_EVENT(EventPublisher::Event::rpush, key);
                 }
@@ -60,7 +60,7 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
             case LPUSHX:
             {
                 if (listMap.keyExists(key)) {
-                    string value = mTokens[2].first;
+                    const string& value = mTokens[2].first;
                     len = listMap.push(key, value, ListMap::Position::FRONT);
                     FIRE_EVENT(EventPublisher::Event::lpush, key);                    
                 }
@@ -86,10 +86,10 @@ CommandResultPtr LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         ListMap& listMap = data.getListMap();
         
@@ -109,7 +109,7 @@ CommandResultPtr LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
             case INDEX:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
-                    throw invalid_argument("Wrong number of arguments");
+                    throw EInvalidArgument();
                 }
                 int index = Utils::convertToInt(mTokens[2].first);
                 
@@ -132,10 +132,10 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         ListMap& listMap = data.getListMap();
         
@@ -172,9 +172,9 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
             case RPOPLPUSH:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM - 1) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
-                string dest = mTokens[2].first;
+                const string& dest = mTokens[2].first;
                 
                 string val = listMap.pop(key, ListMap::Position::BACK);
                 if (!listMap.keyExists(key)) {
@@ -191,11 +191,11 @@ CommandResultPtr LRemCommand::execute(InMemoryData& data, SessionContext& ctx)
             case REM:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 int count = Utils::convertToInt(mTokens[2].first);
-                string val = mTokens[3].first;
+                const string& val = mTokens[3].first;
                 
                 count = listMap.rem(key, val, count);
                 
@@ -216,10 +216,10 @@ CommandResultPtr LRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int start = Utils::convertToInt(mTokens[2].first);
         int end = Utils::convertToInt(mTokens[3].first);
         
@@ -244,12 +244,12 @@ CommandResultPtr LSetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int index = Utils::convertToInt(mTokens[2].first);
-        string val = mTokens[3].first;
+        const string& val = mTokens[3].first;
         
         ListMap& listMap = data.getListMap();
         
@@ -276,10 +276,10 @@ CommandResultPtr LTrimCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int start = Utils::convertToInt(mTokens[2].first);
         int stop = Utils::convertToInt(mTokens[3].first);
         
@@ -311,16 +311,16 @@ CommandResultPtr LInsertCommand::execute(InMemoryData& data, SessionContext& ctx
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string pos = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& pos = mTokens[2].first;
         if (pos != "BEFORE" && pos != "AFTER") {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
-        string pivot = mTokens[3].first;
-        string val = mTokens[4].first;
+        const string& pivot = mTokens[3].first;
+        const string& val = mTokens[4].first;
         
         ListMap& listMap = data.getListMap();
         
@@ -348,7 +348,7 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         int timeout = Utils::convertToInt(mTokens[mTokens.size() - 1].first);
@@ -409,7 +409,7 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         const std::string& source = mTokens[1].first;

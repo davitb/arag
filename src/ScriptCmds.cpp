@@ -52,14 +52,14 @@ CommandResultPtr EvalCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         const string& script = mTokens[1].first;
         int numKeys = Utils::convertToInt(mTokens[2].first);
         
         if (3 + numKeys > cmdNum) {
-            throw invalid_argument("Invalid num of args");
+            throw EInvalidArgument();
         }
         
         vector<string> keys;
@@ -97,7 +97,7 @@ CommandResultPtr EvalSHACommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         ScriptMap& map = db.getScriptMap();
@@ -123,7 +123,7 @@ CommandResultPtr ScriptCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         const string& subCmd = mTokens[1].first;
@@ -132,7 +132,7 @@ CommandResultPtr ScriptCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         if (subCmd == "LOAD") {
             if (cmdNum <= 2) {
-                throw invalid_argument("Wrong number of args");
+                throw EInvalidArgument();
             }
             
             const string& script = mTokens[2].first;
@@ -143,7 +143,7 @@ CommandResultPtr ScriptCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         if (subCmd == "EXISTS") {
             if (cmdNum <= 2) {
-                throw invalid_argument("Wrong number of args");
+                throw EInvalidArgument();
             }
 
             RedisProtocol::RedisArray arr;

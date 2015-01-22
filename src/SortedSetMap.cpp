@@ -71,7 +71,7 @@ int SortedSetMap::insert(const std::string &key, const std::string &val, double 
     if (iter == sset.mMap.end()) {
         auto result = sset.mSkipList.insert(Item(val, score));
         if (!result.second) {
-            throw invalid_argument("Cannot add new elem");
+            throw EInvalidArgument();
         }
         sset.mMap[val] = score;
         return 1;
@@ -85,7 +85,7 @@ int SortedSetMap::insert(const std::string &key, const std::string &val, double 
     sset.mSkipList.erase(Item(val, iter->second));
     auto result = sset.mSkipList.insert(Item(val, score));
     if (!result.second) {
-        throw invalid_argument("Cannot add new elem");
+        throw EInvalidArgument();
     }
     // Update the map
     iter->second = score;
@@ -141,7 +141,7 @@ double SortedSetMap::score(const std::string &key, const std::string &member)
     
     auto iter = sset.mMap.find(member);
     if (iter == sset.mMap.end()) {
-        throw invalid_argument("Wrong member");
+        throw EInvalidArgument();
     }
     
     return sset.mMap[member];
@@ -153,7 +153,7 @@ int SortedSetMap::rank(const std::string &key, const std::string &member, bool r
     
     auto iter = sset.mMap.find(member);
     if (iter == sset.mMap.end()) {
-        throw invalid_argument("Wrong member");
+        throw EInvalidArgument();
     }
     
     double score = iter->second;

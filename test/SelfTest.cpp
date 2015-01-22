@@ -66,7 +66,7 @@ void SelfTest::testParser()
         Utils::convertToInt(str);
         assert(1 == 0);
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
     
     try {
@@ -74,7 +74,7 @@ void SelfTest::testParser()
         Utils::convertToInt(str);
         assert(1 == 0);
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
 
     try {
@@ -82,7 +82,7 @@ void SelfTest::testParser()
         Utils::convertToInt(str);
         assert(1 == 0);
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
     
     

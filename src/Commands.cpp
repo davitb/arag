@@ -206,7 +206,7 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["ZLEXCOUNT"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
         sNameToCommand["ZCARD"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CARD));
         sNameToCommand["ZCARD"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
-        sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand(ZRemCommand::REM));
+        sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand());
         sNameToCommand["ZREM"]->setCommandContext(Command::Context(1, InMemoryData::SORTEDSET));
         sNameToCommand["ZUNIONSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::UNION));
         sNameToCommand["ZINTERSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::INTERSECT));
@@ -259,7 +259,7 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
     
     if (sNameToCommand.count(upperCaseCmd) == 0) {
         cout << "command: " + cmdName << endl;
-        throw invalid_argument("Invalid command: " + cmdName);
+        throw EInvalidCommand(cmdName);
     }
     
     return shared_ptr<Command>(sNameToCommand[upperCaseCmd]->clone());
@@ -277,7 +277,7 @@ void Command::getCommand(const string& cmdline, vector<shared_ptr<Command>>& com
     RedisProtocol::parse(cmdline, parsedCommands);
     
     if (parsedCommands.size() == 0) {
-        throw invalid_argument("Invalid Command");
+        throw EInvalidRequest();
     }
     
     for (int i = 0; i < parsedCommands.size(); ++i) {
@@ -361,14 +361,14 @@ void Command::extractExpirationNum(const vector<pair<string, int>>& tokens,
     if (cmdNum != minArgsNum) {
         
         if (cmdNum != maxArgsNum || (pExp == nullptr || pExpType == nullptr)) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string expType = tokens[3].first;
-        string expVal = tokens[4].first;
+        const string& expType = tokens[3].first;
+        const string& expVal = tokens[4].first;
         
         if (expType != "EX" && expType != "PX") {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         *pExpType = expType == "EX" ? StringMap::ExpirationType::SEC : StringMap::ExpirationType::MSEC;
@@ -432,7 +432,7 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
         sessionCtx.checkPendingBLCommand();
 
         if (!cmd->isKeyTypeValid(selectedDB)) {
-            throw invalid_argument("Wrong key operation");
+            throw EWrongKeyType();
         }
         
         CommandResultPtr res = cmd->execute(selectedDB, sessionCtx);
@@ -441,7 +441,7 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             writeResponse(session, pCmdResult, res);
         }
     }
-    catch (invalid_argument& e) {
+    catch (AragException& e) {
         if (cmd->getType() != Command::Type::INTERNAL) {
             writeResponse(session,
                           pCmdResult,

@@ -43,7 +43,7 @@ CommandResultPtr InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         string section;
@@ -74,7 +74,7 @@ CommandResultPtr FlushCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         switch (mCmdType)
@@ -132,20 +132,20 @@ CommandResultPtr ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
-        string subCommand = mTokens[1].first;
+        const string& subCommand = mTokens[1].first;
         
         if (subCommand == "SETNAME") {
             if (cmdNum != 3) {
-                throw invalid_argument("Invalid number of args");
+                throw EInvalidArgument();
             }
             
-            string name = mTokens[2].first;
+            const string& name = mTokens[2].first;
             
             if (name == "" || name.find(' ') != string::npos) {
-                throw invalid_argument("Invalid client name");
+                throw EInvalidArgument();
             }
             
             ctx.setClientName(name);
@@ -155,7 +155,7 @@ CommandResultPtr ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
         else
         if (subCommand == "GETNAME") {
 
-            string name = mTokens[2].first;
+            const string& name = mTokens[2].first;
             
             if (name == "") {
                 return CommandResult::redisNULLResult();
@@ -178,7 +178,7 @@ CommandResultPtr ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
                                                       RedisProtocol::BULK_STRING));
         }
         else {
-            throw invalid_argument("SubCommand not supported");
+            throw EInvalidCommand(subCommand);
         }
     }
     catch (std::exception& e) {
@@ -195,20 +195,20 @@ CommandResultPtr ConfigCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string subCommand = mTokens[1].first;
+        const string& subCommand = mTokens[1].first;
         
         if (subCommand == "GET") {
             if (cmdNum != 3) {
-                throw invalid_argument("Invalid number of args");
+                throw EInvalidArgument();
             }
             
-            string param = mTokens[2].first;
+            const string& param = mTokens[2].first;
             
             if (param == "" || param.find(' ') != string::npos) {
-                throw invalid_argument("Invalid config param");
+                throw EInvalidArgument();
             }
 
             // FIXME: Need to support configuration to fulfill values here
@@ -220,14 +220,14 @@ CommandResultPtr ConfigCommand::execute(InMemoryData& data, SessionContext& ctx)
         else
         if (subCommand == "SET") {
             if (cmdNum != 3) {
-                throw invalid_argument("Invalid number of args");
+                throw EInvalidArgument();
             }
             
-            string param = mTokens[2].first;
-            string val = mTokens[3].first;
+            const string& param = mTokens[2].first;
+            //const string& val = mTokens[3].first;
             
             if (param == "" || param.find(' ') != string::npos) {
-                throw invalid_argument("Invalid config param");
+                throw EInvalidArgument();
             }
             
             // FIXME: Need to support configuration to fulfill values here
@@ -250,7 +250,7 @@ CommandResultPtr SingleArgumentCommand::execute(InMemoryData& data, SessionConte
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         switch (mCmdType)

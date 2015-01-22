@@ -44,13 +44,13 @@ int ListMap::len(const std::string &key)
 string ListMap::val(const std::string &key, int pos)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];
     
     if (abs(pos) >= l.size()) {
-        throw invalid_argument("Out of range");
+        throw EInvalidArgument();
     }
     
     if (pos < 0) {
@@ -66,13 +66,13 @@ string ListMap::val(const std::string &key, int pos)
 void ListMap::setVal(const std::string &key, int pos, const std::string &val)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];
     
     if (abs(pos) >= l.size()) {
-        throw invalid_argument("Out of range");
+        throw EInvalidArgument();
     }
     
     if (pos < 0) {
@@ -88,14 +88,14 @@ void ListMap::setVal(const std::string &key, int pos, const std::string &val)
 string ListMap::pop(const std::string &key, Position pos)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];
     string val;
 
     if (l.size() == 0) {
-        throw invalid_argument("List is empty");
+        throw EInvalidArgument();
     }
     
     switch (pos)
@@ -155,7 +155,7 @@ static int removeElement(list<string>& l,
 int ListMap::rem(const std::string &key, const std::string &val, int count)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];
@@ -179,7 +179,7 @@ int ListMap::rem(const std::string &key, const std::string &val, int count)
 vector<pair<string, int>> ListMap::getRange(const std::string &key, int start, int end)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];
@@ -214,7 +214,7 @@ vector<pair<string, int>> ListMap::getRange(const std::string &key, int start, i
 void ListMap::trim(const std::string &key, int start, int end)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];
@@ -243,7 +243,7 @@ int ListMap::insert(const std::string &key,
                     const std::string &val)
 {
     if (!keyExists(key)) {
-        throw invalid_argument("Wrong key");
+        throw EInvalidKey();
     }
     
     list<string>& l = mListMap[key];

@@ -17,14 +17,14 @@ CommandResultPtr ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         if (mTokens.size() % 2 != 0) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         SortedSetMap& setMap = data.getSortedSetMap();
         
@@ -54,17 +54,17 @@ CommandResultPtr ZRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int start = Utils::convertToInt(mTokens[2].first);
         int end = Utils::convertToInt(mTokens[3].first);
         bool bWithScores = false;
         
         if (cmdNum == Consts::MAX_ARG_NUM) {
             if (mTokens[4].first != "WITHSCORES") {
-                throw invalid_argument("Invalid args");
+                throw EInvalidArgument();
             }
             bWithScores = true;
         }
@@ -106,11 +106,11 @@ CommandResultPtr ZScoreCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string member = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& member = mTokens[2].first;
         
         SortedSetMap& setMap = data.getSortedSetMap();
         
@@ -152,10 +152,10 @@ CommandResultPtr ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
 
         SortedSetMap& setMap = data.getSortedSetMap();
         
@@ -164,7 +164,7 @@ CommandResultPtr ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
             case COUNT:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 double min = Utils::convertToDoubleByLimit(mTokens[2].first, false);
@@ -179,7 +179,7 @@ CommandResultPtr ZCountCommand::execute(InMemoryData& data, SessionContext& ctx)
             case LEXCOUNT:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 string min = Utils::convertToStringByLimit(mTokens[2].first, false);
@@ -214,12 +214,12 @@ CommandResultPtr ZIncrByCommand::execute(InMemoryData& data, SessionContext& ctx
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         double by = Utils::convertToDouble(mTokens[2].first);
-        string member = mTokens[3].first;
+        const string& member = mTokens[3].first;
         
         SortedSetMap& setMap = data.getSortedSetMap();
         
@@ -243,42 +243,30 @@ CommandResultPtr ZRemCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         SortedSetMap& setMap = data.getSortedSetMap();
         
-        switch (mCmdType)
-        {
-            case REM:
-            {
-                if (cmdNum % 2 != 1) {
-                    throw invalid_argument("Invalid args");
-                }
+        if (cmdNum % 2 != 1) {
+            throw EInvalidArgument();
+        }
 
-                int numRemoved = 0;
-                
-                for (int i = 2; i < mTokens.size(); i += 2) {
-                    numRemoved += setMap.rem(key, mTokens[i].first);
-                }
-                
-                if (!setMap.keyExists(key)) {
-                    FIRE_EVENT(EventPublisher::Event::del, key);
-                }
-                FIRE_EVENT(EventPublisher::Event::zrem, key);
-                
-                return CommandResultPtr(new CommandResult(to_string(numRemoved),
-                                                          RedisProtocol::INTEGER));
-            }
-                
-            default:
-            {
-                throw invalid_argument("not supported");
-            }
+        int numRemoved = 0;
+        
+        for (int i = 2; i < mTokens.size(); i += 2) {
+            numRemoved += setMap.rem(key, mTokens[i].first);
         }
         
+        if (!setMap.keyExists(key)) {
+            FIRE_EVENT(EventPublisher::Event::del, key);
+        }
+        FIRE_EVENT(EventPublisher::Event::zrem, key);
+        
+        return CommandResultPtr(new CommandResult(to_string(numRemoved),
+                                                  RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
         return CommandResultPtr(new CommandResult(redis_const::UNKNOWN_ERROR,
@@ -295,19 +283,19 @@ CommandResultPtr ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string dest = mTokens[1].first;
+        const string& dest = mTokens[1].first;
         int numKeys = Utils::convertToInt(mTokens[2].first);
 
         if (numKeys == 0) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         int pos = 3;
         if (cmdNum < numKeys + pos) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         vector<string> keys(numKeys);
@@ -328,12 +316,12 @@ CommandResultPtr ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         if (cmdNum > pos) {
             if (mTokens[pos].first != "WEIGHTS" && mTokens[pos].first != "AGGREGATE") {
-                throw invalid_argument("Invalid args");
+                throw EInvalidArgument();
             }
             
             if (mTokens[pos].first == "WEIGHTS") {
                 if (cmdNum < numKeys + pos) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 bWeigthsProvided = true;
@@ -346,13 +334,13 @@ CommandResultPtr ZUnionCommand::execute(InMemoryData& data, SessionContext& ctx)
             
             if (mTokens[pos].first == "AGGREGATE") {
                 if (cmdNum < pos + 1) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 pos += 1; // Skip "AGGREGATE"
                 aggregate = mTokens[pos].first;
                 if (aggregate != "SUM" && aggregate != "MIN" && aggregate != "MAX") {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
             }
         }
@@ -405,10 +393,10 @@ CommandResultPtr ZRangeByCommand::execute(InMemoryData& data, SessionContext& ct
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int offset = 0;
         int count = INT_MAX;
         
@@ -423,7 +411,7 @@ CommandResultPtr ZRangeByCommand::execute(InMemoryData& data, SessionContext& ct
         
         if (cmdNum > pos && mTokens[pos].first == "LIMIT") {
             if (cmdNum != pos + 3) {
-                throw invalid_argument("Invalid args");
+                throw EInvalidArgument();
             }
             
             offset = Utils::convertToInt(mTokens[pos + 1].first);
@@ -476,10 +464,10 @@ CommandResultPtr ZRangeByLexCommand::execute(InMemoryData& data, SessionContext&
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int offset = 0;
         int count = INT_MAX;
         
@@ -487,7 +475,7 @@ CommandResultPtr ZRangeByLexCommand::execute(InMemoryData& data, SessionContext&
         
         if (cmdNum > pos && mTokens[pos].first == "LIMIT") {
             if (cmdNum != pos + 3) {
-                throw invalid_argument("Invalid args");
+                throw EInvalidArgument();
             }
             
             offset = Utils::convertToInt(mTokens[pos + 1].first);
@@ -538,10 +526,10 @@ CommandResultPtr ZRemByCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int numRemoved = 0;
         
         SortedSetMap& setMap = data.getSortedSetMap();

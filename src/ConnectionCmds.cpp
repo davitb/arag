@@ -14,7 +14,7 @@ CommandResultPtr PingCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         switch (mCmdType)
@@ -27,7 +27,7 @@ CommandResultPtr PingCommand::execute(InMemoryData& data, SessionContext& ctx)
             case ECHO_CMD:
             {
                 if (cmdNum != Consts::MAX_ARG_NUM) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 return CommandResultPtr(new CommandResult(mTokens[1].first, RedisProtocol::BULK_STRING));
             }
@@ -47,7 +47,7 @@ CommandResultPtr SelectCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         int index = Utils::convertToInt(mTokens[1].first);

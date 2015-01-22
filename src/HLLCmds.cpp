@@ -15,10 +15,10 @@ CommandResultPtr PFAddCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int bAdded = 0;
         HLLMap& hll = db.getHyperLogLogMap();
         
@@ -46,7 +46,7 @@ CommandResultPtr PFCountCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         HLLMap& hll = db.getHyperLogLogMap();
@@ -79,10 +79,10 @@ CommandResultPtr PFMergeCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string destKey = mTokens[1].first;
+        const string& destKey = mTokens[1].first;
         HLLMap& hll = db.getHyperLogLogMap();
         
         vector<string> keys;

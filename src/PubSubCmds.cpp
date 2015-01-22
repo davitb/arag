@@ -112,7 +112,7 @@ CommandResultPtr SubscribeCommand::execute(InMemoryData& db, SessionContext& ctx
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         return subscribe(mTokens, db.getPubSubMap(), ctx, "subscribe", false);
@@ -131,7 +131,7 @@ CommandResultPtr PSubscribeCommand::execute(InMemoryData& db, SessionContext& ct
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         return subscribe(mTokens, db.getPubSubMap(), ctx, "psubscribe", true);
@@ -150,11 +150,11 @@ CommandResultPtr PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
-        string channel = mTokens[1].first;
-        string message = mTokens[2].first;
+        const string& channel = mTokens[1].first;
+        const string& message = mTokens[2].first;
         
         PubSubMap& pubSub = db.getPubSubMap();
         
@@ -188,7 +188,7 @@ CommandResultPtr PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
                     
                     num++;
                 }
-                catch (std::invalid_argument& e) {
+                catch (AragException& e) {
                     //cout << e.what() << endl;
                     pubSub.removeSubscriber(subscrs.second.second, sid);
                 }
@@ -212,7 +212,7 @@ CommandResultPtr UnsubscribeCommand::execute(InMemoryData& db, SessionContext& c
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         return unsubscribe(mTokens, db.getPubSubMap(), ctx, "unsubscribe");
@@ -231,7 +231,7 @@ CommandResultPtr PUnsubscribeCommand::execute(InMemoryData& db, SessionContext& 
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         return unsubscribe(mTokens, db.getPubSubMap(), ctx, "punsubscribe");

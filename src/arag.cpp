@@ -4,7 +4,7 @@
 #include "RedisProtocol.h"
 #include <string>
 #include "LuaInterpreter.h"
-#include <regex>
+#include "AragException.h"
 
 using namespace std;
 using namespace arag;
@@ -12,7 +12,6 @@ using namespace arag;
 int main(int argc, char* argv[])
 {
     {
-        
 //        return 1;
     }
     

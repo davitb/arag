@@ -90,7 +90,7 @@ ClientSession& Arag::getClientSession(int sessionID)
     lock_guard<mutex> lock(mSessionMapLock);
     auto elem = mSessions.find(sessionID);
     if (elem == mSessions.end()) {
-        throw invalid_argument("Arag::getClientSession: Wrong sessionID");
+        throw EWrongSessionID();
     }
     
     return *elem->second;

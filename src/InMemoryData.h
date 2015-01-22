@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include "AragException.h"
 #include "StringMap.h"
 #include "ListMap.h"
 #include "SetMap.h"

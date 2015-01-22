@@ -20,7 +20,6 @@ std::list<PubSubMap::PubSubElement> PubSubMap::getSubscribers(const std::string&
     std::list<PubSubElement> subscrs;
     
     for (auto iter = mSubscrMap.begin(); iter != mSubscrMap.end(); ++iter) {
-        string ch = iter->first;
         if (Utils::checkPattern(channel, iter->first)) {
             subscrs.push_back(iter->second);
         }
@@ -58,10 +57,9 @@ vector<string> PubSubMap::unsubscribeFromAllChannels(int sid)
 void PubSubMap::removeSubscriber(const std::vector<std::string>& patterns, int sid)
 {
     for (auto elem : mSubscrMap) {
-        std::string channel = elem.first;
         for (auto patt : patterns) {
-            if (Utils::checkPattern(channel, patt)) {
-                removeSubscriber(channel, sid);
+            if (Utils::checkPattern(elem.first, patt)) {
+                removeSubscriber(elem.first, sid);
             }
         }
     }

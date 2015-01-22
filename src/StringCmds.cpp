@@ -19,11 +19,11 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
-        string key = mTokens[1].first;
-        string val = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& val = mTokens[2].first;
         
         // Extract expiration time
         int exp = 0;
@@ -59,7 +59,7 @@ CommandResultPtr GetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         return CommandResultPtr(new CommandResult(map.get(mTokens[1].first),
@@ -79,11 +79,11 @@ CommandResultPtr GetSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string val = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& val = mTokens[2].first;
         
         return CommandResultPtr(new CommandResult(map.getset(key, val),
                                                 RedisProtocol::BULK_STRING));
@@ -102,11 +102,11 @@ CommandResultPtr AppendCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string val = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& val = mTokens[2].first;
         int res = map.append(key, val);
 
         FIRE_EVENT(EventPublisher::Event::append, key);
@@ -129,10 +129,10 @@ CommandResultPtr IncrCommand::execute(InMemoryData& data, SessionContext& ctx)
     try {
     
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         string resp = to_string(map.incrBy(key, 1));
         
@@ -155,10 +155,10 @@ CommandResultPtr IncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
     try {
         
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int by = Utils::convertToInt(mTokens[2].first);
         
         string resp = to_string(map.incrBy(key, by));
@@ -182,10 +182,10 @@ CommandResultPtr IncrByFloatCommand::execute(InMemoryData& data, SessionContext&
     try {
         
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         double by = Utils::convertToDouble(mTokens[2].first);
         
         const string& resp = map.incrBy(key, by);
@@ -209,10 +209,10 @@ CommandResultPtr DecrCommand::execute(InMemoryData& data, SessionContext& ctx)
     try {
         
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         string resp = to_string(map.incrBy(key, -1));
         
@@ -235,10 +235,10 @@ CommandResultPtr DecrByCommand::execute(InMemoryData& data, SessionContext& ctx)
     try {
         
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int by = Utils::convertToInt(mTokens[2].first);
         
         int res = map.incrBy(key, by * -1);
@@ -262,12 +262,12 @@ CommandResultPtr GetRangeCommand::execute(InMemoryData& data, SessionContext& ct
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string start = mTokens[2].first;
-        string end = mTokens[3].first;
+        const string& key = mTokens[1].first;
+        const string& start = mTokens[2].first;
+        const string& end = mTokens[3].first;
         
         return CommandResultPtr(new CommandResult(map.getRange(key,
                                           Utils::convertToInt(start),
@@ -288,16 +288,16 @@ CommandResultPtr SetRangeCommand::execute(InMemoryData& data, SessionContext& ct
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int offset = Utils::convertToInt(mTokens[2].first);
         if (offset < 0) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string value = mTokens[3].first;
+        const string& value = mTokens[3].first;
         int valueLen = (int)value.length();
         
         string oldVal = "";
@@ -348,7 +348,7 @@ CommandResultPtr MGetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         vector<string> keys(mTokens.size() - 1);
@@ -373,13 +373,13 @@ CommandResultPtr MSetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         size_t size = mTokens.size();
         
         if (size % 2 != 1) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         // If this is a MSETNX command - make sure that all given keys exist
@@ -425,16 +425,16 @@ CommandResultPtr BitCountCommand::execute(InMemoryData& data, SessionContext& ct
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int start = 0;
         int end = INT_MAX;
 
         if (cmdNum != Consts::MIN_ARG_NUM) {
             if (cmdNum != Consts::MAX_ARG_NUM) {
-                throw invalid_argument("Invalid args");
+                throw EInvalidArgument();
             }
             
             start = Utils::convertToInt(mTokens[2].first);
@@ -465,11 +465,11 @@ CommandResultPtr BitOpCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string op = mTokens[1].first;
-        string destKey = mTokens[2].first;
+        const string& op = mTokens[1].first;
+        const string& destKey = mTokens[2].first;
         vector<string> keys(mTokens.size() - 3);
         
         for (int i = 3; i < mTokens.size(); ++i) {
@@ -498,13 +498,13 @@ CommandResultPtr BitPosCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int bit = Utils::convertToInt(mTokens[2].first);
         if (bit != 0 && bit != 1) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         int start = 0;
@@ -546,13 +546,13 @@ CommandResultPtr GetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int offset = Utils::convertToInt(mTokens[2].first);
         if (offset < 0 || offset >= SetBitCommand::Consts::MAX_OFFSET) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
         string val = "";
@@ -580,18 +580,18 @@ CommandResultPtr SetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         int originalBit = 0;
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         int offset = Utils::convertToInt(mTokens[2].first);
         if (offset < 0 || offset >= Consts::MAX_OFFSET) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         int bitValue = Utils::convertToInt(mTokens[3].first);
         if (bitValue != 0 && bitValue != 1) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         string val = "";
@@ -629,10 +629,10 @@ CommandResultPtr StrlenCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         size_t len = 0;
         

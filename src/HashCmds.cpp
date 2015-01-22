@@ -17,12 +17,12 @@ CommandResultPtr HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string field = mTokens[2].first;
-        string val = mTokens[3].first;
+        const string& key = mTokens[1].first;
+        const string& field = mTokens[2].first;
+        const string& val = mTokens[3].first;
         
         StringMap& map = data.getFromHashMap(key);
         
@@ -66,7 +66,7 @@ CommandResultPtr HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 size_t size = mTokens.size();
                 
                 if (mTokens.size() < Consts::MIN_ARG_NUM || size % 2 != 0) {
-                    throw invalid_argument("Invalid args");
+                    throw EInvalidArgument();
                 }
                 
                 for (int i = 2; i < size; i += 2) {
@@ -95,11 +95,11 @@ CommandResultPtr HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string field = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& field = mTokens[2].first;
         
         StringMap& map = data.getFromHashMap(key);
      
@@ -119,11 +119,11 @@ CommandResultPtr HExistsCommand::execute(InMemoryData& data, SessionContext& ctx
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string field = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& field = mTokens[2].first;
         
         StringMap& map = data.getFromHashMap(key);
         int ret = 1;
@@ -152,10 +152,10 @@ CommandResultPtr HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         StringMap& map = data.getFromHashMap(key);
         int numDeleted = 0;
         
@@ -184,10 +184,10 @@ CommandResultPtr HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         StringMap& map = data.getFromHashMap(key);
 
         switch (cmdType)
@@ -210,7 +210,7 @@ CommandResultPtr HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx
             case MGET:
             {
                 if (mTokens.size() == Consts::MIN_ARG_NUM) {
-                    throw invalid_argument("Wrong number of args");
+                    throw EInvalidArgument();
                 }
                 
                 size_t numOfKeys = mTokens.size() - 2;
@@ -242,11 +242,11 @@ CommandResultPtr HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
-        string key = mTokens[1].first;
-        string field = mTokens[2].first;
+        const string& key = mTokens[1].first;
+        const string& field = mTokens[2].first;
         StringMap& map = data.getFromHashMap(key);
         
         switch (cmdType)

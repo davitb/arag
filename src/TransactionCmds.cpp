@@ -50,7 +50,7 @@ CommandResultPtr WatchCommand::execute(InMemoryData& db, SessionContext& ctx)
 
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         for (int i = 1; i < mTokens.size(); ++i) {

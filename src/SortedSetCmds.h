@@ -121,36 +121,6 @@ private:
 
 //----------------------------------------------------------------
 
-class ZRemCommand: public Command
-{
-public:
-    
-    enum CmdType
-    {
-        REM,
-        REMRANGEBYLEX,
-        REMRANGEBYRANK,
-        REMRANGEBYSCORE
-    };
-    
-    ZRemCommand(CmdType type) { mCmdType = type; }
-    
-    DEEP_CLONE(ZRemCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = INT_MAX
-    };
-    
-    CmdType mCmdType;
-};
-
-//----------------------------------------------------------------
-
 class ZUnionCommand: public Command
 {
 public:
@@ -234,6 +204,7 @@ private:
     CmdType mCmdType;
 };
 
+COMMAND_CLASS(ZRemCommand, 3, INT_MAX);
     
 COMMAND_CLASS(ZAddCommand, 4, INT_MAX);
 

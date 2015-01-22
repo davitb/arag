@@ -16,11 +16,11 @@ CommandResultPtr DelCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         if (mTokens.size() % 2 != 0) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
         
         int numRemoved = 0;
@@ -49,10 +49,10 @@ CommandResultPtr ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
-            throw invalid_argument("Invalid args");
+            throw EInvalidArgument();
         }
 
-        string key = mTokens[1].first;
+        const string& key = mTokens[1].first;
         
         int ret = db.keyExists(key) ? 1 : 0;
         

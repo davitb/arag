@@ -42,12 +42,12 @@ int StringMap::set(std::string key, std::string value,
         auto iter = map.find(key);
         if (iter == map.end()) {
             if (policy == SetKeyPolicy::ONLY_IF_ALREADY_EXISTS) {
-                throw invalid_argument("Wrong Key"); // WRONG_KEY
+                throw EInvalidArgument("Wrong Key"); // WRONG_KEY
             }
         }
         else {
             if (policy == SetKeyPolicy::ONLY_IF_DOESNT_ALREADY_EXISTS) {
-                throw invalid_argument("Wrong Key"); // WRONG_KEY
+                throw EInvalidArgument("Wrong Key"); // WRONG_KEY
             }
         }
     }
@@ -86,12 +86,12 @@ string StringMap::get(std::string key)
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
     if (iter == map.end()) {
-        throw invalid_argument("Wrong Key"); // WRONG_KEY
+        throw EInvalidArgument("Wrong Key"); // WRONG_KEY
     }
     
     Item& item = iter->second;
     if (isExpired(item.timestamp, item.expType, item.exp)) {
-        throw invalid_argument("Key expired"); // WRONG_KEY
+        throw EInvalidArgument("Key expired"); // WRONG_KEY
     }
     return iter->second.strVal;
 }
@@ -132,7 +132,7 @@ int StringMap::incrBy(string key, int by)
     try {
         intVal = Utils::convertToInt(get(key)) + by;
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
 
     set(key, to_string(intVal));
@@ -147,7 +147,7 @@ string StringMap::incrBy(string key, double by)
         string val = get(key);
         dval = Utils::convertToDouble(val) + by;
     }
-    catch (invalid_argument& e) {
+    catch (EInvalidArgument& e) {
     }
     
     string sVal = Utils::dbl2str(dval);

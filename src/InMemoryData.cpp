@@ -109,7 +109,7 @@ Database::Database(int count)
 InMemoryData& Database::get(int index)
 {
     if (index >= mDatabases.size()) {
-        throw invalid_argument("Index is bigger than number of DBs");
+        throw EWrongDBIndex();
     }
     
     return mDatabases[index];
@@ -118,7 +118,7 @@ InMemoryData& Database::get(int index)
 void Database::flush(int index)
 {
     if (index >= mDatabases.size()) {
-        throw invalid_argument("Index is bigger than number of DBs");
+        throw EWrongDBIndex();
     }
 
     if (index == FLUSH_ALL) {
