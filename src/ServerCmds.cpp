@@ -4,6 +4,7 @@
 #include "AragServer.h"
 #include <sstream>
 #include "Database.h"
+#include "Config.h"
 
 using namespace std;
 using namespace arag;
@@ -56,7 +57,10 @@ CommandResultPtr InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
         InfoBuilder out;
         
         out.addSection("Server");
+        out.addProperty("arag_version", ARAG_VERSION);
         out.addProperty("redis_version", redis_const::REDIS_VERSION);
+        
+        // FIXME: need to add other info as well
         
         return CommandResultPtr(new CommandResult(out.serialize(),
                                                   RedisProtocol::BULK_STRING));
@@ -268,6 +272,7 @@ CommandResultPtr SingleArgumentCommand::execute(InMemoryData& data, SessionConte
                 
             case LASTSAVE:
             {
+                // FIXME: need properly implement
                 return CommandResultPtr(new CommandResult("0",
                                                           RedisProtocol::INTEGER));
             }

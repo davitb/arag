@@ -47,7 +47,7 @@ int HLLMap::count(const std::vector<std::string> &keys)
     return hll.estimate();
 }
 
-void HLLMap::clearKeys()
+void HLLMap::flush()
 {
     mHLLMap.clear();
 }
@@ -71,4 +71,9 @@ bool HLLMap::keyExists(const std::string &key)
 int HLLMap::size()
 {
     return (int)mHLLMap.size();
+}
+
+IMapCommon::ContainerType HLLMap::getContainerType()
+{
+    return IMapCommon::HLL;
 }

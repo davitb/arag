@@ -10,8 +10,11 @@ using namespace hll;
 void PubSubMap::addSubscriber(const std::string& channel, int sid, bool pattern)
 {
     PubSubElement& elem = mSubscrMap[channel];
+    // Add the sid
     elem.first.push_back(sid);
+    // Add channel type (pattern based or not)
     elem.second.first = pattern;
+    // Add channel name
     elem.second.second = channel;
 }
 
@@ -20,6 +23,7 @@ std::list<PubSubMap::PubSubElement> PubSubMap::getSubscribers(const std::string&
     std::list<PubSubElement> subscrs;
     
     for (auto iter = mSubscrMap.begin(); iter != mSubscrMap.end(); ++iter) {
+        // Check channel name against the pattern
         if (Utils::checkPubSubPattern(channel, iter->first)) {
             subscrs.push_back(iter->second);
         }
@@ -40,6 +44,10 @@ void PubSubMap::removeSubscriber(const std::string& channel, int sid)
 
 vector<string> PubSubMap::unsubscribeFromAllChannels(int sid)
 {
+    // For all channels:
+    //   If sid is in subscriptions list:
+    //     Add channel to the return list and remove it from subscriptions
+    
     vector<string> chnls;
     for (auto iter = mSubscrMap.begin(); iter != mSubscrMap.end(); ++iter) {
         const std::list<int>& l = iter->second.first;
@@ -65,7 +73,7 @@ void PubSubMap::removeSubscriber(const std::vector<std::string>& patterns, int s
     }
 }
 
-int PubSubMap::getSubscribersNum(int sid)
+int PubSubMap::getSubscriptionsNum(int sid)
 {
     int num = 0;
     for (auto iter = mSubscrMap.begin(); iter != mSubscrMap.end(); ++iter) {

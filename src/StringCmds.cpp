@@ -10,6 +10,7 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
+// A helper function to extract expiration num from a command
 static void extractExpirationNum(const vector<pair<string, int>>& tokens,
                                    int minArgsNum,
                                    int maxArgsNum,
@@ -41,9 +42,7 @@ static void extractExpirationNum(const vector<pair<string, int>>& tokens,
 
 CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
-    vector<string> out;
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -67,6 +66,8 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
             }
         }
         
+        StringMap& map = data.getStringMap();
+        
         map.set(key, val, expType, exp, policy);
         
         FIRE_EVENT(EventPublisher::set, key);
@@ -83,13 +84,14 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr GetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
             throw EInvalidArgument();
         }
         
+        StringMap& map = data.getStringMap();
+
         return CommandResultPtr(new CommandResult(map.get(mTokens[1].first),
                                                 RedisProtocol::BULK_STRING));
     }
@@ -103,7 +105,6 @@ CommandResultPtr GetCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr GetSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
 
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -112,6 +113,8 @@ CommandResultPtr GetSetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         const string& key = mTokens[1].first;
         const string& val = mTokens[2].first;
+
+        StringMap& map = data.getStringMap();
         
         return CommandResultPtr(new CommandResult(map.getset(key, val),
                                                 RedisProtocol::BULK_STRING));
@@ -126,7 +129,6 @@ CommandResultPtr GetSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr AppendCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -135,6 +137,9 @@ CommandResultPtr AppendCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         const string& key = mTokens[1].first;
         const string& val = mTokens[2].first;
+        
+        StringMap& map = data.getStringMap();
+        
         int res = map.append(key, val);
 
         FIRE_EVENT(EventPublisher::Event::append, key);
@@ -152,7 +157,6 @@ CommandResultPtr AppendCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr IncrCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
     
@@ -161,6 +165,8 @@ CommandResultPtr IncrCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         const string& key = mTokens[1].first;
+
+        StringMap& map = data.getStringMap();
         
         string resp = to_string(map.incrBy(key, 1));
         
@@ -178,7 +184,6 @@ CommandResultPtr IncrCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr IncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         
@@ -188,6 +193,8 @@ CommandResultPtr IncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         const string& key = mTokens[1].first;
         int by = Utils::convertToInt(mTokens[2].first);
+
+        StringMap& map = data.getStringMap();
         
         string resp = to_string(map.incrBy(key, by));
         
@@ -205,7 +212,6 @@ CommandResultPtr IncrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr IncrByFloatCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         
@@ -215,6 +221,8 @@ CommandResultPtr IncrByFloatCommand::execute(InMemoryData& data, SessionContext&
         
         const string& key = mTokens[1].first;
         double by = Utils::convertToDouble(mTokens[2].first);
+
+        StringMap& map = data.getStringMap();
         
         const string& resp = map.incrBy(key, by);
         
@@ -232,7 +240,6 @@ CommandResultPtr IncrByFloatCommand::execute(InMemoryData& data, SessionContext&
 CommandResultPtr DecrCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         
@@ -241,6 +248,8 @@ CommandResultPtr DecrCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         const string& key = mTokens[1].first;
+
+        StringMap& map = data.getStringMap();
         
         string resp = to_string(map.incrBy(key, -1));
         
@@ -258,7 +267,6 @@ CommandResultPtr DecrCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr DecrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         
@@ -268,6 +276,8 @@ CommandResultPtr DecrByCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         const string& key = mTokens[1].first;
         int by = Utils::convertToInt(mTokens[2].first);
+        
+        StringMap& map = data.getStringMap();
         
         int res = map.incrBy(key, by * -1);
         
@@ -286,7 +296,6 @@ CommandResultPtr DecrByCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr GetRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -296,6 +305,8 @@ CommandResultPtr GetRangeCommand::execute(InMemoryData& data, SessionContext& ct
         const string& key = mTokens[1].first;
         const string& start = mTokens[2].first;
         const string& end = mTokens[3].first;
+
+        StringMap& map = data.getStringMap();
         
         return CommandResultPtr(new CommandResult(map.getRange(key,
                                           Utils::convertToInt(start),
@@ -312,7 +323,6 @@ CommandResultPtr GetRangeCommand::execute(InMemoryData& data, SessionContext& ct
 CommandResultPtr SetRangeCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -330,6 +340,8 @@ CommandResultPtr SetRangeCommand::execute(InMemoryData& data, SessionContext& ct
         
         string oldVal = "";
         size_t finalLen = offset + valueLen;
+
+        StringMap& map = data.getStringMap();
         
         try {
             oldVal = map.get(key);
@@ -372,7 +384,6 @@ CommandResultPtr SetRangeCommand::execute(InMemoryData& data, SessionContext& ct
 CommandResultPtr MGetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -384,6 +395,8 @@ CommandResultPtr MGetCommand::execute(InMemoryData& data, SessionContext& ctx)
         for (int i = 0; i < mTokens.size() - 1; ++i) {
             keys[i] = mTokens[i + 1].first;
         }
+
+        StringMap& map = data.getStringMap();
         
         return CommandResultPtr(new CommandResult(map.mget(keys)));
     }
@@ -397,7 +410,6 @@ CommandResultPtr MGetCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr MSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -410,6 +422,8 @@ CommandResultPtr MSetCommand::execute(InMemoryData& data, SessionContext& ctx)
             throw EInvalidArgument();
         }
 
+        StringMap& map = data.getStringMap();
+        
         // If this is a MSETNX command - make sure that all given keys exist
         if (mNX) {
             for (int i = 1; i < size; i += 2) {
@@ -449,7 +463,6 @@ CommandResultPtr MSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr BitCountCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -469,6 +482,8 @@ CommandResultPtr BitCountCommand::execute(InMemoryData& data, SessionContext& ct
             end = Utils::convertToInt(mTokens[3].first);
         }
 
+        StringMap& map = data.getStringMap();
+        
         string str = map.getRange(key, start, end);
         
         int total = 0;
@@ -489,7 +504,6 @@ CommandResultPtr BitCountCommand::execute(InMemoryData& data, SessionContext& ct
 CommandResultPtr BitOpCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -503,6 +517,8 @@ CommandResultPtr BitOpCommand::execute(InMemoryData& data, SessionContext& ctx)
         for (int i = 3; i < mTokens.size(); ++i) {
             keys[i - 3] = mTokens[i].first;
         }
+
+        StringMap& map = data.getStringMap();
         
         vector<pair<string, int>> vals = map.mget(keys);
         
@@ -522,7 +538,6 @@ CommandResultPtr BitOpCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr BitPosCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -535,6 +550,8 @@ CommandResultPtr BitPosCommand::execute(InMemoryData& data, SessionContext& ctx)
             throw EInvalidArgument();
         }
 
+        StringMap& map = data.getStringMap();
+        
         int start = 0;
         int end = INT_MAX;
         
@@ -570,7 +587,6 @@ CommandResultPtr BitPosCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr GetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -583,6 +599,8 @@ CommandResultPtr GetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
             throw EInvalidArgument();
         }
 
+        StringMap& map = data.getStringMap();
+        
         string val = "";
         try {
             val = map.get(key);
@@ -604,7 +622,6 @@ CommandResultPtr GetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr SetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -621,6 +638,8 @@ CommandResultPtr SetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
         if (bitValue != 0 && bitValue != 1) {
             throw EInvalidArgument();
         }
+        
+        StringMap& map = data.getStringMap();
         
         string val = "";
         try {
@@ -653,7 +672,6 @@ CommandResultPtr SetBitCommand::execute(InMemoryData& data, SessionContext& ctx)
 CommandResultPtr StrlenCommand::execute(InMemoryData& data, SessionContext& ctx)
 {
     size_t cmdNum = mTokens.size();
-    StringMap& map = data.getStringMap();
     
     try {
         if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
@@ -663,6 +681,8 @@ CommandResultPtr StrlenCommand::execute(InMemoryData& data, SessionContext& ctx)
         const string& key = mTokens[1].first;
         
         size_t len = 0;
+
+        StringMap& map = data.getStringMap();
         
         string val = "";
         try {

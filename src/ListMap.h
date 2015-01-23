@@ -12,6 +12,9 @@
 namespace arag
 {
 
+/*
+    Implements a map which maps keys into Lists.
+ */
 class ListMap : public IMapCommon
 {
 public:
@@ -22,34 +25,52 @@ public:
         BACK
     };
     
+    // Adds a new value front or back
     int push(const std::string& key, const std::string& val, Position direction);
-    
-    virtual int size();
 
-    int len(const std::string& key);
-    
+    // Returns the size of lists stored under key
+    int size(const std::string& key);
+
+    // Returns value of the element in position "pos" for "key"
     std::string val(const std::string& key, int pos);
-    
+
+    // Sets the value of the element in position "pos" for "key"
     void setVal(const std::string& key, int pos, const std::string& val);
-    
+
+    // Pops the front or back element from list under key
     std::string pop(const std::string &key, Position pos);
-    
+
+    // Removes "count" occurences of the given val.
+    // If count is negative it removed from end.
     int rem(const std::string &key, const std::string &val, int count);
-    
+
+    // Trims the list for the given range
     void trim(const std::string &key, int start, int stop);
 
+    // Finds the element with value equals to pivot and inserts new value
+    // either after or before it.
     int insert(const std::string &key,
                const std::string &pos,
                const std::string &pivot,
                const std::string &val);
-    
+
+    // Returns the given range of elements
     std::vector<std::pair<std::string, int>> getRange(const std::string& key, int start, int end);
     
-    virtual void clearKeys();
+    // Returns number of all keys stored in the databases
+    virtual int size();
     
+    // Flushes all data
+    virtual void flush();
+    
+    // Finds where the given key is and deletes its content
     virtual int delKey(const std::string& key);
     
-    virtual bool keyExists(const std::string &key);
+    // Finds where the given key is and deletes its content
+    virtual bool keyExists(const std::string& key);
+    
+    // Returns the container type associated with key
+    IMapCommon::ContainerType getContainerType();
     
 private:
     typedef std::list<std::string> ListType;

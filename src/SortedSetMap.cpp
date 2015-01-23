@@ -8,6 +8,7 @@ using namespace std;
 using namespace arag;
 using namespace goodliffe;
 
+// Performs binary search on skip list and applies fComp for comparison
 static int bound(const SortedSetMap::SortedSet::SkipListType& l,
                 int first,
                 int last,
@@ -34,6 +35,8 @@ static int bound(const SortedSetMap::SortedSet::SkipListType& l,
     return first;
 }
 
+// This is a generic function for performing binary search on skip list.
+// It can find by score or by value, starting from end or beginning.
 static int bound(const SortedSetMap::SortedSet::SkipListType& l,
                        int first,
                        int last,
@@ -63,16 +66,42 @@ static int bound(const SortedSetMap::SortedSet::SkipListType& l,
     return bound(l, first, last, fComp);
 }
 
+//------------------------------------------------------------------------
+
+bool SortedSetMap::Item::Less::operator()(const Item &lhs, const Item &rhs) const
+{
+    // First check my scores
+    if (lhs.score < rhs.score) {
+        return true;
+    }
+    
+    // If scores are equal - check values by lex
+    if (lhs.score == rhs.score && lhs.val.compare(rhs.val) < 0) {
+        return true;
+    }
+    
+    // If scores and vlaues are equal - doesn't matter which one to choose
+    if (lhs.score == rhs.score && lhs.val == rhs.val) {
+        return false;
+    }
+    
+    return false;
+}
+
+//------------------------------------------------------------------------
+
 int SortedSetMap::insert(const std::string &key, const std::string &val, double score)
 {
     SortedSet& sset = mSetMap[key];
     
     auto iter = sset.mMap.find(val);
     if (iter == sset.mMap.end()) {
+        // New element, try to insert into skiplist first
         auto result = sset.mSkipList.insert(Item(val, score));
         if (!result.second) {
             throw EInvalidArgument();
         }
+        // Insert to map
         sset.mMap[val] = score;
         return 1;
     }
@@ -82,11 +111,13 @@ int SortedSetMap::insert(const std::string &key, const std::string &val, double 
         return 0;
     }
 
+    // Erase and then add. This will make sure to keep the list sorted
     sset.mSkipList.erase(Item(val, iter->second));
     auto result = sset.mSkipList.insert(Item(val, score));
     if (!result.second) {
         throw EInvalidArgument();
     }
+    
     // Update the map
     iter->second = score;
 
@@ -156,6 +187,7 @@ int SortedSetMap::rank(const std::string &key, const std::string &member, bool r
         throw EInvalidArgument();
     }
     
+    // Skiplist has a random access iterator so std::distance is O(1)
     double score = iter->second;
     if (!reverse) {
         return (int)std::distance(sset.mSkipList.begin(), sset.mSkipList.find(Item(member, score)));
@@ -321,6 +353,7 @@ double SortedSetMap::incrBy(const std::string &key, const std::string &member, d
         return by;
     }
     
+    // Calculate new score and insert it to the structures
     double newScore = iter->second + by;
     insert(key, member, newScore);
     
@@ -449,6 +482,7 @@ int SortedSetMap::remByRank(const std::string &key, int start, int stop)
 {
     SortedSet& sset = mSetMap[key];
 
+    // Since skiplist is sorted - element's rank is its position
     auto first = sset.mSkipList.iterator_at(start);
     auto last = sset.mSkipList.iterator_at(stop);
     int num = (int)std::distance(first, last) + 1;
@@ -507,7 +541,7 @@ int SortedSetMap::remByLex(const std::string &key, const std::string &min, const
 }
 
 
-void SortedSetMap::clearKeys()
+void SortedSetMap::flush()
 {
     mSetMap.clear();
 }
@@ -529,4 +563,9 @@ int SortedSetMap::delKey(const std::string &key)
 bool SortedSetMap::keyExists(const std::string &key)
 {
     return mSetMap.find(key) != mSetMap.end();
+}
+
+IMapCommon::ContainerType SortedSetMap::getContainerType()
+{
+    return IMapCommon::SORTEDSET;
 }

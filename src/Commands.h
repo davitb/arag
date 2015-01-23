@@ -110,15 +110,15 @@ public:
     public:
         // Indicates which argument is a key. FIXME: this must be fixed.
         int mKeyArgIndex;
-        InMemoryData::ContainerType mContainerType;
+        IMapCommon::ContainerType mContainerType;
 
         Context()
         {
             mKeyArgIndex = -1;
-            mContainerType = InMemoryData::NONE;
+            mContainerType = IMapCommon::NONE;
         }
         
-        Context(int k, InMemoryData::ContainerType t)
+        Context(int k, IMapCommon::ContainerType t)
         {
             mKeyArgIndex = k;
             mContainerType = t;

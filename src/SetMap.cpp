@@ -94,7 +94,8 @@ vector<pair<string, int>> SetMap::getRandMembers(const std::string &key, const i
         }
         return res;
     }
-    
+
+    // We pick a random element and return n members starting from it
     int rand = Utils::genRandom(0, size - n);
     auto iter = s.begin();
     std::advance(iter, rand);
@@ -191,7 +192,7 @@ int SetMap::move(const string& source, const string& dest, const string& member)
     return 1;
 }
 
-void SetMap::clearKeys()
+void SetMap::flush()
 {
     mSetMap.clear();
 }
@@ -213,4 +214,9 @@ int SetMap::delKey(const std::string& key)
 bool SetMap::keyExists(const std::string &key)
 {
     return mSetMap.find(key) != mSetMap.end();
+}
+
+IMapCommon::ContainerType SetMap::getContainerType()
+{
+    return IMapCommon::SET;
 }

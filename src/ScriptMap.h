@@ -7,6 +7,9 @@
 namespace arag
 {
     
+/*
+    This class implements a map to store scripts and retrieve them when necessary.
+ */
 class ScriptMap
 {
 public:

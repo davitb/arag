@@ -13,7 +13,6 @@ class IScriptNotifications
 public:
     
     virtual CommandResultPtr onRedisCall(const std::vector<std::string>& tokens) = 0;
-    virtual CommandResultPtr onRedisPcall(const std::vector<std::string>& tokens) = 0;
 };
     
 /*

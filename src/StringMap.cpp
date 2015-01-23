@@ -33,7 +33,7 @@ static bool isExpired(int timestamp, StringMap::ExpirationType expType, int exp)
     return (exp != 0) && (finalTimestamp <= currTimestamp);
 }
 
-int StringMap::set(std::string key, std::string value,
+int StringMap::set(const std::string& key, const std::string& value,
                ExpirationType expType, int exp, SetKeyPolicy policy)
 {
     lock_guard<recursive_mutex> lock(mLock);
@@ -57,7 +57,7 @@ int StringMap::set(std::string key, std::string value,
     return (int)map[key].strVal.length();
 }
 
-string StringMap::getset(string key, string value)
+string StringMap::getset(const std::string& key, const std::string& value)
 {
     lock_guard<recursive_mutex> lock(mLock);
     Item& item = map[key];
@@ -81,7 +81,7 @@ int StringMap::delKey(const std::string& key)
     return 1;
 }
 
-string StringMap::get(std::string key)
+string StringMap::get(const std::string& key)
 {
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
@@ -96,7 +96,7 @@ string StringMap::get(std::string key)
     return iter->second.strVal;
 }
 
-int StringMap::append(std::string key, std::string value)
+int StringMap::append(const std::string& key, const std::string& value)
 {
     lock_guard<recursive_mutex> lock(mLock);
     auto iter = map.find(key);
@@ -107,7 +107,7 @@ int StringMap::append(std::string key, std::string value)
     return (int)iter->second.strVal.length();
 }
 
-string StringMap::getRange(std::string key, int start, int end)
+string StringMap::getRange(const std::string& key, int start, int end)
 {
     string val = get(key);
     if (val == "") {
@@ -125,7 +125,7 @@ string StringMap::getRange(std::string key, int start, int end)
     return val.substr(start, end - start + 1);
 }
 
-int StringMap::incrBy(string key, int by)
+int StringMap::incrBy(const std::string& key, int by)
 {
     int intVal = 0;
     
@@ -139,7 +139,7 @@ int StringMap::incrBy(string key, int by)
     return intVal;
 }
 
-string StringMap::incrBy(string key, double by)
+string StringMap::incrBy(const std::string& key, double by)
 {
     double dval = 0;
     
@@ -212,7 +212,7 @@ void StringMap::cleanup()
     }
 }
 
-void StringMap::clearKeys()
+void StringMap::flush()
 {
     lock_guard<recursive_mutex> lock(mLock);
     map.clear();
@@ -221,4 +221,9 @@ void StringMap::clearKeys()
 bool StringMap::keyExists(const std::string &key)
 {
     return map.find(key) != map.end();
+}
+
+IMapCommon::ContainerType StringMap::getContainerType()
+{
+    return IMapCommon::STRING;
 }

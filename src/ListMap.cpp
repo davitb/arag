@@ -32,7 +32,7 @@ int ListMap::size()
     return (int)mListMap.size();
 }
 
-int ListMap::len(const std::string &key)
+int ListMap::size(const std::string &key)
 {
     if (!keyExists(key)) {
         return 0;
@@ -264,7 +264,7 @@ int ListMap::insert(const std::string &key,
 }
 
 
-void ListMap::clearKeys()
+void ListMap::flush()
 {
     mListMap.clear();
 }
@@ -287,4 +287,9 @@ int ListMap::delKey(const std::string& key)
 bool ListMap::keyExists(const std::string &key)
 {
     return mListMap.find(key) != mListMap.end();
+}
+
+IMapCommon::ContainerType ListMap::getContainerType()
+{
+    return IMapCommon::LIST;
 }

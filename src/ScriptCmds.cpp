@@ -9,6 +9,9 @@ using namespace arag::command_const;
 
 //-------------------------------------------------------------------------
 
+/*
+    Handles redis.call from a running Lua script. Those are:
+ */
 class Handler : public IScriptNotifications
 {
 public:
@@ -26,17 +29,15 @@ public:
         
         CommandResultPtr response = CommandResultPtr(new CommandResult(CommandResult::MULTI_RESPONSE));
         
+        // Execute the command and return its result
         Command::executeEndToEnd(Command::getCommand(arr),
                                  mCtx.get().getSessionID(),
                                  response.get());
         
+        // We assume that transactions or pipelining can't be done in Redis script
         return response->getMultiCommandResult()[0];
     }
-    
-    virtual CommandResultPtr onRedisPcall(const std::vector<std::string>& tokens)
-    {
-        return CommandResult::redisOKResult();
-    }
+
     
 private:
     reference_wrapper<SessionContext> mCtx;

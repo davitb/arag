@@ -6,6 +6,11 @@
 namespace arag
 {
 
+/*
+    This singleton has two responsibilities:
+    1) Keeping a list of all in-memory databases
+    2) Acting as an event publisher for database state change
+ */
 class Database
 {
 public:
@@ -17,16 +22,20 @@ public:
     
     static Database& instance();
     
-    Database(int count);
-    
+    // Return database by db index
     InMemoryData& get(int index);
     
+    // Flush the database with index. If FLUSH_ALL is specified -
+    // all databases will be flushed
     void flush(int index);
     
     EventPublisher& getEventPublisher()
     {
         return mEventPublisher;
     }
+
+private:
+    Database(int count);
     
 private:
     std::vector<InMemoryData> mDatabases;

@@ -103,7 +103,7 @@ CommandResultPtr LGetCommand::execute(InMemoryData& data, SessionContext& ctx)
         {
             case LEN:
             {
-                return CommandResultPtr(new CommandResult(to_string(listMap.len(key)),
+                return CommandResultPtr(new CommandResult(to_string(listMap.size(key)),
                                      RedisProtocol::INTEGER));
             }
                 
@@ -358,6 +358,7 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         ListMap& listMap = data.getListMap();
 
+        // If timeout expired - return nill
         if (timeout != 0 && (mTimestamp + timeout < time(0))) {
             return CommandResultPtr(new CommandResult({
                 make_pair(redis_const::NULL_BULK_STRING, RedisProtocol::BULK_STRING)
@@ -366,7 +367,7 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         for (int i = 1; i < mTokens.size() - 1; ++i) {
             const std::string& key = mTokens[i].first;
-            if (listMap.keyExists(key) && listMap.len(key) != 0) {
+            if (listMap.keyExists(key) && listMap.size(key) != 0) {
                 
                 // Found a non-empty list. Pop it up and return.
                 
@@ -390,6 +391,8 @@ CommandResultPtr BLCommand::execute(InMemoryData& data, SessionContext& ctx)
             watchKeys.push_back(key);
         }
         
+        // Since no value exists in the list - set the pending BL command
+        // to context for later execution
         ctx.setPendingtBLCommand(std::shared_ptr<Command>(this->clone()),
                                  timeout,
                                  watchKeys);
@@ -426,7 +429,7 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
             }));
         }
         
-        if (listMap.keyExists(source) && listMap.len(source) != 0) {
+        if (listMap.keyExists(source) && listMap.size(source) != 0) {
             // Found a non-empty list. Pop it up and return.
             string val = listMap.pop(source, ListMap::Position::BACK);
             if (!listMap.keyExists(source)) {
@@ -442,6 +445,8 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
 
         watchKeys.push_back(source);
         
+        // Since no value exists in the list - set the pending BL command
+        // to context for later execution        
         ctx.setPendingtBLCommand(std::shared_ptr<Command>(this->clone()),
                                  timeout,
                                  watchKeys);

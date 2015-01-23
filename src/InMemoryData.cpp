@@ -3,15 +3,13 @@
 using namespace arag;
 using namespace std;
 
-int InMemoryData::getCounter() const
+InMemoryData::InMemoryData()
 {
-    int c = mStringMap.getCounter();
-    
-    for (auto map = mHashMap.begin(); map != mHashMap.end(); ++map) {
-        c += map->second.getCounter();
-    }
-    
-    return c;
+    mCommonMaps.push_back(mStringMap);
+    mCommonMaps.push_back(mSetMap);
+    mCommonMaps.push_back(mSortedSetMap);
+    mCommonMaps.push_back(mListMap);
+    mCommonMaps.push_back(mHLLMap);
 }
 
 StringMap& InMemoryData::getFromHashMap(const std::string& key)
@@ -19,76 +17,66 @@ StringMap& InMemoryData::getFromHashMap(const std::string& key)
     return mHashMap[key];
 };
 
-void InMemoryData::cleanup()
-{
-    mStringMap.cleanup();
-    
-    for (auto map = mHashMap.begin(); map != mHashMap.end(); ++map) {
-        map->second.cleanup();
-    }
-}
-
 void InMemoryData::flush()
 {
-    mStringMap.clearKeys();
-    mSetMap.clearKeys();
-    mSortedSetMap.clearKeys();
-    mListMap.clearKeys();
+    for (int i = 0; i < mCommonMaps.size(); ++i) {
+        mCommonMaps[i].get().flush();
+    }
     mHashMap.clear();
-    mHLLMap.clearKeys();
 }
 
 int InMemoryData::size()
 {
-    return (int)(mStringMap.size() + mSetMap.size() +
-            mSortedSetMap.size() + mListMap.size() + mHashMap.size() + mHLLMap.size());
+    int num = 0;
+    for (int i = 0; i < mCommonMaps.size(); ++i) {
+        num += mCommonMaps[i].get().size();
+    }
+    
+    return (int)(num + mHashMap.size());
 }
 
 int InMemoryData::delKey(const std::string &key)
 {
-    return mStringMap.delKey(key) +
-            mSetMap.delKey(key) +
-            mSortedSetMap.delKey(key) +
-            mListMap.delKey(key) +
-            mHLLMap.delKey(key) +
-            (int)mHashMap.erase(key);
-}
-
-InMemoryData::ContainerType InMemoryData::getKeyType(const std::string &key)
-{
-    if (mStringMap.keyExists(key)) {
-        return ContainerType::STRING;
-    }
-
-    if (mSetMap.keyExists(key)) {
-        return ContainerType::SET;
-    }
-
-    if (mSortedSetMap.keyExists(key)) {
-        return ContainerType::SORTEDSET;
-    }
-
-    if (mListMap.keyExists(key)) {
-        return ContainerType::LIST;
-    }
-
-    if ((mHashMap.find(key) != mHashMap.end())) {
-        return ContainerType::HASH;
-    }
-
-    if (mHLLMap.keyExists(key)) {
-        return ContainerType::HLL;
+    int num = 0;
+    for (int i = 0; i < mCommonMaps.size(); ++i) {
+        num += mCommonMaps[i].get().delKey(key);
     }
     
-    return ContainerType::NONE;
+    return num + (int)mHashMap.erase(key);
+}
+
+IMapCommon::ContainerType InMemoryData::getContainerType()
+{
+    return IMapCommon::ContainerType::NONE;
+}
+
+IMapCommon::ContainerType InMemoryData::getContainerType(const std::string &key)
+{
+    for (int i = 0; i < mCommonMaps.size(); ++i) {
+        if (mCommonMaps[i].get().keyExists(key)) {
+            return mCommonMaps[i].get().getContainerType();
+        }
+    }
+    
+    if ((mHashMap.find(key) != mHashMap.end())) {
+        return IMapCommon::HASH;
+    }
+    
+    return IMapCommon::NONE;
 }
 
 bool InMemoryData::keyExists(const std::string& key)
 {
-    bool bExists = mStringMap.keyExists(key) || mSetMap.keyExists(key) ||
-    mSortedSetMap.keyExists(key) || mListMap.keyExists(key) ||
-    (mHashMap.find(key) != mHashMap.end());
+    for (int i = 0; i < mCommonMaps.size(); ++i) {
+        if (mCommonMaps[i].get().keyExists(key)) {
+            return true;
+        }
+    }
     
-    return bExists;
+    if (mHashMap.count(key) > 0) {
+        return true;
+    }
+    
+    return false;
 }
 

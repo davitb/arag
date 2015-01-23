@@ -49,6 +49,7 @@ static CommandResult::ResultArray prepareResponseWithNill(const string& type)
     return arr;
 }
 
+// Subscriber to N channels
 static CommandResultPtr subscribe(const RedisProtocol::RedisArray& tokens,
                         PubSubMap& pubSub,
                         SessionContext& ctx,
@@ -63,12 +64,13 @@ static CommandResultPtr subscribe(const RedisProtocol::RedisArray& tokens,
         
         response->appendToArray(prepareResponse(type,
                                     tokens[i].first,
-                                    to_string(pubSub.getSubscribersNum(sid))));
+                                    to_string(pubSub.getSubscriptionsNum(sid))));
     }
     
     return response;
 }
 
+// Unsubscriber from N channels
 static CommandResultPtr unsubscribe(const RedisProtocol::RedisArray& tokens,
                           PubSubMap& pubSub,
                           SessionContext& ctx,
@@ -76,8 +78,8 @@ static CommandResultPtr unsubscribe(const RedisProtocol::RedisArray& tokens,
 {
     CommandResultPtr response(new CommandResult(CommandResult::MULTI_ARRAY_RESPONSE));
     
+    // If no channel provided - unscubscribe from all channels
     if (tokens.size() == 1) {
-        // Unscubscribe from all channels
         vector<string> channels = pubSub.unsubscribeFromAllChannels(ctx.getSessionID());
         if (channels.size() == 0) {
             return CommandResultPtr(new CommandResult(prepareResponseWithNill(type)));
@@ -97,7 +99,7 @@ static CommandResultPtr unsubscribe(const RedisProtocol::RedisArray& tokens,
         
         response->appendToArray(prepareResponse(type,
                                     tokens[i].first,
-                                    to_string(pubSub.getSubscribersNum(sid))));
+                                    to_string(pubSub.getSubscriptionsNum(sid))));
     }
     
     return response;
@@ -158,6 +160,8 @@ CommandResultPtr PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         PubSubMap& pubSub = db.getPubSubMap();
         
+        // Get all subscribers for this channel
+        // FIXME. this needs an optimization
         list<PubSubMap::PubSubElement> subscribersList = pubSub.getSubscribers(channel);
 
         int num = 0;
@@ -169,8 +173,8 @@ CommandResultPtr PublishCommand::execute(InMemoryData& db, SessionContext& ctx)
                     
                     string response;
                     
+                    // Check if it's a pattern based channel
                     if (subscrs.second.first == true) {
-                        // This is a pattern based channel
                         CommandResult res = prepareResponseWithPattern("pmessage",
                                                                        subscrs.second.second,
                                                                        channel,

@@ -92,16 +92,19 @@ CommandResultPtr ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     try {
         
+        // If we are not in transaction or transaction has been aborted - fail
         if (!ctx.isInTransaction() || ctx.isTransactionAborted()) {
             throw runtime_error("Transaction has been aborted");
         }
-        
+
+        // Set this so that following commands can be executed properly
         ctx.setTransactionState(SessionContext::TransactionState::NO_TRANSACTION);
         
         const list<shared_ptr<Command>>& cmds = ctx.getTransactionQueue();
         
         response = CommandResultPtr(new CommandResult(CommandResult::MULTI_RESPONSE));
-        
+
+        // Run all commands in the transaction queue
         for (auto cmdIter = cmds.begin(); cmdIter != cmds.end(); ++cmdIter) {
             Command::executeEndToEnd(*cmdIter, ctx.getSessionID(), response.get());
         }
@@ -109,7 +112,8 @@ CommandResultPtr ExecCommand::execute(InMemoryData& db, SessionContext& ctx)
     catch (std::exception& e) {
         response = CommandResult::redisNULLResult();
     }
-    
+
+    // Reset all transaction variables
     ctx.finishTransaction();
 
     return response;

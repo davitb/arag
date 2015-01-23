@@ -20,27 +20,23 @@
 namespace arag
 {
 
-class InMemoryData
+/*
+    This class exposes all Redis data structures to Commands.
+    Every data structure is implemented as a map which supports
+    certain functionality. All maps implement IMapCommon interface.
+ */
+class InMemoryData : IMapCommon
 {
 public:
 
     typedef std::unordered_map<std::string, StringMap> HashMap;
-    
-    enum ContainerType
-    {
-        NONE,
-        STRING,
-        HASH,
-        LIST,
-        SET,
-        SORTEDSET,
-        HLL
-    };
-    
-    
-    StringMap& getFromHashMap(const std::string& key);
+        
+    InMemoryData();
     
     StringMap& getStringMap() { return mStringMap; }
+    
+    // Returns the StringMap associated with given key
+    StringMap& getFromHashMap(const std::string& key);
     
     ListMap& getListMap() { return mListMap; }
     
@@ -54,19 +50,25 @@ public:
 
     ScriptMap& getScriptMap() { return mScriptMap; }
     
-    int size();
+    // Returns number of all keys stored in the databases
+    virtual int size();
+
+    // Flushes all data
+    virtual void flush();
     
-    int getCounter() const;
+    // Finds where the given key is and deletes its content
+    virtual int delKey(const std::string& key);
+
+    // Finds where the given key is and deletes its content
+    virtual bool keyExists(const std::string& key);
+
+    // Returns the container type associated with key
+    IMapCommon::ContainerType getContainerType(const std::string& key);
+
+private:
     
-    void cleanup();
-    
-    void flush();
-    
-    int delKey(const std::string& key);
-    
-    bool keyExists(const std::string& key);
-    
-    ContainerType getKeyType(const std::string& key);
+    // Returns ContainerType::NONE
+    IMapCommon::ContainerType getContainerType();
     
 private:
     
@@ -78,7 +80,7 @@ private:
     PubSubMap mPubSubMap;
     HLLMap mHLLMap;
     ScriptMap mScriptMap;
-    int mCounter;
+    std::vector<std::reference_wrapper<IMapCommon>> mCommonMaps;
 };
 
 };
