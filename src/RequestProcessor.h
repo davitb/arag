@@ -59,8 +59,6 @@ private:
 
     void enqueueRequest(ProcessingUnit& punit, Request req);
     
-    Request extractNextRequest(std::list<Request>& que);
-    
 public:
     
     RequestProcessor(int threadCount = THREAD_COUNT);

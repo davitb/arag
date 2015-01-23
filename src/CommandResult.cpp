@@ -35,6 +35,7 @@ std::string CommandResult::toRedisResponse()
     }
     if (mType == MULTI_ARRAY_RESPONSE) {
         stringstream str;
+        // Create a sequence of Redis arrays and return
         for (int i = 0; i < mMultiArray.size(); ++i) {
             str << RedisProtocol::serializeArray(mMultiArray[i]);
         }
@@ -42,9 +43,11 @@ std::string CommandResult::toRedisResponse()
     }
     if (mType == MULTI_RESPONSE) {
         stringstream str;
+        // Create a sequence of Redis arrays
         for (int i = 0; i < mMultiResult.size(); ++i) {
             str << mMultiResult[i]->toRedisResponse();
         }
+        // Prepand the number of elements and return
         return RedisProtocol::serializeArrayWithPreparedItems(size(), str.str());
     }
 

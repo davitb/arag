@@ -68,13 +68,6 @@ void RequestProcessor::enqueueRequest(ProcessingUnit& punit, Request req)
     punit.cond.notify_one();
 }
 
-RequestProcessor::Request RequestProcessor::extractNextRequest(std::list<Request>& que)
-{
-    Request req = que.front();
-    que.pop_front();
-    return req;
-}
-
 void RequestProcessor::processingThread(ProcessingUnit& punit)
 {
     while (true) {
@@ -83,7 +76,8 @@ void RequestProcessor::processingThread(ProcessingUnit& punit)
         // Wait for the conditional variable
         punit.cond.wait(lock, [&punit] { return !punit.que.empty(); });
         
-        Request req = extractNextRequest(punit.que);
+        Request req = punit.que.front();
+        punit.que.pop_front();
         
         lock.unlock();
 

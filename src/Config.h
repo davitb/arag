@@ -4,6 +4,9 @@
 namespace arag
 {
 
+/*
+    This class represents arag configuration data, read from config file.
+*/
 class Config
 {
 public:

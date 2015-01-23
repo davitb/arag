@@ -1,7 +1,7 @@
 #ifndef __arag__CommandEvents__
 #define __arag__CommandEvents__
 
-#include <list>
+#include <unordered_map>
 #include <string>
 
 namespace arag
@@ -9,6 +9,10 @@ namespace arag
 
 class ISubscriber;
     
+/*
+    Upon changing database state arag commands fire appropriate events.
+    This class defined the events and also is used to fire them.
+*/
 class EventPublisher
 {
 public:
@@ -53,14 +57,17 @@ public:
         evicted
     };
     
+    // Add the given subscriber to the map
     void subscribe(ISubscriber* subscr);
-    
+
+    // Remove the given subscriber
     void unsubscribe(ISubscriber* subscr);
     
+    // Fire given event, key and db to all subscribers
     void fire(Event event, const std::string& key, int db);
     
 private:
-    std::list<ISubscriber*> mSubscribers;
+    std::unordered_map<ISubscriber*, bool> mSubscribers;
 };
 
 class ISubscriber

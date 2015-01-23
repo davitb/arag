@@ -10,6 +10,33 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
+static void extractExpirationNum(const vector<pair<string, int>>& tokens,
+                                   int minArgsNum,
+                                   int maxArgsNum,
+                                   StringMap::ExpirationType* pExpType,
+                                   int* pExp)
+{
+    size_t cmdNum = tokens.size();
+    
+    if (cmdNum != minArgsNum) {
+        
+        if (cmdNum != maxArgsNum || (pExp == nullptr || pExpType == nullptr)) {
+            throw EInvalidArgument();
+        }
+        
+        const string& expType = tokens[3].first;
+        const string& expVal = tokens[4].first;
+        
+        if (expType != "EX" && expType != "PX") {
+            throw EInvalidArgument();
+        }
+        
+        *pExpType = expType == "EX" ? StringMap::ExpirationType::SEC : StringMap::ExpirationType::MSEC;
+        *pExp = Utils::convertToInt(expVal);
+    }
+}
+
+
 //-------------------------------------------------------------------------
 
 CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)

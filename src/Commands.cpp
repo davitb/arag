@@ -24,6 +24,11 @@ using namespace std;
 using namespace arag;
 using namespace arag::command_const;
 
+/*
+    This function creates a static map of all supported commands when called the first time
+    and then returns a clone of a command on each subsequent call.
+    This way creating a new command given its name is really fast since it's just a lookup in a map.
+*/
 static shared_ptr<Command> getCommandByName(const string& cmdName)
 {
     static unordered_map<string, shared_ptr<Command>> sNameToCommand;
@@ -259,51 +264,53 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
     std::transform(upperCaseCmd.begin(), upperCaseCmd.end(), upperCaseCmd.begin(), ::toupper);
     
     if (sNameToCommand.count(upperCaseCmd) == 0) {
-        cout << "command: " + cmdName << endl;
+//        cout << "command: " + cmdName << endl;
         throw EInvalidCommand(cmdName);
     }
     
+    // Create a clone and return in form of a shared pointer
     return shared_ptr<Command>(sNameToCommand[upperCaseCmd]->clone());
 }
 
-void Command::getCommand(const string& cmdline, vector<shared_ptr<Command>>& commands)
+void Command::getCommand(const string& request, vector<shared_ptr<Command>>& commands)
 {
     // Skip parsing if this is an internal command
-    if (cmdline.substr(0, CMD_INTERNAL_PREFIX.length()) == CMD_INTERNAL_PREFIX) {
-        commands.push_back(getCommandByName(cmdline));
+    if (request.substr(0, CMD_INTERNAL_PREFIX.length()) == CMD_INTERNAL_PREFIX) {
+        commands.push_back(getCommandByName(request));
     }
     
-    vector<RedisProtocol::RedisArray> parsedCommands;
+    // Parse the request and concert it to array of parsed tokens
+    vector<RedisProtocol::RedisArray> parsedTokens;
+    RedisProtocol::parse(request, parsedTokens);
     
-    RedisProtocol::parse(cmdline, parsedCommands);
-    
-    if (parsedCommands.size() == 0) {
+    if (parsedTokens.size() == 0) {
         throw EInvalidRequest();
     }
     
-    for (int i = 0; i < parsedCommands.size(); ++i) {
-        RedisProtocol::RedisArray& tokens = parsedCommands[i];
+    for (int i = 0; i < parsedTokens.size(); ++i) {
+        // Concert tokens into a command
+        RedisProtocol::RedisArray& tokens = parsedTokens[i];
         shared_ptr<Command> pCmd = getCommandByName(tokens[0].first);
-        
         pCmd->setTokens(tokens);
         
+        // Push the created command into the final array
         commands.push_back(pCmd);
     }
 }
 
 shared_ptr<Command> Command::getCommand(const CommandResult::ResultArray& tokens)
 {
+    // Convert tokens into a command and return it
     shared_ptr<Command> pCmd = getCommandByName(tokens[0].first);
-        
     pCmd->setTokens(tokens);
-        
     return pCmd;
 }
 
-shared_ptr<Command> Command::getCommand(const string &cmdline)
+shared_ptr<Command> Command::getFirstCommand(const string &request)
 {
+    // Convert request to commands and return the first command
     vector<shared_ptr<Command>> cmds;
-    getCommand(cmdline, cmds);
+    getCommand(request, cmds);
     return cmds[0];
 }
 
@@ -325,15 +332,18 @@ Command::~Command()
 
 bool Command::isKeyTypeValid(InMemoryData& db)
 {
+    // If command doesn't receive key as argument - return true
     if (mCtx.mKeyArgIndex == -1) {
         return true;
     }
 
+    // Obtain the container type for this key
     InMemoryData::ContainerType type = db.getKeyType(mTokens[mCtx.mKeyArgIndex].first);
     if (type == InMemoryData::NONE) {
         return true;
     }
     
+    // Check the container types
     return (type == mCtx.mContainerType);
 }
 
@@ -342,39 +352,14 @@ void Command::setTokens(const vector<pair<string, int>> &tokens)
     mTokens = tokens;
 }
 
-string Command::getCommandName() const
+string Command::getName() const
 {
     if (mTokens.size() == 0) {
         return "";
     }
     
+    // First token is always the name of command
     return mTokens[0].first;
-}
-
-void Command::extractExpirationNum(const vector<pair<string, int>>& tokens,
-                          int minArgsNum,
-                          int maxArgsNum,
-                          StringMap::ExpirationType* pExpType,
-                          int* pExp)
-{
-    size_t cmdNum = tokens.size();
-    
-    if (cmdNum != minArgsNum) {
-        
-        if (cmdNum != maxArgsNum || (pExp == nullptr || pExpType == nullptr)) {
-            throw EInvalidArgument();
-        }
-        
-        const string& expType = tokens[3].first;
-        const string& expVal = tokens[4].first;
-        
-        if (expType != "EX" && expType != "PX") {
-            throw EInvalidArgument();
-        }
-        
-        *pExpType = expType == "EX" ? StringMap::ExpirationType::SEC : StringMap::ExpirationType::MSEC;
-        *pExp = Utils::convertToInt(expVal);
-    }
 }
 
 void Command::setCommandContext(Command::Context ctx)
@@ -382,6 +367,10 @@ void Command::setCommandContext(Command::Context ctx)
     mCtx = ctx;
 }
 
+/*
+    This helper function writes the command result either to client session (socket)
+    or into the passed pCmdResult param.
+ */
 static void writeResponse(ClientSession& session,
                           CommandResult* pCmdResult,
                           CommandResultPtr resp)
@@ -417,11 +406,14 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             }
         }
         
+        // If the current session is in transaction mode - all commands must be enqueued into
+        // transaction queue, unless they are specially marked as "bypass-able".
         if (sessionCtx.isInTransaction() &&
             cmd->getSpecialType() != Command::SpecialType::BYPASS_TRANSACTION_STATE) {
             
             sessionCtx.addToTransactionQueue(cmd);
 
+            // Return "QUEUED" as a response for now
             writeResponse(session,
                           pCmdResult,
                           CommandResultPtr(new CommandResult(redis_const::QUEUED,
@@ -429,15 +421,16 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             return;
         }
         
-        // Process a pending Blocking List command if any
+        // Process a pending Blocking List command, if any
         sessionCtx.checkPendingBLCommand();
 
+        // Check if the key type is valid
         if (!cmd->isKeyTypeValid(selectedDB)) {
             throw EWrongKeyType();
         }
         
+        // Execute the command and return the response
         CommandResultPtr res = cmd->execute(selectedDB, sessionCtx);
-        
         if (!res->isEmpty() && cmd->getType() != Command::Type::INTERNAL) {
             writeResponse(session, pCmdResult, res);
         }
@@ -457,7 +450,7 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
 
 Command::ResultType Command::processInternalCommand()
 {
-    const std::string cmd = getCommandName();
+    const std::string cmd = getName();
     
     if (cmd == command_const::CMD_INTERNAL_STOP || cmd == command_const::CMD_EXTERNAL_EXIT) {
         cout << "Stopping the thread" << endl;
@@ -484,4 +477,9 @@ Command::ResultType Command::processInternalCommand()
 InternalCommand::InternalCommand(std::string name)
 {
     mTokens.push_back(std::make_pair(name, 0));
+}
+
+CommandResultPtr InternalCommand::execute(InMemoryData& data, SessionContext& ctx)
+{
+    throw AragException("This function should never be called");
 }

@@ -69,8 +69,9 @@ namespace command_const
 };
     
 /*
-    Base class for all commands.
- */
+    Base class for all commands. 
+    All arag commands are inherited from this class.
+*/
 class Command
 {
 public:
@@ -86,21 +87,28 @@ public:
         CONTINUE
     };
     
+    // Command type
     enum Type
     {
         INTERNAL,
         EXTERNAL,
     };
     
+    // Indicates some special characterisitcs of a command
     enum SpecialType
     {
         NORMAL,
+        // These commands can bypass transaction state and be executed immediately
         BYPASS_TRANSACTION_STATE
     };
     
+    /*
+        Keeps a context information about a command
+     */
     class Context
     {
     public:
+        // Indicates which argument is a key. FIXME: this must be fixed.
         int mKeyArgIndex;
         InMemoryData::ContainerType mContainerType;
 
@@ -125,23 +133,30 @@ public:
     
     virtual Command* clone() const = 0;
     
+    // Execute the command and return its result
     virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx) = 0;
-    
+
+    // Execute the command and send the response either to the requesting client
+    // or into pCmdResult
     static void executeEndToEnd(std::shared_ptr<Command> cmd,
                                 int sessionID,
                                 CommandResult* pCmdResult = nullptr);
     
-    std::string getCommandName() const;
+    std::string getName() const;
     
-    static void getCommand(const std::string& cmdline,
+    // Parses given request and returns a list of commands
+    static void getCommand(const std::string& request,
                            std::vector<std::shared_ptr<Command>>& commands);
 
-    static std::shared_ptr<Command> getCommand(const std::string& cmdline);
-    
+    // Converts prepared tokens into a single command
     static std::shared_ptr<Command> getCommand(const CommandResult::ResultArray& tokens);
+    
+    // Parses given request and returns a single command (this is used only internally)
+    static std::shared_ptr<Command> getFirstCommand(const std::string& request);
     
     void setCommandContext(Context ctx);
     
+    // Checks if the key that this command is going to operate on can be operated by this command
     bool isKeyTypeValid(InMemoryData& db);
     
     Type getType() const
@@ -161,14 +176,8 @@ public:
     
 protected:
     
+    // Sets the request tokens
     void setTokens(const std::vector<std::pair<std::string, int>>& tokens);
-    
-    void extractExpirationNum(const std::vector<std::pair<std::string, int>>& tokens,
-                                       int minArgsNum,
-                                       int maxArgsNum,
-                                       StringMap::ExpirationType* pExpType,
-                                       int* pExp);
-    
     
     friend class SelfTest;
     
@@ -181,9 +190,16 @@ protected:
     
 private:
     
+    // Processes internal commands
     Command::ResultType processInternalCommand();
 };
 
+
+/*
+    Class for Internal Commands. 
+    Internal commands which must be processed inside RP but don't come from outside
+    are implemented in this class.
+*/
 class InternalCommand: public Command
 {
 public:
@@ -192,10 +208,7 @@ public:
     
     DEEP_CLONE(InternalCommand)
     
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx)
-    {
-        throw std::logic_error("This function should not be called");
-    }
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
 };
 
     

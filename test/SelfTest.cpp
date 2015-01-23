@@ -18,10 +18,10 @@ string runCommandsAndGetLatestResult(InMemoryData& data, const vector<string>& c
     SessionContext ctx;
     
     for (int i = 0; i < cmds.size() - 1; ++i) {
-        shared_ptr<Command> cmd = Command::getCommand(cmds[i]);
+        shared_ptr<Command> cmd = Command::getFirstCommand(cmds[i]);
         cmd->execute(data, ctx);
     }
-    shared_ptr<Command> cmd = Command::getCommand(cmds[cmds.size() - 1]);
+    shared_ptr<Command> cmd = Command::getFirstCommand(cmds[cmds.size() - 1]);
     
     return cmd->execute(data, ctx)->toRedisResponse();
 }
@@ -321,7 +321,7 @@ void SelfTest::testMultiThreading()
         cmdLine += "$2\r\nk1\r\n";
         cmdLine += "$" + lenIstr + "\r\n" + istr + "\r\n";
         
-        RequestProcessor::Request req(Command::getCommand(cmdLine), SessionContext::FAKE_SESSION);
+        RequestProcessor::Request req(Command::getFirstCommand(cmdLine), SessionContext::FAKE_SESSION);
         rp.enqueueRequest(req);
     }
     
@@ -344,7 +344,7 @@ void SelfTest::testMultiThreading()
         cmdLine += "$" + lenKstr + "\r\nk" + istr + "\r\n";
         cmdLine += "$" + lenIstr + "\r\n" + istr + "\r\n";
         
-        RequestProcessor::Request req(Command::getCommand(cmdLine), SessionContext::FAKE_SESSION);
+        RequestProcessor::Request req(Command::getFirstCommand(cmdLine), SessionContext::FAKE_SESSION);
         rp.enqueueRequest(req);
         
         if (i == numRequests / 2) {

@@ -16,6 +16,9 @@ public:
     virtual CommandResultPtr onRedisPcall(const std::vector<std::string>& tokens) = 0;
 };
     
+/*
+    This class implement pImpl idiom and exposes Lua interpreter API to outside world.
+*/
 class LuaInterpreter
 {
 public:
@@ -24,6 +27,7 @@ public:
     
     ~LuaInterpreter();
     
+    // Runs a script, fires redis call events when necessary and returns the result.
     CommandResultPtr runScript(const std::string& script,
                                const std::vector<std::string>& keys,
                                const std::vector<std::string>& args,

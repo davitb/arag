@@ -11,6 +11,7 @@ SessionContext::SessionContext()
 {
     mDatabaseIndex = 0;
     mIsAuthenticated = false;
+    // Generate a random session ID
     mSessionID = Utils::genRandom(0, INT_MAX);
     mTransactionInfo.transactionState = NO_TRANSACTION;
 }
@@ -140,15 +141,20 @@ void SessionContext::unsubscribeFromNotifications(bool force)
 
 void SessionContext::notify(EventPublisher::Event event, const std::string& key, int db)
 {
+    // This function is called on any event. Check to see if this provided key is in
+    // watchKeys map.
     auto item = std::find(mTransactionInfo.watchedKeys.begin(),
                           mTransactionInfo.watchedKeys.end(),
                           key);
     if (item != mTransactionInfo.watchedKeys.end()) {
         if (!isInTransaction()) {
+            // We need to mark the transaction as "aborted" since a watchKey has been changed.
             markTransactionAborted();
         }
     }
-    
+
+    // This function is called on any event. Check to see if this provided key is in
+    // watchKeys map.
     item = std::find(mPendingBLCmd.watchedKeys.begin(),
                      mPendingBLCmd.watchedKeys.end(),
                      key);
@@ -156,10 +162,10 @@ void SessionContext::notify(EventPublisher::Event event, const std::string& key,
         std::shared_ptr<Command> pendingCmd = mPendingBLCmd.cmd;
         RequestProcessor::Request req(pendingCmd, mSessionID);
         
-        // Enqueue the request to Request Processor
-        Arag::instance().getRequestProcessor().enqueueRequest(req);
-
+        // We have been notified that a watchKey has elements now.
+        // Enqueue the BL request to RP and try to execute it again
         clearPendingBLCommand();
+        Arag::instance().getRequestProcessor().enqueueRequest(req);
     }
 }
 
