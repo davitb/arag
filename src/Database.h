@@ -33,6 +33,8 @@ public:
     {
         return mEventPublisher;
     }
+    
+    void initialize();
 
 private:
     Database(int count);

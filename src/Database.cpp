@@ -17,6 +17,13 @@ Database::Database(int count)
     mDatabases = vector<InMemoryData>(count);
 }
 
+void Database::initialize()
+{
+    for (int i = 0; i < mDatabases.size(); ++i) {
+        mDatabases[i].initialize();
+    }
+}
+
 InMemoryData& Database::get(int index)
 {
     if (index >= mDatabases.size()) {

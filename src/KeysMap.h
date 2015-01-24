@@ -29,6 +29,12 @@ public:
     
     typedef std::unordered_map<std::string, Item> KeyMapType;
 
+    KeyMap();
+    
+    ~KeyMap();
+    
+    void initialize();
+    
     void subscribeMap(IMapCommon& map);
     
     Item get(const std::string& key);
@@ -61,6 +67,7 @@ private:
     
     KeyMapType _keyMap;
     std::vector<std::reference_wrapper<IMapCommon>> _maps;
+    bool _bSubscribed;
 };
     
 };

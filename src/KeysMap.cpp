@@ -1,5 +1,6 @@
 #include "KeysMap.h"
 #include "AragException.h"
+#include "Database.h"
 
 using namespace std;
 using namespace arag;
@@ -23,6 +24,21 @@ KeyMap::Item::Item(IMapCommon::ContainerType t)
 }
 
 //----------------------------------------------------------
+
+KeyMap::KeyMap()
+{
+    _bSubscribed = false;
+}
+
+KeyMap::~KeyMap()
+{
+    Database::instance().getEventPublisher().unsubscribe(this);
+}
+
+void KeyMap::initialize()
+{
+    Database::instance().getEventPublisher().subscribe(this);
+}
 
 void KeyMap::subscribeMap(IMapCommon& map)
 {
@@ -96,6 +112,8 @@ KeyMap::Item KeyMap::get(const std::string &key)
 
 void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)
 {
+    // When a new key is added/delete in Database -
+    // make sure to add/delete them into/from keyMap as well
     try {
         if (event == EventPublisher::Event::del) {
             delOnlyFromKeyMap(key);

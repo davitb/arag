@@ -94,11 +94,7 @@ CommandResultPtr GetCommand::execute(InMemoryData& data, SessionContext& ctx)
 
         string& key = mTokens[1].first;
 
-        string val = map.get(key);
-        
-        FIRE_EVENT(EventPublisher::set, key);
-        
-        return CommandResultPtr(new CommandResult(val, RedisProtocol::BULK_STRING));
+        return CommandResultPtr(new CommandResult(map.get(key), RedisProtocol::BULK_STRING));
     }
     catch (std::exception& e) {
         return CommandResult::redisNULLResult();
@@ -121,8 +117,11 @@ CommandResultPtr GetSetCommand::execute(InMemoryData& data, SessionContext& ctx)
 
         StringMap& map = data.getStringMap();
         
-        return CommandResultPtr(new CommandResult(map.getset(key, val),
-                                                RedisProtocol::BULK_STRING));
+        string ret = map.getset(key, val);
+        
+        FIRE_EVENT(EventPublisher::set, key);
+        
+        return CommandResultPtr(new CommandResult(ret, RedisProtocol::BULK_STRING));
     }
     catch (std::exception& e) {
         return CommandResult::redisNULLResult();

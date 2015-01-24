@@ -9,6 +9,7 @@
 #include "AragServer.h"
 #include "Commands.h"
 #include "ClientSession.h"
+#include "Database.h"
 
 using namespace std;
 using namespace arag;
@@ -38,6 +39,8 @@ asio::io_service& Arag::ioService()
 
 void Arag::startServer()
 {
+    Database::instance().initialize();
+    
     mProcessor.startThreads();
     
     try {

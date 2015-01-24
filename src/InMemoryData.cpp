@@ -13,4 +13,8 @@ InMemoryData::InMemoryData()
     _keyMap.subscribeMap(_hashMap);
 }
 
+void InMemoryData::initialize()
+{
+    _keyMap.initialize();
+}
 
