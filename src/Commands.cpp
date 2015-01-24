@@ -337,8 +337,10 @@ bool Command::isKeyTypeValid(InMemoryData& db)
         return true;
     }
 
+    KeyMap& kmap = db.getKeyMap();
+    
     // Obtain the container type for this key
-    IMapCommon::ContainerType type = db.getContainerType(mTokens[mCtx.mKeyArgIndex].first);
+    IMapCommon::ContainerType type = kmap.getContainerType(mTokens[mCtx.mKeyArgIndex].first);
     if (type == IMapCommon::NONE) {
         return true;
     }

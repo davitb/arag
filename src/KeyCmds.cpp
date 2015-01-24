@@ -26,8 +26,10 @@ CommandResultPtr DelCommand::execute(InMemoryData& db, SessionContext& ctx)
         
         int numRemoved = 0;
         
+        KeyMap& kmap = db.getKeyMap();
+        
         for (int i = 1; i < mTokens.size(); ++i) {
-            int removed = db.delKey(mTokens[i].first);
+            int removed = kmap.delKey(mTokens[i].first);
             if (removed != 0) {
                 FIRE_EVENT(EventPublisher::Event::del, mTokens[i].first);
             }
@@ -55,7 +57,9 @@ CommandResultPtr ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
 
         const string& key = mTokens[1].first;
         
-        int ret = db.keyExists(key) ? 1 : 0;
+        KeyMap& kmap = db.getKeyMap();
+        
+        int ret = kmap.keyExists(key) ? 1 : 0;
         
         return CommandResultPtr(new CommandResult(to_string(ret),
                                                   RedisProtocol::INTEGER));

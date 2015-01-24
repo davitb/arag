@@ -12,8 +12,6 @@
 #include "CommandResult.h"
 #include "SelfTest.h"
 
-#define FIRE_EVENT(event, key) \
-Database::instance().getEventPublisher().fire(event, key, ctx.getDatabaseIndex());\
 
 #define DEEP_CLONE(class) \
 virtual class* clone() const \

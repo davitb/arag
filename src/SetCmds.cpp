@@ -27,7 +27,10 @@ CommandResultPtr SAddCommand::execute(InMemoryData& data, SessionContext& ctx)
         int numAdded = 0;
         
         for (int i = 2; i < mTokens.size(); ++i) {
-            numAdded += setMap.add(key, mTokens[i].first);
+            if (setMap.add(key, mTokens[i].first)) {
+                FIRE_EVENT(EventPublisher::Event::set_new, key);
+                numAdded++;
+            }
         }
         
         FIRE_EVENT(EventPublisher::Event::sadd, key);
@@ -404,6 +407,7 @@ CommandResultPtr SMoveCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         FIRE_EVENT(EventPublisher::Event::srem, source);
         FIRE_EVENT(EventPublisher::Event::sadd, dest);
+        FIRE_EVENT(EventPublisher::Event::set_new, dest);
         
         return CommandResultPtr(new CommandResult(to_string(ret),
                                                   RedisProtocol::INTEGER));

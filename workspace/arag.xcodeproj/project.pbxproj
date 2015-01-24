@@ -38,6 +38,8 @@
 		17B4EFED1A5C4D6100B2E5B0 /* Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFEB1A5C4D6100B2E5B0 /* Config.cpp */; };
 		17B4EFF01A5C6FAD00B2E5B0 /* ServerCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFEE1A5C6FAD00B2E5B0 /* ServerCmds.cpp */; };
 		17B4EFF31A60EA1F00B2E5B0 /* KeyCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17B4EFF11A60EA1F00B2E5B0 /* KeyCmds.cpp */; };
+		17D0F3AD1A73068E005F9081 /* KeysMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17D0F3AB1A73068E005F9081 /* KeysMap.cpp */; };
+		17D0F3B01A7313EF005F9081 /* HashMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17D0F3AE1A7313EF005F9081 /* HashMap.cpp */; };
 		17ED91331A50E6930035DFE6 /* StringCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91321A50E6930035DFE6 /* StringCmds.cpp */; };
 		17ED91361A50E76A0035DFE6 /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91351A50E76A0035DFE6 /* Commands.cpp */; };
 		17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17ED91371A50ED0F0035DFE6 /* HashCmds.cpp */; };
@@ -121,6 +123,10 @@
 		17B4EFEF1A5C6FAD00B2E5B0 /* ServerCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerCmds.h; sourceTree = "<group>"; };
 		17B4EFF11A60EA1F00B2E5B0 /* KeyCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyCmds.cpp; sourceTree = "<group>"; };
 		17B4EFF21A60EA1F00B2E5B0 /* KeyCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyCmds.h; sourceTree = "<group>"; };
+		17D0F3AB1A73068E005F9081 /* KeysMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeysMap.cpp; sourceTree = "<group>"; };
+		17D0F3AC1A73068E005F9081 /* KeysMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeysMap.h; sourceTree = "<group>"; };
+		17D0F3AE1A7313EF005F9081 /* HashMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HashMap.cpp; sourceTree = "<group>"; };
+		17D0F3AF1A7313EF005F9081 /* HashMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HashMap.h; sourceTree = "<group>"; };
 		17ED91321A50E6930035DFE6 /* StringCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringCmds.cpp; sourceTree = "<group>"; };
 		17ED91341A50E6B80035DFE6 /* StringCmds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringCmds.h; sourceTree = "<group>"; };
 		17ED91351A50E76A0035DFE6 /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Commands.cpp; sourceTree = "<group>"; };
@@ -248,11 +254,15 @@
 			children = (
 				17AD40171A7181D700D11CE5 /* Database.cpp */,
 				17AD40181A7181D700D11CE5 /* Database.h */,
+				17D0F3AE1A7313EF005F9081 /* HashMap.cpp */,
+				17D0F3AF1A7313EF005F9081 /* HashMap.h */,
 				17B04E5C1A637EEB009CF9F8 /* HLLMap.cpp */,
 				17B04E5D1A637EEB009CF9F8 /* HLLMap.h */,
 				17B04E5F1A6386AD009CF9F8 /* IMapCommon.h */,
 				17ED913A1A50EDFC0035DFE6 /* InMemoryData.cpp */,
 				17ED913B1A50EDFC0035DFE6 /* InMemoryData.h */,
+				17D0F3AB1A73068E005F9081 /* KeysMap.cpp */,
+				17D0F3AC1A73068E005F9081 /* KeysMap.h */,
 				1784BB411A513D13008F7DCE /* ListMap.cpp */,
 				1784BB421A513D13008F7DCE /* ListMap.h */,
 				171EF7621A674D8C0033EFD1 /* PubSubMap.cpp */,
@@ -337,10 +347,12 @@
 			files = (
 				171EF7641A674D8C0033EFD1 /* PubSubMap.cpp in Sources */,
 				1784BB461A513DE7008F7DCE /* ListCmds.cpp in Sources */,
+				17D0F3B01A7313EF005F9081 /* HashMap.cpp in Sources */,
 				175BFA4F1A54728F001751CE /* SortedSetMap.cpp in Sources */,
 				1776F1931A6ED763006E5DE1 /* LuaInterpreter.cpp in Sources */,
 				172DA3AB1A4C89DC00AD6767 /* RequestProcessor.cpp in Sources */,
 				1737FA7C1A5321610099D0A6 /* SetMap.cpp in Sources */,
+				17D0F3AD1A73068E005F9081 /* KeysMap.cpp in Sources */,
 				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
 				1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */,
 				17B4EFED1A5C4D6100B2E5B0 /* Config.cpp in Sources */,

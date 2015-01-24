@@ -92,8 +92,13 @@ CommandResultPtr GetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         StringMap& map = data.getStringMap();
 
-        return CommandResultPtr(new CommandResult(map.get(mTokens[1].first),
-                                                RedisProtocol::BULK_STRING));
+        string& key = mTokens[1].first;
+
+        string val = map.get(key);
+        
+        FIRE_EVENT(EventPublisher::set, key);
+        
+        return CommandResultPtr(new CommandResult(val, RedisProtocol::BULK_STRING));
     }
     catch (std::exception& e) {
         return CommandResult::redisNULLResult();

@@ -34,10 +34,10 @@ void Database::flush(int index)
     
     if (index == FLUSH_ALL) {
         for (int i = 0; i < mDatabases.size(); ++i) {
-            mDatabases[i].flush();
+            mDatabases[i].getKeyMap().flush();
         }
     }
     else {
-        mDatabases[index].flush();
+        mDatabases[index].getKeyMap().flush();
     }
 }

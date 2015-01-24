@@ -2,6 +2,7 @@
 #include "KeyCmds.h"
 #include "RedisProtocol.h"
 #include "Utils.h"
+#include "Database.h"
 
 using namespace std;
 using namespace arag;
@@ -21,9 +22,15 @@ CommandResultPtr PFAddCommand::execute(InMemoryData& db, SessionContext& ctx)
         const string& key = mTokens[1].first;
         int bAdded = 0;
         HLLMap& hll = db.getHyperLogLogMap();
+
+        bool newKey = hll.keyExists(key) == false;
         
         for (int i = 2; i < mTokens.size(); ++i) {
             bAdded += hll.add(key, mTokens[i].first);
+        }
+        
+        if (newKey) {
+            FIRE_EVENT(EventPublisher::Event::hll_new, key);
         }
         
         if (bAdded != 0) {
@@ -91,6 +98,8 @@ CommandResultPtr PFMergeCommand::execute(InMemoryData& db, SessionContext& ctx)
         }
 
         hll.merge(destKey, keys);
+        
+        FIRE_EVENT(EventPublisher::Event::hll_new, destKey);
         
         return CommandResult::redisOKResult();
     }

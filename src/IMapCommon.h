@@ -10,6 +10,19 @@ namespace arag
 class IMapCommon
 {
 public:
+
+    enum TimeBase
+    {
+        SEC,
+        MSEC
+    };
+    
+    enum TimeoutType
+    {
+        TIMEOUT,
+        TIMESTAMP,
+        INFINITE
+    };
     
     // Container types supported in Arag.
     // They map directly to Redis types.
@@ -37,6 +50,21 @@ public:
     
     // Get container type
     virtual ContainerType getContainerType() = 0;
+    
+//    // Dumps the value for the given key
+//    virtual std::string dump(const std::string& key) = 0;
+//    
+//    // Resotores the value for the given key
+//    virtual void restore(const std::string& key, const std::string& dumpedVal) = 0;
+    
+    // Set a timeout on the key
+//    virtual int setTimeout(const std::string& key,
+//                           int timeout,
+//                           TimeoutType ttype,
+//                           TimeBase tbase);
+
+    // Returns time to live
+//    virtual int ttl(const std::string& key, TimeBase tbase) = 0;
 };
 
 };

@@ -32,6 +32,9 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 for (int i = 2; i < mTokens.size(); ++i) {
                     len = listMap.push(key, mTokens[i].first, ListMap::Position::BACK);
+                    if (len == 1) {
+                        FIRE_EVENT(EventPublisher::Event::list_new, key);
+                    }
                 }
                 
                 FIRE_EVENT(EventPublisher::Event::rpush, key);
@@ -43,6 +46,9 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 if (listMap.keyExists(key)) {
                     const string& value = mTokens[2].first;
                     len = listMap.push(key, value, ListMap::Position::BACK);
+                    if (len == 1) {
+                        FIRE_EVENT(EventPublisher::Event::list_new, key);
+                    }
                     FIRE_EVENT(EventPublisher::Event::rpush, key);
                 }
                 break;
@@ -52,6 +58,9 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
             {
                 for (int i = 2; i < mTokens.size(); ++i) {
                     len = listMap.push(key, mTokens[i].first, ListMap::Position::FRONT);
+                    if (len == 1) {
+                        FIRE_EVENT(EventPublisher::Event::list_new, key);
+                    }
                 }
                 
                 FIRE_EVENT(EventPublisher::Event::lpush, key);
@@ -63,6 +72,9 @@ CommandResultPtr LPushCommand::execute(InMemoryData& data, SessionContext& ctx)
                 if (listMap.keyExists(key)) {
                     const string& value = mTokens[2].first;
                     len = listMap.push(key, value, ListMap::Position::FRONT);
+                    if (len == 1) {
+                        FIRE_EVENT(EventPublisher::Event::list_new, key);
+                    }
                     FIRE_EVENT(EventPublisher::Event::lpush, key);                    
                 }
             
@@ -437,7 +449,10 @@ CommandResultPtr BRPopLPushCommand::execute(InMemoryData& data, SessionContext& 
             }
             FIRE_EVENT(EventPublisher::Event::rpop, source);
             
-            listMap.push(dest, val, ListMap::Position::FRONT);
+            int len = listMap.push(dest, val, ListMap::Position::FRONT);
+            if (len == 1) {
+                FIRE_EVENT(EventPublisher::Event::list_new, dest);
+            }
             FIRE_EVENT(EventPublisher::Event::lpush, dest);
             
             return CommandResultPtr(new CommandResult(val, RedisProtocol::BULK_STRING));

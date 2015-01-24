@@ -13,6 +13,8 @@
 #include "HLLMap.h"
 #include "PubSubMap.h"
 #include "ScriptMap.h"
+#include "KeysMap.h"
+#include "HashMap.h"
 #include "Utils.h"
 #include "EventPublisher.h"
 #include <iostream>
@@ -25,18 +27,13 @@ namespace arag
     Every data structure is implemented as a map which supports
     certain functionality. All maps implement IMapCommon interface.
  */
-class InMemoryData : IMapCommon
+class InMemoryData
 {
 public:
 
-    typedef std::unordered_map<std::string, StringMap> HashMap;
-        
     InMemoryData();
     
     StringMap& getStringMap() { return mStringMap; }
-    
-    // Returns the StringMap associated with given key
-    StringMap& getFromHashMap(const std::string& key);
     
     ListMap& getListMap() { return mListMap; }
     
@@ -49,26 +46,10 @@ public:
     PubSubMap& getPubSubMap() { return mPubSubMap; }
 
     ScriptMap& getScriptMap() { return mScriptMap; }
-    
-    // Returns number of all keys stored in the databases
-    virtual int size();
 
-    // Flushes all data
-    virtual void flush();
-    
-    // Finds where the given key is and deletes its content
-    virtual int delKey(const std::string& key);
+    KeyMap& getKeyMap() { return _keyMap; }
 
-    // Finds where the given key is and deletes its content
-    virtual bool keyExists(const std::string& key);
-
-    // Returns the container type associated with key
-    IMapCommon::ContainerType getContainerType(const std::string& key);
-
-private:
-    
-    // Returns ContainerType::NONE
-    IMapCommon::ContainerType getContainerType();
+    HashMap& getHashMap() { return _hashMap; }
     
 private:
     
@@ -80,7 +61,8 @@ private:
     PubSubMap mPubSubMap;
     HLLMap mHLLMap;
     ScriptMap mScriptMap;
-    std::vector<std::reference_wrapper<IMapCommon>> mCommonMaps;
+    KeyMap _keyMap;
+    HashMap _hashMap;
 };
 
 };

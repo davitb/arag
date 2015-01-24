@@ -25,7 +25,9 @@ CommandResultPtr HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
         const string& field = mTokens[2].first;
         const string& val = mTokens[3].first;
         
-        StringMap& map = data.getFromHashMap(key);
+        StringMap& map = data.getHashMap().get(key);
+        
+        bool newKey = map.keyExists(key) == false;
         
         int ret = 0;
         
@@ -76,10 +78,18 @@ CommandResultPtr HSetCommand::execute(InMemoryData& data, SessionContext& ctx)
                 
                 FIRE_EVENT(EventPublisher::Event::hset, key);
                 
+                if (newKey) {
+                    FIRE_EVENT(EventPublisher::Event::hash_new, key);
+                }
+                
                 return CommandResult::redisOKResult();
             }
         }
 
+        if (newKey) {
+            FIRE_EVENT(EventPublisher::Event::hash_new, key);
+        }
+                
         return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
@@ -102,7 +112,7 @@ CommandResultPtr HGetCommand::execute(InMemoryData& data, SessionContext& ctx)
         const string& key = mTokens[1].first;
         const string& field = mTokens[2].first;
         
-        StringMap& map = data.getFromHashMap(key);
+        StringMap& map = data.getHashMap().get(key);
      
         return CommandResultPtr(new CommandResult(map.get(field),
                                                   RedisProtocol::BULK_STRING));
@@ -126,7 +136,7 @@ CommandResultPtr HExistsCommand::execute(InMemoryData& data, SessionContext& ctx
         const string& key = mTokens[1].first;
         const string& field = mTokens[2].first;
         
-        StringMap& map = data.getFromHashMap(key);
+        StringMap& map = data.getHashMap().get(key);
         int ret = 1;
 
         try {
@@ -157,7 +167,7 @@ CommandResultPtr HDelCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         const string& key = mTokens[1].first;
-        StringMap& map = data.getFromHashMap(key);
+        StringMap& map = data.getHashMap().get(key);
         int numDeleted = 0;
         
         for (int i = 1; i < mTokens.size(); ++i) {
@@ -189,7 +199,7 @@ CommandResultPtr HGetAllCommand::execute(InMemoryData& data, SessionContext& ctx
         }
         
         const string& key = mTokens[1].first;
-        StringMap& map = data.getFromHashMap(key);
+        StringMap& map = data.getHashMap().get(key);
 
         switch (cmdType)
         {
@@ -248,7 +258,7 @@ CommandResultPtr HIncrByCommand::execute(InMemoryData& data, SessionContext& ctx
         
         const string& key = mTokens[1].first;
         const string& field = mTokens[2].first;
-        StringMap& map = data.getFromHashMap(key);
+        StringMap& map = data.getHashMap().get(key);
         
         switch (cmdType)
         {

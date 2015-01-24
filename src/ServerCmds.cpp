@@ -264,7 +264,9 @@ CommandResultPtr SingleArgumentCommand::execute(InMemoryData& data, SessionConte
             {
                 InMemoryData& db = Database::instance().get(ctx.getDatabaseIndex());
                 
-                int size = db.size();
+                KeyMap& kmap = db.getKeyMap();
+                
+                int size = kmap.size();
                 
                 return CommandResultPtr(new CommandResult(to_string(size),
                                                           RedisProtocol::INTEGER));

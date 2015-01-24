@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <string>
 
+#define FIRE_EVENT(event, key) \
+Database::instance().getEventPublisher().fire(event, key, ctx.getDatabaseIndex());\
+
 namespace arag
 {
 
@@ -20,6 +23,12 @@ public:
     enum Event
     {
         del,
+        string_new,
+        list_new,
+        hash_new,
+        set_new,
+        z_new,
+        hll_new,
         rename_from,
         rename_to,
         expire,

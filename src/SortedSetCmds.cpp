@@ -32,8 +32,10 @@ CommandResultPtr ZAddCommand::execute(InMemoryData& data, SessionContext& ctx)
         int numAdded = 0;
         
         for (int i = 2; i < mTokens.size(); i += 2) {
-            numAdded += setMap.insert(key, mTokens[i + 1].first,
-                                      Utils::convertToDouble(mTokens[i].first));
+            if (setMap.insert(key, mTokens[i + 1].first, Utils::convertToDouble(mTokens[i].first))) {
+                FIRE_EVENT(EventPublisher::Event::z_new, key);
+                numAdded++;
+            }
         }
         
         FIRE_EVENT(EventPublisher::Event::zadd, key);
