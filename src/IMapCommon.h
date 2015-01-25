@@ -17,7 +17,7 @@ public:
         MSEC
     };
     
-    enum TimeoutType
+    enum ExpirationType
     {
         TIMEOUT,
         TIMESTAMP,
@@ -60,11 +60,12 @@ public:
     // Set a timeout on the key
 //    virtual int setTimeout(const std::string& key,
 //                           int timeout,
-//                           TimeoutType ttype,
+//                           ExpirationType ttype,
 //                           TimeBase tbase);
 
     // Returns time to live
 //    virtual int ttl(const std::string& key, TimeBase tbase) = 0;
+
 };
 
 };

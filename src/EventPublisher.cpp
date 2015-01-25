@@ -3,17 +3,19 @@
 using namespace arag;
 using namespace std;
 
-void EventPublisher::subscribe(ISubscriber *pSubscr)
+void EventPublisher::subscribe(ISubscriber *pSubscr, int dbIndex)
 {
     if (pSubscr) {
-        mSubscribers[pSubscr] = true;
+        mSubscribers[pSubscr] = dbIndex;
     }
 }
 
-void EventPublisher::fire(EventPublisher::Event event, const std::string& key, int db)
+void EventPublisher::fire(EventPublisher::Event event, const std::string& key, int dbIndex)
 {
     for (auto subscr = mSubscribers.begin(); subscr != mSubscribers.end(); ++subscr) {
-        subscr->first->notify(event, key, db);
+        if (subscr->second == -1 || subscr->second == dbIndex) {
+            subscr->first->notify(event, key, dbIndex);
+        }
     }
 }
 

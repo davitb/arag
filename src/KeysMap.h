@@ -16,15 +16,22 @@ class KeyMap : public IMapCommon, ISubscriber
 {
 public:
     
+    typedef std::vector<std::pair<std::string, int>> RedisArray;
+    
     struct Item
     {
-        IMapCommon::TimeBase tbase;
+        IMapCommon::TimeBase timeBase;
+        IMapCommon::ExpirationType expirationType;
+        IMapCommon::ContainerType containerType;
+        int expiration;
         int timestamp;
-        IMapCommon::TimeoutType timeout;
-        IMapCommon::ContainerType ctype;
 
         Item();        
         Item(IMapCommon::ContainerType t);
+        Item(IMapCommon::ContainerType t,
+             IMapCommon::TimeBase tb,
+             IMapCommon::ExpirationType et,
+             int exp);
     };
     
     typedef std::unordered_map<std::string, Item> KeyMapType;
@@ -33,14 +40,15 @@ public:
     
     ~KeyMap();
     
-    void initialize();
-    
+    // Subscribe a map (e.g. SetMap, SortedSetMap, etc) to redirect functions in a batch
     void subscribeMap(IMapCommon& map);
     
-    Item get(const std::string& key);
+    Item& get(const std::string& key);
     
     int add(const std::string& key, Item item);
     
+    // Delete only from keyMap. delKey function deletes both from keyMap and
+    // other subscribed maps.
     void delOnlyFromKeyMap(const std::string& key);
     
     virtual int size();
@@ -63,11 +71,18 @@ public:
     // Recieve notifications about changed state in DB
     virtual void notify(EventPublisher::Event event, const std::string& key, int db);
     
+    // Return human readable container name for the key
+    std::string getContainerName(const std::string& key);
+
+    // Return keys that match the given pattern
+     RedisArray getKeys(const std::string& pattern);
+    
 private:
     
     KeyMapType _keyMap;
     std::vector<std::reference_wrapper<IMapCommon>> _maps;
     bool _bSubscribed;
+    std::unordered_map<int, std::string> _containerMap;
 };
     
 };

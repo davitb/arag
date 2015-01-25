@@ -60,11 +60,9 @@ private:
 };
     
     
-    COMMAND_CLASS(InfoCommand, 1, 2);
-    
-    COMMAND_CLASS(ClientCommand, 2, 3);
-    
-    COMMAND_CLASS(ConfigCommand, 2, 4);
+COMMAND_CLASS(InfoCommand, 1, 2);
+COMMAND_CLASS(ClientCommand, 2, 3);
+COMMAND_CLASS(ConfigCommand, 2, 4);
     
     
 };

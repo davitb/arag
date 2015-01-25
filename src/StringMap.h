@@ -26,12 +26,6 @@ public:
         VALUES
     };
     
-    enum ExpirationType
-    {
-        SEC,
-        MSEC
-    };
-
     enum SetKeyPolicy
     {
         CREATE_IF_DOESNT_EXIST,
@@ -44,8 +38,6 @@ public:
     // Sets a key with a value
     int set(const std::string& key,
             const std::string& value,
-            ExpirationType expType = SEC,
-            int exp = 0,
             SetKeyPolicy policy = CREATE_IF_DOESNT_EXIST);
     
     std::string get(const std::string& key);
@@ -88,21 +80,9 @@ public:
     
 private:
     
-    class Item
-    {
-    public:
-        std::string strVal;
-        int timestamp;
-        int exp;
-        ExpirationType expType;
-
-        Item();
-        Item(std::string val, ExpirationType expType, int exp);
-    };
-    
     friend class SelfTest;
     
-    std::unordered_map<std::string, Item> map;
+    std::unordered_map<std::string, std::string> map;
     // Currently the implemention is thread safe and uses a lock for it. However given
     // that there is only one processing thread - we might need to remove it as the
     // lock is not needed.

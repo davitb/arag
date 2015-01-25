@@ -6,9 +6,13 @@
 namespace arag
 {
 
-    COMMAND_CLASS(DelCommand, 2, INT_MAX);
+COMMAND_CLASS(DelCommand, 2, INT_MAX);
 
-    COMMAND_CLASS(ExistsCommand, 2, 2);
+COMMAND_CLASS(ExistsCommand, 2, 2);
+
+COMMAND_CLASS(TypeCommand, 2, 2);
+    
+COMMAND_CLASS(KeysCommand, 2, 2);
     
 };
 

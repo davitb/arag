@@ -20,7 +20,7 @@ Database::Database(int count)
 void Database::initialize()
 {
     for (int i = 0; i < mDatabases.size(); ++i) {
-        mDatabases[i].initialize();
+        Database::instance().getEventPublisher().subscribe((ISubscriber*)&mDatabases[i].getKeyMap(), i);
     }
 }
 

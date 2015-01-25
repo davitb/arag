@@ -10,31 +10,12 @@
 using namespace std;
 using namespace arag;
 
-StringMap::Item::Item()
-{
-}
-
-StringMap::Item::Item(std::string val, ExpirationType etype, int e) : strVal(val), exp(e), expType(etype)
-{
-    timestamp = (int)time(0);
-}
-
 StringMap::StringMap()
 {
     counter = 0;
 }
 
-static bool isExpired(int timestamp, StringMap::ExpirationType expType, int exp)
-{
-    // FIXME: Need to support miliseconds. time() returns in seconds
-
-    int currTimestamp = (int)time(0);
-    int finalTimestamp = timestamp + exp;
-    return (exp != 0) && (finalTimestamp <= currTimestamp);
-}
-
-int StringMap::set(const std::string& key, const std::string& value,
-               ExpirationType expType, int exp, SetKeyPolicy policy)
+int StringMap::set(const std::string& key, const std::string& value, SetKeyPolicy policy)
 {
     lock_guard<recursive_mutex> lock(mLock);
     
@@ -53,17 +34,16 @@ int StringMap::set(const std::string& key, const std::string& value,
     }
     
     counter++;
-    map[key] = Item(value, expType, exp);
-    return (int)map[key].strVal.length();
+    map[key] = value;
+    return (int)map[key].length();
 }
 
 string StringMap::getset(const std::string& key, const std::string& value)
 {
     lock_guard<recursive_mutex> lock(mLock);
-    Item& item = map[key];
-    string oldVal = item.strVal;
+    string oldVal = map[key];
     
-    set(key, value, item.expType, item.exp);
+    set(key, value);
     
     return oldVal;
 }
@@ -89,11 +69,7 @@ string StringMap::get(const std::string& key)
         throw EWrongKeyType();
     }
     
-    Item& item = iter->second;
-    if (isExpired(item.timestamp, item.expType, item.exp)) {
-        throw EWrongKeyType();
-    }
-    return iter->second.strVal;
+    return iter->second;
 }
 
 int StringMap::append(const std::string& key, const std::string& value)
@@ -103,8 +79,8 @@ int StringMap::append(const std::string& key, const std::string& value)
     if (iter == map.end()) {
         return set(key, "");
     }
-    iter->second.strVal += value;
-    return (int)iter->second.strVal.length();
+    iter->second += value;
+    return (int)iter->second.length();
 }
 
 string StringMap::getRange(const std::string& key, int start, int end)
@@ -179,7 +155,7 @@ vector<pair<string, int>> StringMap::getAll(int getAllType)
             vals.push_back(make_pair(elem->first, (int)RedisProtocol::BULK_STRING));
         }
         if (getAllType == KEYS_AND_VALUES || getAllType == VALUES) {
-            vals.push_back(make_pair(elem->second.strVal, (int)RedisProtocol::BULK_STRING));
+            vals.push_back(make_pair(elem->second, (int)RedisProtocol::BULK_STRING));
         }
     }
 
@@ -198,18 +174,6 @@ int StringMap::getCounter() const
 
 void StringMap::cleanup()
 {
-    lock_guard<recursive_mutex> lock(mLock);
-
-    std::unordered_map<std::string, Item>::iterator iter = map.begin();
-    for(; iter != map.end(); ) {
-        Item& item = iter->second;
-        if (isExpired(item.timestamp, item.expType, item.exp)) {
-            map.erase(iter++);
-            counter--;
-        } else {
-            ++iter;
-        }
-    }
 }
 
 void StringMap::flush()

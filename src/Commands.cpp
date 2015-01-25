@@ -234,6 +234,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         // Key Commands
         sNameToCommand["DEL"] = shared_ptr<Command>(new DelCommand());
         sNameToCommand["EXISTS"] = shared_ptr<Command>(new ExistsCommand());
+        sNameToCommand["TYPE"] = shared_ptr<Command>(new TypeCommand());
+        sNameToCommand["KEYS"] = shared_ptr<Command>(new KeysCommand());
         
         // HyperLogLog Commands
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());

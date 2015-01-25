@@ -51,8 +51,6 @@ public:
 
     HashMap& getHashMap() { return _hashMap; }
     
-    void initialize();
-    
 private:
     
     StringMap mStringMap;

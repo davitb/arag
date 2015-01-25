@@ -67,7 +67,7 @@ public:
     };
     
     // Add the given subscriber to the map
-    void subscribe(ISubscriber* subscr);
+    void subscribe(ISubscriber* subscr, int dbIndex = -1);
 
     // Remove the given subscriber
     void unsubscribe(ISubscriber* subscr);
@@ -76,7 +76,7 @@ public:
     void fire(Event event, const std::string& key, int db);
     
 private:
-    std::unordered_map<ISubscriber*, bool> mSubscribers;
+    std::unordered_map<ISubscriber*, int> mSubscribers;
 };
 
 class ISubscriber

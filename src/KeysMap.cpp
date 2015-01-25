@@ -1,26 +1,52 @@
 #include "KeysMap.h"
 #include "AragException.h"
 #include "Database.h"
+#include "Utils.h"
+#include "RedisProtocol.h"
 
 using namespace std;
 using namespace arag;
 
 //----------------------------------------------------------
 
+static bool isExpired(int timestamp, IMapCommon::ExpirationType expType, int exp)
+{
+    // FIXME: Need to support miliseconds. time() returns in seconds
+    
+    int currTimestamp = (int)time(0);
+    int finalTimestamp = timestamp + exp;
+    return (exp != 0) && (finalTimestamp <= currTimestamp);
+}
+
+
+//----------------------------------------------------------
+
 KeyMap::Item::Item()
 {
-    ctype = IMapCommon::NONE;
+    containerType = IMapCommon::NONE;
     timestamp = (int)time(0);
-    tbase = IMapCommon::SEC;
-    timeout = IMapCommon::INFINITE;
+    timeBase = IMapCommon::SEC;
+    expirationType = IMapCommon::INFINITE;
 }
 
 KeyMap::Item::Item(IMapCommon::ContainerType t)
 {
-    ctype = t;
+    containerType = t;
     timestamp = (int)time(0);
-    tbase = IMapCommon::SEC;
-    timeout = IMapCommon::INFINITE;
+    timeBase = IMapCommon::SEC;
+    expirationType = IMapCommon::INFINITE;
+}
+
+KeyMap::Item::Item(IMapCommon::ContainerType t,
+                   IMapCommon::TimeBase tb,
+                   IMapCommon::ExpirationType et,
+                   int exp)
+{
+    containerType = t;
+    timestamp = (int)time(0);
+    timeBase = tb;
+    expirationType = et;
+    expiration = exp;
 }
 
 //----------------------------------------------------------
@@ -28,16 +54,18 @@ KeyMap::Item::Item(IMapCommon::ContainerType t)
 KeyMap::KeyMap()
 {
     _bSubscribed = false;
+    
+    _containerMap[IMapCommon::HLL] = "hyperloglog";
+    _containerMap[IMapCommon::SET] = "set";
+    _containerMap[IMapCommon::SORTEDSET] = "zset";
+    _containerMap[IMapCommon::LIST] = "list";
+    _containerMap[IMapCommon::HASH] = "hash";
+    _containerMap[IMapCommon::STRING] = "string";
 }
 
 KeyMap::~KeyMap()
 {
     Database::instance().getEventPublisher().unsubscribe(this);
-}
-
-void KeyMap::initialize()
-{
-    Database::instance().getEventPublisher().subscribe(this);
 }
 
 void KeyMap::subscribeMap(IMapCommon& map)
@@ -81,7 +109,7 @@ IMapCommon::ContainerType KeyMap::getContainerType()
 IMapCommon::ContainerType KeyMap::getContainerType(const std::string &key)
 {
     if (keyExists(key)) {
-        return _keyMap[key].ctype;
+        return _keyMap[key].containerType;
     }
     return IMapCommon::NONE;
 }
@@ -94,6 +122,7 @@ bool KeyMap::keyExists(const std::string& key)
 int KeyMap::add(const std::string &key, KeyMap::Item item)
 {
     if (keyExists(key)) {
+        _keyMap[key] = item;
         return 0;
     }
     
@@ -101,13 +130,37 @@ int KeyMap::add(const std::string &key, KeyMap::Item item)
     return 1;
 }
 
-KeyMap::Item KeyMap::get(const std::string &key)
+KeyMap::Item& KeyMap::get(const std::string &key)
 {
     if (!keyExists(key)) {
         throw EInvalidKey();
     }
     
     return _keyMap[key];
+}
+
+std::string KeyMap::getContainerName(const std::string &key)
+{
+    for (int i = 0; i < _maps.size(); ++i) {
+        if (_maps[i].get().keyExists(key)) {
+            return _containerMap[_maps[i].get().getContainerType()];
+        }
+    }
+    
+    throw EInvalidKey();
+}
+
+KeyMap::RedisArray KeyMap::getKeys(const std::string &pattern)
+{
+    RedisArray arr;
+    
+    for (auto elem = _keyMap.begin(); elem != _keyMap.end(); ++elem) {
+        if (Utils::checkPubSubPattern(elem->first, pattern)) {
+            arr.push_back(make_pair(elem->first, RedisProtocol::BULK_STRING));
+        }
+    }
+    
+    return arr;
 }
 
 void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)

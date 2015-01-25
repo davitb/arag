@@ -68,3 +68,50 @@ CommandResultPtr ExistsCommand::execute(InMemoryData& db, SessionContext& ctx)
         return CommandResult::redisNULLResult();
     }
 }
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr TypeCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& key = mTokens[1].first;
+        
+        KeyMap& kmap = db.getKeyMap();
+        
+        return CommandResultPtr(new CommandResult(kmap.getContainerName(key),
+                                                  RedisProtocol::SIMPLE_STRING));
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
+}
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr KeysCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& pattern = mTokens[1].first;
+        
+        KeyMap& kmap = db.getKeyMap();
+        
+        return CommandResultPtr(new CommandResult(kmap.getKeys(pattern)));
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
+}

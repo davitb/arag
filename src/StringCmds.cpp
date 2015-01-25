@@ -14,7 +14,7 @@ using namespace arag::command_const;
 static void extractExpirationNum(const vector<pair<string, int>>& tokens,
                                    int minArgsNum,
                                    int maxArgsNum,
-                                   StringMap::ExpirationType* pExpType,
+                                   IMapCommon::TimeBase* pExpType,
                                    int* pExp)
 {
     size_t cmdNum = tokens.size();
@@ -32,7 +32,7 @@ static void extractExpirationNum(const vector<pair<string, int>>& tokens,
             throw EInvalidArgument();
         }
         
-        *pExpType = expType == "EX" ? StringMap::ExpirationType::SEC : StringMap::ExpirationType::MSEC;
+        *pExpType = expType == "EX" ? IMapCommon::SEC : IMapCommon::MSEC;
         *pExp = Utils::convertToInt(expVal);
     }
 }
@@ -54,8 +54,8 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         // Extract expiration time
         int exp = 0;
-        StringMap::ExpirationType expType = StringMap::ExpirationType::SEC;
-        extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM - 1, &expType, &exp);
+        IMapCommon::TimeBase timeBase = IMapCommon::TimeBase::SEC;
+        extractExpirationNum(mTokens, Consts::MIN_ARG_NUM, Consts::MAX_ARG_NUM - 1, &timeBase, &exp);
         
         StringMap::SetKeyPolicy policy = StringMap::SetKeyPolicy::CREATE_IF_DOESNT_EXIST;
         // Extract NX/XX if it's provided
@@ -68,9 +68,16 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
         
         StringMap& map = data.getStringMap();
         
-        map.set(key, val, expType, exp, policy);
+        map.set(key, val, policy);
         
         FIRE_EVENT(EventPublisher::set, key);
+        if (exp != 0) {
+            KeyMap& kmap = data.getKeyMap();
+            kmap.add(key, KeyMap::Item(IMapCommon::STRING,
+                                       timeBase,
+                                       IMapCommon::TIMEOUT,
+                                       exp));
+        }
         
         return CommandResult::redisOKResult();
     }
