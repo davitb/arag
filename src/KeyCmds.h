@@ -77,7 +77,9 @@ public:
     enum CmdType
     {
         EXPIRE,
-        PEXPIRE
+        EXPIREAT,
+        PEXPIRE,
+        PEXPIREAT
     };
     
     ExpireCommand(CmdType type) { mCmdType = type; }

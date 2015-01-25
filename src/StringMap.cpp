@@ -22,12 +22,12 @@ int StringMap::set(const std::string& key, const std::string& value, SetKeyPolic
     if (policy != SetKeyPolicy::CREATE_IF_DOESNT_EXIST) {
         auto iter = map.find(key);
         if (iter == map.end()) {
-            if (policy == SetKeyPolicy::ONLY_IF_ALREADY_EXISTS) {
+            if (policy == SetKeyPolicy::ONLY_IFEXISTS) {
                 throw EWrongKeyType();
             }
         }
         else {
-            if (policy == SetKeyPolicy::ONLY_IF_DOESNT_ALREADY_EXISTS) {
+            if (policy == SetKeyPolicy::ONLY_IF_DOESNTEXISTS) {
                 throw EWrongKeyType();
             }
         }

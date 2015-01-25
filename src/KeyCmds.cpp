@@ -142,12 +142,19 @@ CommandResultPtr TTLCommand::execute(InMemoryData& db, SessionContext& ctx)
         catch (EInvalidKey) {
             return CommandResultPtr(new CommandResult("-2", RedisProtocol::INTEGER));
         }
+
+        int ttl = expItem.expiration;
+        if (expItem.expirationType == IMapCommon::TIMESTAMP) {
+            ttl = expItem.expiration - (int)time(0);
+            if (ttl < 0) {
+                ttl = 0;
+            }
+        }
         
         switch (mCmdType)
         {
             case TTL:
             {
-                int ttl = expItem.expiration;
                 if (expItem.timeBase == IMapCommon::MSEC) {
                     ttl = ttl / 1000;
                 }
@@ -156,7 +163,6 @@ CommandResultPtr TTLCommand::execute(InMemoryData& db, SessionContext& ctx)
                 
             case PTTL:
             {
-                int ttl = expItem.expiration;
                 if (expItem.timeBase == IMapCommon::SEC) {
                     ttl = ttl * 1000;
                 }
@@ -304,8 +310,12 @@ CommandResultPtr ExpireCommand::execute(InMemoryData& db, SessionContext& ctx)
             
             expItem.expiration = expiration;
             expItem.timeBase = IMapCommon::SEC;
-            if (mCmdType == PEXPIRE) {
+            expItem.expirationType = IMapCommon::TIMEOUT;
+            if (mCmdType == PEXPIRE || mCmdType == PEXPIREAT) {
                 expItem.timeBase = IMapCommon::MSEC;
+            }
+            if (mCmdType == EXPIREAT || mCmdType == PEXPIREAT) {
+                expItem.expirationType = IMapCommon::TIMESTAMP;
             }
             
             return CommandResultPtr(new CommandResult("1", RedisProtocol::INTEGER));

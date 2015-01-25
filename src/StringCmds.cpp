@@ -60,9 +60,9 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
         StringMap::SetKeyPolicy policy = StringMap::SetKeyPolicy::CREATE_IF_DOESNT_EXIST;
         // Extract NX/XX if it's provided
         if (cmdNum == Consts::MAX_ARG_NUM) {
-            policy = StringMap::SetKeyPolicy::ONLY_IF_DOESNT_ALREADY_EXISTS;
+            policy = StringMap::SetKeyPolicy::ONLY_IF_DOESNTEXISTS;
             if (mTokens[4].first == "XX") {
-                policy = StringMap::SetKeyPolicy::ONLY_IF_ALREADY_EXISTS;
+                policy = StringMap::SetKeyPolicy::ONLY_IFEXISTS;
             }
         }
         
@@ -80,6 +80,39 @@ CommandResultPtr SetCommand::execute(InMemoryData& data, SessionContext& ctx)
         }
         
         return CommandResult::redisOKResult();
+    }
+    catch (std::exception& e) {
+        return CommandResult::redisNULLResult();
+    }
+}
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr SetNXCommand::execute(InMemoryData& data, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& key = mTokens[1].first;
+        const string& val = mTokens[2].first;
+        
+        StringMap::SetKeyPolicy policy = StringMap::SetKeyPolicy::ONLY_IF_DOESNTEXISTS;
+        
+        StringMap& map = data.getStringMap();
+        
+        if (map.keyExists(key)) {
+            return CommandResultPtr(new CommandResult("0", RedisProtocol::INTEGER));
+        }
+        
+        map.set(key, val, policy);
+        
+        FIRE_EVENT(EventPublisher::set, key);
+        
+        return CommandResultPtr(new CommandResult("1", RedisProtocol::INTEGER));
     }
     catch (std::exception& e) {
         return CommandResult::redisNULLResult();
@@ -709,4 +742,47 @@ CommandResultPtr StrlenCommand::execute(InMemoryData& data, SessionContext& ctx)
     catch (std::exception& e) {
         return CommandResult::redisNULLResult();
     }
+}
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr SetExCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& key = mTokens[1].first;
+        int expiration = Utils::convertToInt(mTokens[2].first);
+        const string& val = mTokens[3].first;
+
+        StringMap::SetKeyPolicy policy = StringMap::SetKeyPolicy::CREATE_IF_DOESNT_EXIST;
+        
+        StringMap& map = db.getStringMap();
+        
+        map.set(key, val, policy);
+        
+        FIRE_EVENT(EventPublisher::set, key);
+
+        IMapCommon::TimeBase tbase = IMapCommon::SEC;
+        if (mCmdType == PSETEX) {
+            tbase = IMapCommon::MSEC;
+        }
+        
+        // Set the key timeout in KeyMap
+        KeyMap& kmap = db.getKeyMap();
+        kmap.add(key, KeyMap::Item(IMapCommon::STRING,
+                                   tbase,
+                                   IMapCommon::TIMEOUT,
+                                   expiration));
+        
+        return CommandResult::redisOKResult();
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
 }

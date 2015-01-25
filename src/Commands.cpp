@@ -56,6 +56,12 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         // String Commands
         sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());
         sNameToCommand["SET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SETNX"] = shared_ptr<Command>(new SetNXCommand());
+        sNameToCommand["SETNX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SETEX"] = shared_ptr<Command>(new SetExCommand(SetExCommand::SETEX));
+        sNameToCommand["SETEX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["PSETEX"] = shared_ptr<Command>(new SetExCommand(SetExCommand::PSETEX));
+        sNameToCommand["PSETEX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
         sNameToCommand["GET"] = shared_ptr<Command>(new GetCommand());
         sNameToCommand["GET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
         sNameToCommand["GETSET"] = shared_ptr<Command>(new GetSetCommand());
@@ -244,6 +250,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["RENAMENX"] = shared_ptr<Command>(new RenameCommand(RenameCommand::RENAMENX));
         sNameToCommand["EXPIRE"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::EXPIRE));
         sNameToCommand["PEXPIRE"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::PEXPIRE));
+        sNameToCommand["EXPIREAT"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::EXPIREAT));
+        sNameToCommand["PEXPIREAT"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::PEXPIREAT));
         
         // HyperLogLog Commands
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());

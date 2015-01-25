@@ -29,8 +29,8 @@ public:
     enum SetKeyPolicy
     {
         CREATE_IF_DOESNT_EXIST,
-        ONLY_IF_ALREADY_EXISTS,
-        ONLY_IF_DOESNT_ALREADY_EXISTS
+        ONLY_IFEXISTS,
+        ONLY_IF_DOESNTEXISTS
     };
     
     StringMap();

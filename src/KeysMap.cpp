@@ -203,7 +203,6 @@ void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)
             return;
         }
         if (event == EventPublisher::Event::set) {
-            cout << "add(key, Item(IMapCommon::STRING))";
             add(key, Item(IMapCommon::STRING));
             return;
         }
