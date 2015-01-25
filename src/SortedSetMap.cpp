@@ -569,3 +569,13 @@ IMapCommon::ContainerType SortedSetMap::getContainerType()
 {
     return IMapCommon::SORTEDSET;
 }
+
+int SortedSetMap::rename(const std::string &key, const std::string &newKey)
+{
+    mSetMap[newKey] = SortedSet();
+    mSetMap[newKey].mMap.swap(mSetMap[key].mMap);
+    mSetMap[newKey].mSkipList.swap(mSetMap[key].mSkipList);
+    mSetMap.erase(key);
+    
+    return 1;
+}

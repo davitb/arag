@@ -220,3 +220,12 @@ IMapCommon::ContainerType SetMap::getContainerType()
 {
     return IMapCommon::SET;
 }
+
+int SetMap::rename(const std::string &key, const std::string &newKey)
+{
+    mSetMap[newKey] = SetType();
+    mSetMap[newKey].swap(mSetMap[key]);
+    mSetMap.erase(key);
+    
+    return 1;
+}

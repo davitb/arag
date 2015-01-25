@@ -31,6 +31,9 @@ public:
     // Clears all keys
     virtual void flush();
     
+    // Renames the key to newkey
+    virtual int rename(const std::string& key, const std::string& newKey);
+    
     // Return value under the key
     StringMap& get(const std::string& key);
     

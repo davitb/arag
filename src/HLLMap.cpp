@@ -77,3 +77,12 @@ IMapCommon::ContainerType HLLMap::getContainerType()
 {
     return IMapCommon::HLL;
 }
+
+int HLLMap::rename(const std::string &key, const std::string &newKey)
+{
+    mHLLMap[newKey] = HyperLogLog(BIT_WIDTH);
+    mHLLMap[newKey].swap(mHLLMap[key]);
+    mHLLMap.erase(key);
+    
+    return 1;
+}

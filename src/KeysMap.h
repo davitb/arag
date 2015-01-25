@@ -80,6 +80,9 @@ public:
     // Return a random key
     std::string getRandomKey();
     
+    // Renames the key to newkey
+    virtual int rename(const std::string& key, const std::string& newKey);
+    
 private:
     
     KeyMapType _keyMap;

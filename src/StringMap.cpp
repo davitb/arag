@@ -191,3 +191,12 @@ IMapCommon::ContainerType StringMap::getContainerType()
 {
     return IMapCommon::STRING;
 }
+
+int StringMap::rename(const std::string &key, const std::string &newKey)
+{
+    map[newKey] = "";
+    map[newKey].swap(map[key]);
+    map.erase(key);
+    
+    return 1;
+}

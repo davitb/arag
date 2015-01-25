@@ -37,3 +37,11 @@ StringMap& HashMap::get(const std::string& key)
 {
     return _hashMap[key];
 };
+
+int HashMap::rename(const std::string &key, const std::string &newKey)
+{
+    _hashMap[newKey].rename(key, newKey);
+    _hashMap.erase(key);
+    
+    return 1;
+}

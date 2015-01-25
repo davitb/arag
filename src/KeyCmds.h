@@ -43,6 +43,32 @@ private:
     
     CmdType mCmdType;
 };
+
+class RenameCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        RENAME,
+        RENAMENX
+    };
+    
+    RenameCommand(CmdType type) { mCmdType = type; }
+    
+    DEEP_CLONE(RenameCommand)
+    
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 3
+    };
+    
+    CmdType mCmdType;
+};
     
 };
 

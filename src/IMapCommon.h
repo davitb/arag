@@ -51,21 +51,8 @@ public:
     // Get container type
     virtual ContainerType getContainerType() = 0;
     
-//    // Dumps the value for the given key
-//    virtual std::string dump(const std::string& key) = 0;
-//    
-//    // Resotores the value for the given key
-//    virtual void restore(const std::string& key, const std::string& dumpedVal) = 0;
-    
-    // Set a timeout on the key
-//    virtual int setTimeout(const std::string& key,
-//                           int timeout,
-//                           ExpirationType ttype,
-//                           TimeBase tbase);
-
-    // Returns time to live
-//    virtual int ttl(const std::string& key, TimeBase tbase) = 0;
-
+    // Renames the key to newkey
+    virtual int rename(const std::string& key, const std::string& newKey) = 0;
 };
 
 };

@@ -293,3 +293,12 @@ IMapCommon::ContainerType ListMap::getContainerType()
 {
     return IMapCommon::LIST;
 }
+
+int ListMap::rename(const std::string &key, const std::string &newKey)
+{
+    mListMap[newKey] = ListType();
+    mListMap[newKey].swap(mListMap[key]);
+    mListMap.erase(key);
+    
+    return 1;
+}

@@ -171,6 +171,24 @@ std::string KeyMap::getRandomKey()
     return iter->first;
 }
 
+int KeyMap::rename(const std::string &key, const std::string &newKey)
+{
+    for (int i = 0; i < _maps.size(); ++i) {
+        if (!_maps[i].get().keyExists(key)) {
+            continue;
+        }
+
+        if (_maps[i].get().rename(key, newKey) == 1) {
+            _keyMap[newKey] = _keyMap[key];
+            _keyMap.erase(key);
+            return 1;
+        }
+        return 0;
+    }
+    
+    return 0;
+}
+
 void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)
 {
     // When a new key is added/delete in Database -

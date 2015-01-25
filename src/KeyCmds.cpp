@@ -229,3 +229,56 @@ CommandResultPtr RandomKeyCommand::execute(InMemoryData& db, SessionContext& ctx
     
     return CommandResult::redisNULLResult();
 }
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr RenameCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& key = mTokens[1].first;
+        const string& newKey = mTokens[2].first;
+        
+        KeyMap::Item expItem;
+        
+        KeyMap& kmap = db.getKeyMap();
+        
+        if (key == newKey) {
+            return CommandResult::redisErrorResult("Keys are the same");
+        }
+        
+        if (!kmap.keyExists(key)) {
+            return CommandResult::redisErrorResult("Key doesn't exist");
+        }
+        
+        switch (mCmdType)
+        {
+            case RENAME:
+            {
+                kmap.rename(key, newKey);
+                
+                return CommandResult::redisOKResult();
+            }
+                
+            case RENAMENX:
+            {
+                if (kmap.keyExists(newKey)) {
+                    return CommandResultPtr(new CommandResult("0", RedisProtocol::INTEGER));
+                }
+
+                int ret = kmap.rename(key, newKey);
+                
+                return CommandResultPtr(new CommandResult(to_string(ret), RedisProtocol::INTEGER));
+            }
+        }
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
+}

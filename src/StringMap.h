@@ -74,6 +74,9 @@ public:
     // Returns the container type associated with key
     IMapCommon::ContainerType getContainerType();
 
+    // Renames the key to newkey
+    virtual int rename(const std::string& key, const std::string& newKey);
+    
     void cleanup();
     
     int getCounter() const;
