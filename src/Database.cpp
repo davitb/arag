@@ -19,8 +19,10 @@ Database::Database(int count)
 
 void Database::initialize()
 {
+    // Subscriber all KeyMaps to receive notifications about changed keys
     for (int i = 0; i < mDatabases.size(); ++i) {
-        Database::instance().getEventPublisher().subscribe((ISubscriber*)&mDatabases[i].getKeyMap(), i);
+        KeyMap& kmap = mDatabases[i].getKeyMap();
+        Database::instance().getEventPublisher().subscribe((ISubscriber*)&kmap, i);
     }
 }
 

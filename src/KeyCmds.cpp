@@ -282,3 +282,41 @@ CommandResultPtr RenameCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     return CommandResult::redisNULLResult();
 }
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr ExpireCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& key = mTokens[1].first;
+        int expiration = Utils::convertToInt(mTokens[2].first);
+        
+        KeyMap& kmap = db.getKeyMap();
+
+        try {
+            KeyMap::Item& expItem = kmap.get(key);
+            
+            expItem.expiration = expiration;
+            expItem.timeBase = IMapCommon::SEC;
+            if (mCmdType == PEXPIRE) {
+                expItem.timeBase = IMapCommon::MSEC;
+            }
+            
+            return CommandResultPtr(new CommandResult("1", RedisProtocol::INTEGER));
+        }
+        catch (EInvalidKey) {
+            return CommandResultPtr(new CommandResult("0", RedisProtocol::INTEGER));
+        }
+        
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
+}

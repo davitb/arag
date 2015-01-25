@@ -69,6 +69,32 @@ private:
     
     CmdType mCmdType;
 };
+
+class ExpireCommand: public Command
+{
+public:
+    
+    enum CmdType
+    {
+        EXPIRE,
+        PEXPIRE
+    };
+    
+    ExpireCommand(CmdType type) { mCmdType = type; }
+    
+    DEEP_CLONE(ExpireCommand)
+    
+    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
+    
+private:
+    enum Consts
+    {
+        MIN_ARG_NUM = 3,
+        MAX_ARG_NUM = 3
+    };
+    
+    CmdType mCmdType;
+};
     
 };
 

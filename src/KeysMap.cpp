@@ -27,6 +27,7 @@ KeyMap::Item::Item()
     timestamp = (int)time(0);
     timeBase = IMapCommon::SEC;
     expirationType = IMapCommon::INFINITE;
+    expiration = 0;    
 }
 
 KeyMap::Item::Item(IMapCommon::ContainerType t)
@@ -34,6 +35,7 @@ KeyMap::Item::Item(IMapCommon::ContainerType t)
     containerType = t;
     timestamp = (int)time(0);
     timeBase = IMapCommon::SEC;
+    expiration = 0;
     expirationType = IMapCommon::INFINITE;
 }
 
@@ -191,6 +193,8 @@ int KeyMap::rename(const std::string &key, const std::string &newKey)
 
 void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)
 {
+    int k = 0;
+    k++;
     // When a new key is added/delete in Database -
     // make sure to add/delete them into/from keyMap as well
     try {
@@ -199,6 +203,7 @@ void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)
             return;
         }
         if (event == EventPublisher::Event::set) {
+            cout << "add(key, Item(IMapCommon::STRING))";
             add(key, Item(IMapCommon::STRING));
             return;
         }

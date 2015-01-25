@@ -242,6 +242,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["RANDOMKEY"] = shared_ptr<Command>(new RandomKeyCommand());
         sNameToCommand["RENAME"] = shared_ptr<Command>(new RenameCommand(RenameCommand::RENAME));
         sNameToCommand["RENAMENX"] = shared_ptr<Command>(new RenameCommand(RenameCommand::RENAMENX));
+        sNameToCommand["EXPIRE"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::EXPIRE));
+        sNameToCommand["PEXPIRE"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::PEXPIRE));
         
         // HyperLogLog Commands
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());
