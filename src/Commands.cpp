@@ -236,6 +236,10 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["EXISTS"] = shared_ptr<Command>(new ExistsCommand());
         sNameToCommand["TYPE"] = shared_ptr<Command>(new TypeCommand());
         sNameToCommand["KEYS"] = shared_ptr<Command>(new KeysCommand());
+        sNameToCommand["TTL"] = shared_ptr<Command>(new TTLCommand(TTLCommand::TTL));
+        sNameToCommand["PTTL"] = shared_ptr<Command>(new TTLCommand(TTLCommand::PTTL));
+        sNameToCommand["PERSIST"] = shared_ptr<Command>(new PersistCommand());
+        sNameToCommand["RANDOMKEY"] = shared_ptr<Command>(new RandomKeyCommand());
         
         // HyperLogLog Commands
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());

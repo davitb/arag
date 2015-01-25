@@ -163,6 +163,14 @@ KeyMap::RedisArray KeyMap::getKeys(const std::string &pattern)
     return arr;
 }
 
+std::string KeyMap::getRandomKey()
+{
+    int rand = Utils::genRandom(0, (int)_keyMap.size() - 1);
+    auto iter = _keyMap.begin();
+    std::advance(iter, rand);
+    return iter->first;
+}
+
 void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)
 {
     // When a new key is added/delete in Database -
