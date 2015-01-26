@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1701498E1A75C6D100759CFC /* CommandContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1701498C1A75C6D100759CFC /* CommandContext.cpp */; };
 		1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1702B4461A4DFD8700E6093C /* Utils.cpp */; };
 		171978031A55ED6000BEDB62 /* SortedSetCmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 171978011A55ED6000BEDB62 /* SortedSetCmds.cpp */; };
 		171EF7641A674D8C0033EFD1 /* PubSubMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 171EF7621A674D8C0033EFD1 /* PubSubMap.cpp */; };
@@ -60,6 +61,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1701498C1A75C6D100759CFC /* CommandContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandContext.cpp; sourceTree = "<group>"; };
+		1701498D1A75C6D100759CFC /* CommandContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandContext.h; sourceTree = "<group>"; };
 		1702B4461A4DFD8700E6093C /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		1702B4471A4DFD8700E6093C /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		171978011A55ED6000BEDB62 /* SortedSetCmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SortedSetCmds.cpp; sourceTree = "<group>"; };
@@ -217,6 +220,8 @@
 		1761F8C51A53DCE100146F9B /* Commands */ = {
 			isa = PBXGroup;
 			children = (
+				1701498C1A75C6D100759CFC /* CommandContext.cpp */,
+				1701498D1A75C6D100759CFC /* CommandContext.h */,
 				1776F1831A6E016C006E5DE1 /* CommandResult.cpp */,
 				1776F1841A6E016C006E5DE1 /* CommandResult.h */,
 				17ED91351A50E76A0035DFE6 /* Commands.cpp */,
@@ -355,6 +360,7 @@
 				17D0F3AD1A73068E005F9081 /* KeysMap.cpp in Sources */,
 				172DA3A81A4C89DC00AD6767 /* AragServer.cpp in Sources */,
 				1702B4481A4DFD8700E6093C /* Utils.cpp in Sources */,
+				1701498E1A75C6D100759CFC /* CommandContext.cpp in Sources */,
 				17B4EFED1A5C4D6100B2E5B0 /* Config.cpp in Sources */,
 				17ED91391A50ED0F0035DFE6 /* HashCmds.cpp in Sources */,
 				1737FA791A5321500099D0A6 /* SetCmds.cpp in Sources */,

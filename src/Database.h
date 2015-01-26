@@ -35,7 +35,7 @@ public:
     }
     
     void initialize();
-
+    
 private:
     Database(int count);
     

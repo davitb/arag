@@ -83,6 +83,9 @@ public:
     // Renames the key to newkey
     virtual int rename(const std::string& key, const std::string& newKey);
     
+    // Delete the key if it's expired
+    void delIfExpired(const std::string& key);
+    
 private:
     
     KeyMapType _keyMap;

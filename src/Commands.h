@@ -10,6 +10,7 @@
 #include "SessionContext.h"
 #include "Config.h"
 #include "CommandResult.h"
+#include "CommandContext.h"
 #include "SelfTest.h"
 
 
@@ -65,6 +66,7 @@ namespace command_const
     static const std::string CMD_INTERNAL_CLEANUP = "internal::cleanup";
     static const std::string CMD_INTERNAL_PREFIX = "internal::";
 };
+
     
 /*
     Base class for all commands. 
@@ -100,29 +102,6 @@ public:
         BYPASS_TRANSACTION_STATE
     };
     
-    /*
-        Keeps a context information about a command
-     */
-    class Context
-    {
-    public:
-        // Indicates which argument is a key. FIXME: this must be fixed.
-        int mKeyArgIndex;
-        IMapCommon::ContainerType mContainerType;
-
-        Context()
-        {
-            mKeyArgIndex = -1;
-            mContainerType = IMapCommon::NONE;
-        }
-        
-        Context(int k, IMapCommon::ContainerType t)
-        {
-            mKeyArgIndex = k;
-            mContainerType = t;
-        }
-    };
-    
 public:
     
     Command();
@@ -152,10 +131,13 @@ public:
     // Parses given request and returns a single command (this is used only internally)
     static std::shared_ptr<Command> getFirstCommand(const std::string& request);
     
-    void setCommandContext(Context ctx);
+    void setCtx(CommandCtx ctx);
     
     // Checks if the key that this command is going to operate on can be operated by this command
     bool isKeyTypeValid(InMemoryData& db);
+
+    // Finds out expired keys and deletes them
+    void deleteExpiredKeys(InMemoryData& db);
     
     Type getType() const
     {
@@ -181,7 +163,7 @@ protected:
     
 protected:
     std::vector<std::pair<std::string, int>> mTokens;
-    Context mCtx;
+    CommandCtx mCtx;
     Type mType;
     SpecialType mSpecialType;
     int mTimestamp;

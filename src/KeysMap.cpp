@@ -9,13 +9,24 @@ using namespace arag;
 
 //----------------------------------------------------------
 
-static bool isExpired(int timestamp, IMapCommon::ExpirationType expType, int exp)
+static bool isExpired(KeyMap::Item& item)
 {
+    if (item.expiration == 0) {
+        return false;
+    }
+    
     // FIXME: Need to support miliseconds. time() returns in seconds
     
     int currTimestamp = (int)time(0);
-    int finalTimestamp = timestamp + exp;
-    return (exp != 0) && (finalTimestamp <= currTimestamp);
+    int finalTimestamp = item.timestamp + item.expiration;
+    if (item.expirationType == IMapCommon::TIMESTAMP) {
+        finalTimestamp = item.expiration;
+    }
+    if (item.timeBase == IMapCommon::MSEC) {
+        currTimestamp *= 1000;
+    }
+    
+    return finalTimestamp <= currTimestamp;
 }
 
 
@@ -189,6 +200,17 @@ int KeyMap::rename(const std::string &key, const std::string &newKey)
     }
     
     return 0;
+}
+
+void KeyMap::delIfExpired(const std::string &key)
+{
+    if (_keyMap.count(key) == 0) {
+        return;
+    }
+    
+    if (isExpired(_keyMap[key])) {
+        delKey(key);
+    }
 }
 
 void KeyMap::notify(EventPublisher::Event event, const std::string &key, int db)

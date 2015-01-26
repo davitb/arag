@@ -46,6 +46,16 @@ public:
     
     LuaInterpreter& getLuaInterpreter();
 
+    void incrByTotalCommandsProcessed(unsigned int by)
+    {
+        _totalCommandsProcessed += by;
+    }
+    
+    unsigned int getTotalCommandsProcessed() const
+    {
+        return _totalCommandsProcessed;
+    }
+    
 private:
     
     Arag();
@@ -65,6 +75,7 @@ private:
     asio::ip::tcp::acceptor mAcceptor;
     asio::ip::tcp::socket mSocket;
     static asio::io_service sIOS;
+    unsigned int _totalCommandsProcessed;
 };
     
 }; // arag

@@ -41,8 +41,8 @@ void ClientSession::doRead()
             string cmdLine = string(mBuffer.begin(), length);
             
             if (cmdLine.length() < 1000) {
-//                cout << "SessionID: " << mCtx.getSessionID() << " ";
-//                cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
+                cout << "SessionID: " << mCtx.getSessionID() << " ";
+                cout << std::regex_replace(cmdLine, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
             }
             
             // If the request is more than default MAX_REQUEST_LEN - read the remaining here
@@ -84,7 +84,7 @@ void ClientSession::writeResponse(const std::string &str)
         return;
     }
     
-//    cout << std::regex_replace(str, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
+    cout << std::regex_replace(str, std::regex("(\r\n)"),"\\r\\n") << endl << endl;
     
     try {
         // This callback function will be called when async write is done

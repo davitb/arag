@@ -14,6 +14,7 @@ SessionContext::SessionContext()
     // Generate a random session ID
     mSessionID = Utils::genRandom(0, INT_MAX);
     mTransactionInfo.transactionState = NO_TRANSACTION;
+    mClientName = "";
 }
 
 SessionContext::~SessionContext()

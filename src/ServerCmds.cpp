@@ -59,6 +59,7 @@ CommandResultPtr InfoCommand::execute(InMemoryData& data, SessionContext& ctx)
         out.addSection("Server");
         out.addProperty("arag_version", ARAG_VERSION);
         out.addProperty("redis_version", redis_const::REDIS_VERSION);
+        out.addProperty("total_commands_processed", to_string(Arag::instance().getTotalCommandsProcessed()));
         
         // FIXME: need to add other info as well
         
@@ -160,7 +161,7 @@ CommandResultPtr ClientCommand::execute(InMemoryData& data, SessionContext& ctx)
         else
         if (subCommand == "GETNAME") {
 
-            const string& name = mTokens[2].first;
+            string name = ctx.getClientName();
             
             if (name == "") {
                 return CommandResult::redisNULLResult();

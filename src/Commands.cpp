@@ -16,6 +16,7 @@
 #include "RedisProtocol.h"
 #include "Utils.h"
 #include "AragServer.h"
+#include "KeysMap.h"
 #include <iostream>
 #include <regex>
 #include "Database.h"
@@ -55,208 +56,231 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         
         // String Commands
         sNameToCommand["SET"] = shared_ptr<Command>(new SetCommand());
-        sNameToCommand["SET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SET"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["SETNX"] = shared_ptr<Command>(new SetNXCommand());
-        sNameToCommand["SETNX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SETNX"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["SETEX"] = shared_ptr<Command>(new SetExCommand(SetExCommand::SETEX));
-        sNameToCommand["SETEX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SETEX"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["PSETEX"] = shared_ptr<Command>(new SetExCommand(SetExCommand::PSETEX));
-        sNameToCommand["PSETEX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["PSETEX"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["GET"] = shared_ptr<Command>(new GetCommand());
-        sNameToCommand["GET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["GET"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["GETSET"] = shared_ptr<Command>(new GetSetCommand());
-        sNameToCommand["GETSET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["GETSET"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["APPEND"] = shared_ptr<Command>(new AppendCommand());
-        sNameToCommand["APPEND"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["APPEND"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["INCR"] = shared_ptr<Command>(new IncrCommand());
-        sNameToCommand["INCR"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["INCR"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["GETRANGE"] = shared_ptr<Command>(new GetRangeCommand());
-        sNameToCommand["GETRANGE"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["GETRANGE"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
+        sNameToCommand["SUBSTR"] = shared_ptr<Command>(new GetRangeCommand());
+        sNameToCommand["SUBSTR"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["SETRANGE"] = shared_ptr<Command>(new SetRangeCommand());
-        sNameToCommand["SETRANGE"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SETRANGE"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["MGET"] = shared_ptr<Command>(new MGetCommand());
-        sNameToCommand["MGET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["MGET"]->setCtx(CommandCtx({1}, IMapCommon::STRING, CommandCtx::TILL_END));
         sNameToCommand["MSET"] = shared_ptr<Command>(new MSetCommand(false));
-        sNameToCommand["MSET"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["MSET"]->setCtx(CommandCtx({1}, IMapCommon::STRING, CommandCtx::EVERY_OTHER));
         sNameToCommand["MSETNX"] = shared_ptr<Command>(new MSetCommand(true));
-        sNameToCommand["MSETNX"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["MSETNX"]->setCtx(CommandCtx({1}, IMapCommon::STRING, CommandCtx::EVERY_OTHER));
         sNameToCommand["BITCOUNT"] = shared_ptr<Command>(new BitCountCommand());
-        sNameToCommand["BITCOUNT"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["BITCOUNT"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["BITOP"] = shared_ptr<Command>(new BitOpCommand());
-        sNameToCommand["BITOP"]->setCommandContext(Command::Context(2, IMapCommon::STRING));
+        sNameToCommand["BITOP"]->setCtx(CommandCtx({2}, IMapCommon::STRING, CommandCtx::TILL_END));
         sNameToCommand["BITPOS"] = shared_ptr<Command>(new BitPosCommand());
-        sNameToCommand["BITPOS"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["BITPOS"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["GETBIT"] = shared_ptr<Command>(new GetBitCommand());
-        sNameToCommand["GETBIT"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["GETBIT"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["SETBIT"] = shared_ptr<Command>(new SetBitCommand());
-        sNameToCommand["SETBIT"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["SETBIT"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["STRLEN"] = shared_ptr<Command>(new StrlenCommand());
-        sNameToCommand["STRLEN"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["STRLEN"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["INCRBY"] = shared_ptr<Command>(new IncrByCommand());
-        sNameToCommand["INCRBY"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["INCRBY"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["INCRBYFLOAT"] = shared_ptr<Command>(new IncrByFloatCommand());
-        sNameToCommand["INCRBYFLOAT"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["INCRBYFLOAT"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["DECR"] = shared_ptr<Command>(new DecrCommand());
-        sNameToCommand["DECR"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["DECR"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         sNameToCommand["DECRBY"] = shared_ptr<Command>(new DecrByCommand());
-        sNameToCommand["DECRBY"]->setCommandContext(Command::Context(1, IMapCommon::STRING));
+        sNameToCommand["DECRBY"]->setCtx(CommandCtx({1}, IMapCommon::STRING));
         
         // Hash Commands
         sNameToCommand["HSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::SET));
-        sNameToCommand["HSET"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HSET"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HSETNX"] = shared_ptr<Command>(new HSetCommand(HSetCommand::SETNX));
-        sNameToCommand["HSETNX"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HSETNX"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HMSET"] = shared_ptr<Command>(new HSetCommand(HSetCommand::MSET));
-        sNameToCommand["HMSET"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HMSET"]->setCtx(CommandCtx({1}, IMapCommon::HASH, CommandCtx::EVERY_OTHER));
         sNameToCommand["HGET"] = shared_ptr<Command>(new HGetCommand());
-        sNameToCommand["HGET"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HGET"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HEXISTS"] = shared_ptr<Command>(new HExistsCommand());
-        sNameToCommand["HEXISTS"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HEXISTS"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HDEL"] = shared_ptr<Command>(new HDelCommand());
-        sNameToCommand["HDEL"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HDEL"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HGETALL"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::GETALL));
-        sNameToCommand["HGETALL"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HGETALL"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HKEYS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::KEYS));
-        sNameToCommand["HKEYS"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HKEYS"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HVALS"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::VALS));
-        sNameToCommand["HVALS"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HVALS"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HMGET"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::MGET));
-        sNameToCommand["HMGET"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HMGET"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HLEN"] = shared_ptr<Command>(new HGetAllCommand(HGetAllCommand::LEN));
-        sNameToCommand["HLEN"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HLEN"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HINCRBY"] = shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::INCRBY));
-        sNameToCommand["HINCRBY"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HINCRBY"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         sNameToCommand["HINCRBYFLOAT"] =
             shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::INCRBYFLOAT));
-        sNameToCommand["HINCRBYFLOAT"]->setCommandContext(Command::Context(1, IMapCommon::HASH));
+        sNameToCommand["HINCRBYFLOAT"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         
         // List Commands
         sNameToCommand["RPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::RPUSH));
-        sNameToCommand["RPUSH"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["RPUSH"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["RPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::RPUSHX));
-        sNameToCommand["RPUSHX"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["RPUSHX"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::LPUSH));
-        sNameToCommand["LPUSH"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LPUSH"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LPUSHX"] = shared_ptr<Command>(new LPushCommand(LPushCommand::LPUSHX));
-        sNameToCommand["LPUSHX"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LPUSHX"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LLEN"] = shared_ptr<Command>(new LGetCommand(LGetCommand::LEN));
-        sNameToCommand["LLEN"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LLEN"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LINDEX"] = shared_ptr<Command>(new LGetCommand(LGetCommand::INDEX));
-        sNameToCommand["LINDEX"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LINDEX"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::LPOP));
-        sNameToCommand["LPOP"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LPOP"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["RPOP"] = shared_ptr<Command>(new LRemCommand(LRemCommand::RPOP));
-        sNameToCommand["RPOP"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["RPOP"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LREM"] = shared_ptr<Command>(new LRemCommand(LRemCommand::REM));
-        sNameToCommand["LREM"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LREM"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["RPOPLPUSH"] = shared_ptr<Command>(new LRemCommand(LRemCommand::RPOPLPUSH));
-        sNameToCommand["RPOPLPUSH"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["RPOPLPUSH"]->setCtx(CommandCtx({1, 2}, IMapCommon::LIST));
         sNameToCommand["LRANGE"] = shared_ptr<Command>(new LRangeCommand());
-        sNameToCommand["LRANGE"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LRANGE"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LSET"] = shared_ptr<Command>(new LSetCommand());
-        sNameToCommand["LSET"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LSET"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LTRIM"] = shared_ptr<Command>(new LTrimCommand());
-        sNameToCommand["LTRIM"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LTRIM"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["LINSERT"] = shared_ptr<Command>(new LInsertCommand());
-        sNameToCommand["LINSERT"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["LINSERT"]->setCtx(CommandCtx({1}, IMapCommon::LIST));
         sNameToCommand["BLPOP"] = shared_ptr<Command>(new BLCommand(BLCommand::BLPOP));
-        sNameToCommand["BLPOP"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["BLPOP"]->setCtx(CommandCtx({1}, IMapCommon::LIST, CommandCtx::TILL_END_MINUS_ONE));
         sNameToCommand["BRPOP"] = shared_ptr<Command>(new BLCommand(BLCommand::BRPOP));
-        sNameToCommand["BRPOP"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["BRPOP"]->setCtx(CommandCtx({1}, IMapCommon::LIST, CommandCtx::TILL_END_MINUS_ONE));
         sNameToCommand["BRPOPLPUSH"] = shared_ptr<Command>(new BRPopLPushCommand());
-        sNameToCommand["BRPOPLPUSH"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["BRPOPLPUSH"]->setCtx(CommandCtx({1, 2}, IMapCommon::LIST));
 
         
         // Set Commands
         sNameToCommand["SADD"] = shared_ptr<Command>(new SAddCommand());
-        sNameToCommand["SADD"]->setCommandContext(Command::Context(1, IMapCommon::SET));
+        sNameToCommand["SADD"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         sNameToCommand["SMEMBERS"] = shared_ptr<Command>(new SMembersCommand());
-        sNameToCommand["SMEMBERS"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SMEMBERS"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         sNameToCommand["SCARD"] = shared_ptr<Command>(new SCardCommand(SCardCommand::CARD));
-        sNameToCommand["SCARD"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SCARD"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         sNameToCommand["SISMEMBER"] = shared_ptr<Command>(new SCardCommand(SCardCommand::ISMEMBER));
-        sNameToCommand["SISMEMBER"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SISMEMBER"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         sNameToCommand["SPOP"] = shared_ptr<Command>(new SRemCommand(SRemCommand::POP));
-        sNameToCommand["SPOP"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SPOP"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         sNameToCommand["SREM"] = shared_ptr<Command>(new SRemCommand(SRemCommand::REM));
-        sNameToCommand["SREM"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SREM"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         sNameToCommand["SDIFF"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::DIFF));
-        sNameToCommand["SDIFF"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SDIFF"]->setCtx(CommandCtx({1}, IMapCommon::SET, CommandCtx::TILL_END));
         sNameToCommand["SDIFFSTORE"] = shared_ptr<Command>(new SDiffCommand(SDiffCommand::DIFFSTORE));
-        sNameToCommand["SDIFFSTORE"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SDIFFSTORE"]->setCtx(CommandCtx({1}, IMapCommon::SET, CommandCtx::TILL_END));
         sNameToCommand["SINTER"] = shared_ptr<Command>(new SInterCommand(SInterCommand::INTER));
-        sNameToCommand["SINTER"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SINTER"]->setCtx(CommandCtx({1}, IMapCommon::SET, CommandCtx::TILL_END));
         sNameToCommand["SINTERSTORE"] = shared_ptr<Command>(new SInterCommand(SInterCommand::INTERSTORE));
-        sNameToCommand["SINTERSTORE"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SINTERSTORE"]->setCtx(CommandCtx({1}, IMapCommon::SET, CommandCtx::TILL_END));
         sNameToCommand["SUNION"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::UNION));
-        sNameToCommand["SUNION"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SUNION"]->setCtx(CommandCtx({1}, IMapCommon::SET, CommandCtx::TILL_END));
         sNameToCommand["SUNIONSTORE"] = shared_ptr<Command>(new SUnionCommand(SUnionCommand::UNIONSTORE));
-        sNameToCommand["SUNIONSTORE"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SUNIONSTORE"]->setCtx(CommandCtx({1}, IMapCommon::SET, CommandCtx::TILL_END));
         sNameToCommand["SMOVE"] = shared_ptr<Command>(new SMoveCommand());
-        sNameToCommand["SMOVE"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SMOVE"]->setCtx(CommandCtx({1, 2}, IMapCommon::SET));
         sNameToCommand["SRANDMEMBER"] = shared_ptr<Command>(new SRandMemberCommand());
-        sNameToCommand["SRANDMEMBER"]->setCommandContext(Command::Context(1, IMapCommon::LIST));
+        sNameToCommand["SRANDMEMBER"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         
         // Sorted Set Commands
         sNameToCommand["ZADD"] = shared_ptr<Command>(new ZAddCommand());
-        sNameToCommand["ZADD"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZADD"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::RANGE));
-        sNameToCommand["ZRANGE"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZRANGE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREVRANGE"] = shared_ptr<Command>(new ZRangeCommand(ZRangeCommand::REVRANGE));
-        sNameToCommand["ZREVRANGE"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREVRANGE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZINCRBY"] = shared_ptr<Command>(new ZIncrByCommand());
-        sNameToCommand["ZINCRBY"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZINCRBY"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZSCORE"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::SCORE));
-        sNameToCommand["ZSCORE"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZSCORE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::RANK));
-        sNameToCommand["ZRANK"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZRANK"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREVRANK"] = shared_ptr<Command>(new ZScoreCommand(ZScoreCommand::REVRANK));
-        sNameToCommand["ZREVRANK"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREVRANK"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::COUNT));
-        sNameToCommand["ZCOUNT"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZCOUNT"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZLEXCOUNT"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::LEXCOUNT));
-        sNameToCommand["ZLEXCOUNT"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZLEXCOUNT"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZCARD"] = shared_ptr<Command>(new ZCountCommand(ZCountCommand::CARD));
-        sNameToCommand["ZCARD"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZCARD"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREM"] = shared_ptr<Command>(new ZRemCommand());
-        sNameToCommand["ZREM"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREM"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZUNIONSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::UNION));
+        sNameToCommand["ZUNIONSTORE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET, CommandCtx::NUM_KEYS, 2));
         sNameToCommand["ZINTERSTORE"] = shared_ptr<Command>(new ZUnionCommand(ZUnionCommand::INTERSECT));
+        sNameToCommand["ZINTERSTORE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET, CommandCtx::NUM_KEYS, 2));
         sNameToCommand["ZRANGEBYSCORE"] = shared_ptr<Command>(new ZRangeByCommand(ZRangeByCommand::RANGEBYSCORE));
-        sNameToCommand["ZRANGEBYSCORE"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZRANGEBYSCORE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
+        
         sNameToCommand["ZREVRANGEBYSCORE"] = shared_ptr<Command>(new ZRangeByCommand(ZRangeByCommand::REVRANGEBYSCORE));
-        sNameToCommand["ZREVRANGEBYSCORE"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREVRANGEBYSCORE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
+        
         sNameToCommand["ZREMRANGEBYSCORE"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::REMRANGEBYSCORE));
-        sNameToCommand["ZREMRANGEBYSCORE"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYSCORE"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREMRANGEBYRANK"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::REMRANGEBYRANK));
-        sNameToCommand["ZREMRANGEBYRANK"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYRANK"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYRANK"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREMRANGEBYLEX"] = shared_ptr<Command>(new ZRemByCommand(ZRemByCommand::REMRANGEBYLEX));
-        sNameToCommand["ZREMRANGEBYLEX"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREMRANGEBYLEX"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::RANGEBYLEX));
-        sNameToCommand["ZRANGEBYLEX"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZRANGEBYLEX"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREVRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::REVRANGEBYLEX));
-        sNameToCommand["ZREVRANGEBYLEX"]->setCommandContext(Command::Context(1, IMapCommon::SORTEDSET));
+        sNameToCommand["ZREVRANGEBYLEX"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         
         // Key Commands
         sNameToCommand["DEL"] = shared_ptr<Command>(new DelCommand());
+        sNameToCommand["DEL"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["EXISTS"] = shared_ptr<Command>(new ExistsCommand());
+        sNameToCommand["EXISTS"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["TYPE"] = shared_ptr<Command>(new TypeCommand());
+        sNameToCommand["TYPE"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["KEYS"] = shared_ptr<Command>(new KeysCommand());
+        sNameToCommand["KEYS"]->setCtx(CommandCtx({1}, IMapCommon::NONE, CommandCtx::PATTERN));
         sNameToCommand["TTL"] = shared_ptr<Command>(new TTLCommand(TTLCommand::TTL));
+        sNameToCommand["TTL"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["PTTL"] = shared_ptr<Command>(new TTLCommand(TTLCommand::PTTL));
+        sNameToCommand["PTTL"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["PERSIST"] = shared_ptr<Command>(new PersistCommand());
+        sNameToCommand["PERSIST"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["RANDOMKEY"] = shared_ptr<Command>(new RandomKeyCommand());
         sNameToCommand["RENAME"] = shared_ptr<Command>(new RenameCommand(RenameCommand::RENAME));
+        sNameToCommand["RENAME"]->setCtx(CommandCtx({1, 2}, IMapCommon::NONE));
         sNameToCommand["RENAMENX"] = shared_ptr<Command>(new RenameCommand(RenameCommand::RENAMENX));
+        sNameToCommand["RENAMENX"]->setCtx(CommandCtx({1, 2}, IMapCommon::NONE));
         sNameToCommand["EXPIRE"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::EXPIRE));
+        sNameToCommand["EXPIRE"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["PEXPIRE"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::PEXPIRE));
+        sNameToCommand["PEXPIRE"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["EXPIREAT"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::EXPIREAT));
+        sNameToCommand["EXPIREAT"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["PEXPIREAT"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::PEXPIREAT));
+        sNameToCommand["PEXPIREAT"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         
         // HyperLogLog Commands
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());
+        sNameToCommand["PFADD"]->setCtx(CommandCtx({1}, IMapCommon::HLL));
         sNameToCommand["PFCOUNT"] = shared_ptr<Command>(new PFCountCommand());
+        sNameToCommand["PFCOUNT"]->setCtx(CommandCtx({1}, IMapCommon::HLL, CommandCtx::TILL_END));
         sNameToCommand["PFMERGE"] = shared_ptr<Command>(new PFMergeCommand());
+        sNameToCommand["PFMERGE"]->setCtx(CommandCtx({1}, IMapCommon::HLL, CommandCtx::TILL_END));
         
         // PubSub Commands
         sNameToCommand["SUBSCRIBE"] = shared_ptr<Command>(new SubscribeCommand());
@@ -276,6 +300,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["EVAL"] = shared_ptr<Command>(new EvalCommand());
         sNameToCommand["EVALSHA"] = shared_ptr<Command>(new EvalSHACommand());
         sNameToCommand["SCRIPT"] = shared_ptr<Command>(new ScriptCommand());
+        
+//        cout << sNameToCommand.size() << endl;
     }
     
     string upperCaseCmd = cmdName;
@@ -351,20 +377,11 @@ Command::~Command()
 bool Command::isKeyTypeValid(InMemoryData& db)
 {
     // If command doesn't receive key as argument - return true
-    if (mCtx.mKeyArgIndex == -1) {
+    if (!mCtx.hasAnyKey()) {
         return true;
     }
 
-    KeyMap& kmap = db.getKeyMap();
-    
-    // Obtain the container type for this key
-    IMapCommon::ContainerType type = kmap.getContainerType(mTokens[mCtx.mKeyArgIndex].first);
-    if (type == IMapCommon::NONE) {
-        return true;
-    }
-    
-    // Check the container types
-    return (type == mCtx.mContainerType);
+    return mCtx.commandMatchesContainer(db, mTokens);
 }
 
 void Command::setTokens(const vector<pair<string, int>> &tokens)
@@ -382,7 +399,7 @@ string Command::getName() const
     return mTokens[0].first;
 }
 
-void Command::setCommandContext(Command::Context ctx)
+void Command::setCtx(CommandCtx ctx)
 {
     mCtx = ctx;
 }
@@ -426,6 +443,9 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
             }
         }
         
+        // Increment processed commands counter
+        Arag::instance().incrByTotalCommandsProcessed(1);
+        
         // If the current session is in transaction mode - all commands must be enqueued into
         // transaction queue, unless they are specially marked as "bypass-able".
         if (sessionCtx.isInTransaction() &&
@@ -448,6 +468,9 @@ void Command::executeEndToEnd(std::shared_ptr<Command> cmd,
         if (!cmd->isKeyTypeValid(selectedDB)) {
             throw EWrongKeyType();
         }
+
+        // Delete expired keys, if any
+        cmd->deleteExpiredKeys(selectedDB);
         
         // Execute the command and return the response
         CommandResultPtr res = cmd->execute(selectedDB, sessionCtx);
@@ -491,6 +514,10 @@ Command::ResultType Command::processInternalCommand()
     return ResultType::CONTINUE;
 }
 
+void Command::deleteExpiredKeys(InMemoryData &db)
+{
+    mCtx.deleteExpiredKeys(db, mTokens);
+}
 
 //----------------------------------------------------------------------------
 
@@ -503,3 +530,4 @@ CommandResultPtr InternalCommand::execute(InMemoryData& data, SessionContext& ct
 {
     throw AragException("This function should never be called");
 }
+
