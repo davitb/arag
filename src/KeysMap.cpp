@@ -163,17 +163,26 @@ std::string KeyMap::getContainerName(const std::string &key)
     throw EInvalidKey();
 }
 
-KeyMap::RedisArray KeyMap::getKeys(const std::string &pattern)
+int KeyMap::getKeys(const std::string &pattern, KeyMap::RedisArray& arr, int cursor, int timestamp, int upperLimit)
 {
-    RedisArray arr;
+    auto elem = _keyMap.begin();
+    std::advance(elem, cursor);
     
-    for (auto elem = _keyMap.begin(); elem != _keyMap.end(); ++elem) {
-        if (Utils::checkPubSubPattern(elem->first, pattern)) {
-            arr.push_back(make_pair(elem->first, RedisProtocol::BULK_STRING));
+    while (elem != _keyMap.end() && cursor != upperLimit) {
+        if (timestamp > 0 && elem->second.timestamp < timestamp) {
+            if (pattern.length() == 0 || (pattern.length() > 0 && Utils::checkPubSubPattern(elem->first, pattern))) {
+                arr.push_back(make_pair(elem->first, RedisProtocol::BULK_STRING));
+            }
         }
+        elem++;
+        cursor++;
     }
     
-    return arr;
+    if (elem == _keyMap.end()) {
+        cursor = 0;
+    }
+    
+    return cursor;
 }
 
 std::string KeyMap::getRandomKey()

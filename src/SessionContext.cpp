@@ -208,3 +208,12 @@ void SessionContext::clearPendingBLCommand()
     unsubscribeFromNotifications();
 }
 
+void SessionContext::setScanCommandStartTime(ScanCmdType type)
+{
+    _scanCmdTimes[type] = (int)time(0);
+}
+
+int SessionContext::getScanCommandStartTime(ScanCmdType type)
+{
+    return _scanCmdTimes[type];
+}

@@ -163,7 +163,8 @@ void CommandCtx::deleteExpiredKeys(InMemoryData& db, const CommandResult::Result
             
         case PATTERN:
         {
-            KeyMap::RedisArray arr = kmap.getKeys(tokens[_keyIndexList[0]].first);
+            KeyMap::RedisArray arr;
+            kmap.getKeys(tokens[_keyIndexList[0]].first, arr);
             for (int i = 0; i < arr.size(); i++) {
                 kmap.delIfExpired(arr[i].first);
             }

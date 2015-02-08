@@ -75,7 +75,7 @@ public:
     std::string getContainerName(const std::string& key);
 
     // Return keys that match the given pattern
-    RedisArray getKeys(const std::string& pattern);
+    int getKeys(const std::string& pattern, RedisArray& arr, int cursor = 0, int timestamp = 0, int upperLimit = INT_MAX);
 
     // Return a random key
     std::string getRandomKey();

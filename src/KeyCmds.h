@@ -17,6 +17,8 @@ COMMAND_CLASS(KeysCommand, 2, 2);
 COMMAND_CLASS(PersistCommand, 2, 2);
 
 COMMAND_CLASS(RandomKeyCommand, 1, 1);
+
+COMMAND_CLASS(ScanCommand, 2, 6);
     
 class TTLCommand: public Command
 {

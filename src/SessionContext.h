@@ -31,6 +31,11 @@ public:
         IN_TRANSACTION,
         NO_TRANSACTION
     };
+    
+    enum ScanCmdType
+    {
+        SCAN = 0, SSCAN = 1, HSCAN = 2, ZSCAN = 3
+    };
         
     SessionContext();
     
@@ -116,6 +121,12 @@ public:
      */
     void checkPendingBLCommand();
     
+    // Sets tiemstamp when last time SCAN command has been called with cursor=0
+    void setScanCommandStartTime(ScanCmdType type);
+    
+    // Returns tiemstamp when last time SCAN command has been called with cursor=0
+    int getScanCommandStartTime(ScanCmdType type);
+    
 private:
     struct TransactionInfo
     {
@@ -142,6 +153,8 @@ private:
     PendingBLCommand mPendingBLCmd;
     // True when context is sibscribed to notifications
     bool mIsSubscribed;
+    // SCAN family has 4 commands
+    int _scanCmdTimes[4];
     
 private:
     

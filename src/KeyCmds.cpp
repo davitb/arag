@@ -107,8 +107,9 @@ CommandResultPtr KeysCommand::execute(InMemoryData& db, SessionContext& ctx)
         const string& pattern = mTokens[1].first;
         
         KeyMap& kmap = db.getKeyMap();
-        
-        return CommandResultPtr(new CommandResult(kmap.getKeys(pattern)));
+        KeyMap::RedisArray arr;
+        kmap.getKeys(pattern, arr);
+        return CommandResultPtr(new CommandResult(arr));
     }
     catch (std::exception& e) {
     }
@@ -330,3 +331,57 @@ CommandResultPtr ExpireCommand::execute(InMemoryData& db, SessionContext& ctx)
     
     return CommandResult::redisNULLResult();
 }
+
+//-------------------------------------------------------------------------
+
+CommandResultPtr ScanCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        int cursor = Utils::convertToInt(mTokens[1].first);
+        string pattern = "";
+        int count = 10; // Return max 10 items
+        
+        if (cmdNum > 2) {
+            int pos = 2;
+            if (mTokens[pos].first == "MATCH") {
+                pattern = mTokens[pos + 1].first;
+                pos += 2;
+            }
+
+            if (cmdNum > pos && mTokens[pos].first == "COUNT") {
+                count = Utils::convertToInt(mTokens[pos + 1].first);
+            }
+        }
+
+        if (cursor == 0) {
+            ctx.setScanCommandStartTime(SessionContext::SCAN);
+        }
+        
+        KeyMap& kmap = db.getKeyMap();
+        
+        KeyMap::RedisArray secondArray;
+        int nextCursor = kmap.getKeys(pattern,
+                                      secondArray,
+                                      cursor,
+                                      ctx.getScanCommandStartTime(SessionContext::SCAN),
+                                      cursor + count);
+        
+        CommandResultPtr response(new CommandResult(CommandResult::MULTI_RESPONSE));
+
+        response->appendToMultiArray(CommandResultPtr(new CommandResult(to_string(nextCursor), RedisProtocol::BULK_STRING)));
+        response->appendToMultiArray(CommandResultPtr(new CommandResult(secondArray)));
+
+        return response;
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
+}
+
