@@ -579,3 +579,40 @@ int SortedSetMap::rename(const std::string &key, const std::string &newKey)
     
     return 1;
 }
+
+int SortedSetMap::scan(const std::string& key,
+                 std::vector<std::pair<std::string, int>>& outArr,
+                 const std::string& pattern,
+                 int cursor,
+                 int timestamp,
+                 int upperLimit)
+{
+    if (!keyExists(key)) {
+        throw EInvalidKey();
+    }
+    
+    SortedSet::MapType& s = mSetMap[key].mMap;
+    
+    if (abs(cursor) >= s.size()) {
+        return 0;
+    }
+    
+    auto elem = s.begin();
+    std::advance(elem, cursor);
+    
+    while (elem != s.end() && cursor != upperLimit) {
+        if (pattern.length() == 0 || (pattern.length() > 0 && Utils::checkPubSubPattern(elem->first, pattern))) {
+            outArr.push_back(make_pair(elem->first, RedisProtocol::BULK_STRING));
+            outArr.push_back(make_pair(Utils::dbl2str(elem->second), RedisProtocol::BULK_STRING));
+        }
+        elem++;
+        cursor++;
+    }
+    
+    if (elem == s.end()) {
+        cursor = 0;
+    }
+    
+    return cursor;
+}
+

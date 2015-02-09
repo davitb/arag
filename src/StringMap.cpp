@@ -200,3 +200,33 @@ int StringMap::rename(const std::string &key, const std::string &newKey)
     
     return 1;
 }
+
+
+int StringMap::scan(std::vector<std::pair<std::string, int>>& outArr,
+                 const std::string& pattern,
+                 int cursor,
+                 int timestamp,
+                 int upperLimit)
+{
+    if (abs(cursor) >= size()) {
+        return 0;
+    }
+    
+    auto elem = map.begin();
+    std::advance(elem, cursor);
+    
+    while (elem != map.end() && cursor != upperLimit) {
+        if (pattern.length() == 0 || (pattern.length() > 0 && Utils::checkPubSubPattern(elem->first, pattern))) {
+            outArr.push_back(make_pair(elem->first, RedisProtocol::BULK_STRING));
+            outArr.push_back(make_pair(elem->second, RedisProtocol::BULK_STRING));
+        }
+        elem++;
+        cursor++;
+    }
+    
+    if (elem == map.end()) {
+        cursor = 0;
+    }
+    
+    return cursor;
+}

@@ -209,7 +209,8 @@ COMMAND_CLASS(ZRemCommand, 3, INT_MAX);
 COMMAND_CLASS(ZAddCommand, 4, INT_MAX);
 
 COMMAND_CLASS(ZIncrByCommand, 4, 4);
-    
+
+COMMAND_CLASS(ZScanCommand, 3, 7);
 };
 
 

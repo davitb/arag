@@ -31,6 +31,14 @@ public:
     // Returns all members of the set
     std::vector<std::pair<std::string, int>> getMembers(const std::string& key);
 
+    // Scans members starting from a given cursor
+    int scan(const std::string& key,
+             std::vector<std::pair<std::string, int>>& outArr,
+             const std::string& pattern,
+             int cursor = 0,
+             int timestamp = 0,
+             int upperLimit = INT_MAX);
+    
     // Returns a random element from the set
     std::string getRandMember(const std::string& key);
 

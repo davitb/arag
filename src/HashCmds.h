@@ -34,54 +34,6 @@ private:
     CmdType cmdType;
 };
 
-class HGetCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(HGetCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-  
-class HExistsCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(HExistsCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = 3
-    };
-};
-
-class HDelCommand: public Command
-{
-public:
-    
-    DEEP_CLONE(HDelCommand)
-    
-    virtual CommandResultPtr execute(InMemoryData& data, SessionContext& ctx);
-    
-private:
-    enum Consts
-    {
-        MIN_ARG_NUM = 3,
-        MAX_ARG_NUM = INT_MAX
-    };
-};
-
 class HGetAllCommand: public Command
 {
 public:
@@ -136,7 +88,12 @@ private:
     
     CmdType cmdType;
 };
-    
+
+COMMAND_CLASS(HGetCommand, 3, 3);
+COMMAND_CLASS(HExistsCommand, 3, 3);
+COMMAND_CLASS(HDelCommand, 3, INT_MAX);
+COMMAND_CLASS(HScanCommand, 3, 7);
+
 };
 
 #endif /* defined(__arag__HashCmds__) */

@@ -37,6 +37,14 @@ public:
     // Return value under the key
     StringMap& get(const std::string& key);
     
+    // Scans members starting from a given cursor
+    int scan(const std::string& key,
+             std::vector<std::pair<std::string, int>>& outArr,
+             const std::string& pattern,
+             int cursor = 0,
+             int timestamp = 0,
+             int upperLimit = INT_MAX);
+    
 private:
     
     HashMapType _hashMap;

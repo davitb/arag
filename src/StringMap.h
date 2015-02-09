@@ -77,6 +77,13 @@ public:
     // Renames the key to newkey
     virtual int rename(const std::string& key, const std::string& newKey);
     
+    // Scans members starting from a given cursor
+    int scan(std::vector<std::pair<std::string, int>>& outArr,
+             const std::string& pattern,
+             int cursor = 0,
+             int timestamp = 0,
+             int upperLimit = INT_MAX);
+    
     void cleanup();
     
     int getCounter() const;

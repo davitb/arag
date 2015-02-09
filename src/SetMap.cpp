@@ -64,6 +64,41 @@ vector<pair<string, int>> SetMap::getMembers(const string& key)
     return members;
 }
 
+int SetMap::scan(const std::string& key,
+                 std::vector<std::pair<std::string, int>>& outArr,
+                 const std::string& pattern,
+                 int cursor,
+                 int timestamp,
+                 int upperLimit)
+{
+    if (!keyExists(key)) {
+        throw EInvalidKey();
+    }
+    
+    unordered_set<string>& s = mSetMap[key];
+    
+    if (abs(cursor) >= s.size()) {
+        return 0;
+    }
+    
+    auto elem = s.begin();
+    std::advance(elem, cursor);
+    
+    while (elem != s.end() && cursor != upperLimit) {
+        if (pattern.length() == 0 || (pattern.length() > 0 && Utils::checkPubSubPattern(*elem, pattern))) {
+            outArr.push_back(make_pair(*elem, RedisProtocol::BULK_STRING));
+        }
+        elem++;
+        cursor++;
+    }
+    
+    if (elem == s.end()) {
+        cursor = 0;
+    }
+    
+    return cursor;
+}
+
 string SetMap::getRandMember(const std::string &key)
 {
     if (size(key) == 0) {

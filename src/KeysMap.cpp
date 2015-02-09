@@ -165,6 +165,10 @@ std::string KeyMap::getContainerName(const std::string &key)
 
 int KeyMap::getKeys(const std::string &pattern, KeyMap::RedisArray& arr, int cursor, int timestamp, int upperLimit)
 {
+    if (abs(cursor) >= _keyMap.size()) {
+        return 0;
+    }
+    
     auto elem = _keyMap.begin();
     std::advance(elem, cursor);
     

@@ -144,7 +144,8 @@ namespace arag
     COMMAND_CLASS(SMoveCommand, 4, 4);
 
     COMMAND_CLASS(SRandMemberCommand, 2, 3);
-    
+
+    COMMAND_CLASS(SScanCommand, 3, 7);
 };
 
 #endif /* defined(__arag__SetCmds__) */

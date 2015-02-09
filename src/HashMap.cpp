@@ -45,3 +45,20 @@ int HashMap::rename(const std::string &key, const std::string &newKey)
     
     return 1;
 }
+
+int HashMap::scan(const std::string& key,
+                 std::vector<std::pair<std::string, int>>& outArr,
+                 const std::string& pattern,
+                 int cursor,
+                 int timestamp,
+                 int upperLimit)
+{
+    if (!keyExists(key)) {
+        throw EInvalidKey();
+    }
+    
+    StringMap& s = _hashMap[key];
+    
+    return s.scan(outArr, pattern, cursor, timestamp, upperLimit);
+}
+

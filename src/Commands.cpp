@@ -132,6 +132,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["HINCRBYFLOAT"] =
             shared_ptr<Command>(new HIncrByCommand(HIncrByCommand::INCRBYFLOAT));
         sNameToCommand["HINCRBYFLOAT"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
+        sNameToCommand["HSCAN"] = shared_ptr<Command>(new HScanCommand());
+        sNameToCommand["HSCAN"]->setCtx(CommandCtx({1}, IMapCommon::HASH));
         
         // List Commands
         sNameToCommand["RPUSH"] = shared_ptr<Command>(new LPushCommand(LPushCommand::RPUSH));
@@ -199,6 +201,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["SMOVE"]->setCtx(CommandCtx({1, 2}, IMapCommon::SET));
         sNameToCommand["SRANDMEMBER"] = shared_ptr<Command>(new SRandMemberCommand());
         sNameToCommand["SRANDMEMBER"]->setCtx(CommandCtx({1}, IMapCommon::SET));
+        sNameToCommand["SSCAN"] = shared_ptr<Command>(new SScanCommand());
+        sNameToCommand["SSCAN"]->setCtx(CommandCtx({1}, IMapCommon::SET));
         
         // Sorted Set Commands
         sNameToCommand["ZADD"] = shared_ptr<Command>(new ZAddCommand());
@@ -244,6 +248,8 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["ZRANGEBYLEX"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         sNameToCommand["ZREVRANGEBYLEX"] = shared_ptr<Command>(new ZRangeByLexCommand(ZRangeByLexCommand::REVRANGEBYLEX));
         sNameToCommand["ZREVRANGEBYLEX"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
+        sNameToCommand["ZSCAN"] = shared_ptr<Command>(new ZScanCommand());
+        sNameToCommand["ZSCAN"]->setCtx(CommandCtx({1}, IMapCommon::SORTEDSET));
         
         // Key Commands
         sNameToCommand["DEL"] = shared_ptr<Command>(new DelCommand());
