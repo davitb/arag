@@ -10,7 +10,7 @@ There are several reasons why arag project has been started:
 Currently arag implements over 130 commands and passes most of the tests by redis-py (most popular redis python client).
 <br>
 <br>
-What it currently supports:
+What is supported currently:
 <br>
 
 1) All data structures supported by Redis (String, Set, Hashe, List, Sorted Set, Hyperloglog)
@@ -26,7 +26,7 @@ What it currently supports:
 6) Keys Commands and some Server and Connections commands
 <br>
 
-What is doesn't support yet:
+What is NOT supported currently:
 <br>
 
 1) Some commands (DUMP, RESTORE, SCAN*, MIGRATE, monitoring and configuration related commands)
