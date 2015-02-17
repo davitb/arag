@@ -20,6 +20,8 @@ COMMAND_CLASS(RandomKeyCommand, 1, 1);
 
 COMMAND_CLASS(ScanCommand, 2, 6);
     
+COMMAND_CLASS(SortCommand, 2, 11);
+    
 class TTLCommand: public Command
 {
 public:

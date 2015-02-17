@@ -64,6 +64,9 @@ public:
     
     // Returns the container type associated with key
     IMapCommon::ContainerType getContainerType(const std::string& key);
+
+    // Returns the container associated with key
+    IMapCommon& getContainer(IMapCommon::ContainerType);
     
     // Clears all keys
     virtual void flush();

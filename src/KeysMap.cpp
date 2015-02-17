@@ -127,6 +127,17 @@ IMapCommon::ContainerType KeyMap::getContainerType(const std::string &key)
     return IMapCommon::NONE;
 }
 
+IMapCommon& KeyMap::getContainer(IMapCommon::ContainerType type)
+{
+    for (int i = 0; i < _maps.size(); ++i) {
+        if (_maps[i].get().getContainerType() == type) {
+            return _maps[i];
+        }
+    }
+    
+    throw EInvalidArgument();
+}
+
 bool KeyMap::keyExists(const std::string& key)
 {
     return _keyMap.count(key) > 0;

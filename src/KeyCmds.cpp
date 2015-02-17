@@ -385,3 +385,76 @@ CommandResultPtr ScanCommand::execute(InMemoryData& db, SessionContext& ctx)
     return CommandResult::redisNULLResult();
 }
 
+//-------------------------------------------------------------------------
+
+CommandResultPtr SortCommand::execute(InMemoryData& db, SessionContext& ctx)
+{
+    size_t cmdNum = mTokens.size();
+    
+    try {
+        if (cmdNum < Consts::MIN_ARG_NUM || cmdNum > Consts::MAX_ARG_NUM) {
+            throw EInvalidArgument();
+        }
+        
+        const string& key = mTokens[1].first;
+        string destKey;
+        int offset = 0;
+        int count = 0;
+        bool asc = true;
+        bool alpha = false;
+
+        int pos = 2;
+        while (pos <= cmdNum - 1) {
+            if (mTokens[pos].first == "LIMIT") {
+                if (cmdNum < pos + 2) {
+                    throw EInvalidArgument();
+                }
+                
+                offset = Utils::convertToInt(mTokens[pos + 1].first);
+                count = Utils::convertToInt(mTokens[pos + 2].first);
+                pos += 3;
+            }
+            else
+            if (mTokens[pos].first == "ASC") {
+                asc = true;
+                pos++;
+            }
+            else
+            if (mTokens[pos].first == "DESC") {
+                asc = false;
+                pos++;
+            }
+            else
+            if (mTokens[pos].first == "ALPHA") {
+                alpha = true;
+                pos++;
+            }
+            else
+            if (mTokens[pos].first == "STORE") {
+                destKey = mTokens[pos].first;
+                pos++;
+            }
+            else {
+                throw EInvalidArgument();
+            }
+        }
+        
+        KeyMap& kmap = db.getKeyMap();
+        
+        IMapCommon::ContainerType type = kmap.getContainerType(key);
+        if (type == IMapCommon::ContainerType::NONE) {
+            return CommandResult::redisNULLResult();
+        }
+        
+        KeyMap::RedisArray arr;
+        kmap.getContainer(type).sort(key, destKey, asc, alpha, offset, count, arr);
+        
+        return CommandResultPtr(new CommandResult(arr));
+        
+    }
+    catch (std::exception& e) {
+    }
+    
+    return CommandResult::redisNULLResult();
+}
+

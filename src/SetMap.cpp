@@ -264,3 +264,55 @@ int SetMap::rename(const std::string &key, const std::string &newKey)
     
     return 1;
 }
+
+void SetMap::sort(const std::string& key,
+                   std::string destKey,
+                   bool asc,
+                   bool alpha,
+                   int offset,
+                   int limit,
+                   RedisArray& arr)
+{
+    if (!keyExists(key)) {
+        throw EInvalidKey();
+    }
+    
+    SetType& s = mSetMap[key];
+    
+    if (offset < 0 || offset > s.size() || limit < 0) {
+        throw EInvalidKey();
+    }
+    
+    if (offset + limit > s.size()) {
+        limit = (int)s.size() - offset;
+    }
+    
+    if (limit == 0) {
+        limit = (int)s.size();
+    }
+    
+    function<bool(const string&, const string&)> fCompare = [alpha, asc] (const string& first,
+                                                                          const string& second) {
+        if (alpha == false) {
+            double f = Utils::convertToDouble(first);
+            double s = Utils::convertToDouble(second);
+            
+            return asc ? f < s : s < f;
+        }
+        
+        return asc ? first.compare(second) < 0 : second.compare(first) < 0;
+    };
+    
+    typedef std::set<string, function<bool(const string&, const string&)>> sset;
+    sset ss = sset(fCompare);
+
+    ss.insert(s.begin(), s.end());
+    
+    auto iter = ss.begin();
+    std::advance(iter, offset);
+    
+    while (limit-- != 0 && iter != ss.end()) {
+        arr.push_back(make_pair(*iter, RedisProtocol::BULK_STRING));
+        iter++;
+    }
+}

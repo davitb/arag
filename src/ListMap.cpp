@@ -302,3 +302,55 @@ int ListMap::rename(const std::string &key, const std::string &newKey)
     
     return 1;
 }
+
+void ListMap::sort(const std::string& key,
+                   std::string destKey,
+                   bool asc,
+                   bool alpha,
+                   int offset,
+                   int limit,
+                   RedisArray& arr)
+{
+    if (!keyExists(key)) {
+        throw EInvalidKey();
+    }
+    
+    // Need to make a copy since we don't want to sort the actual list
+    list<string> l = mListMap[key];
+
+    if (offset < 0 || offset > l.size() || limit < 0) {
+        throw EInvalidKey();
+    }
+        
+    if (offset + limit > l.size()) {
+        limit = (int)l.size() - offset;
+    }
+    
+    if (limit == 0) {
+        limit = (int)l.size();
+    }
+
+    function<bool(const string&, const string&)> fCompare = [alpha, asc] (const string& first,
+                                                                          const string& second) {
+        
+        if (alpha == false) {
+            double f = Utils::convertToDouble(first);
+            double s = Utils::convertToDouble(second);
+            
+            return asc ? f < s : s < f;
+        }
+        
+        return asc ? first.compare(second) < 0 : second.compare(first) < 0;
+    };
+    
+    l.sort(fCompare);
+    
+    auto iter = l.begin();
+    std::advance(iter, offset);
+    
+    while (limit-- != 0 && iter != l.end()) {
+        arr.push_back(make_pair(*iter, RedisProtocol::BULK_STRING));
+        iter++;
+    }
+}
+

@@ -81,6 +81,15 @@ public:
     // Finds where the given key is and deletes its content
     virtual bool keyExists(const std::string& key);
     
+    // Return sorted container and store in the specified destKey
+    virtual void sort(const std::string& key,
+                      std::string destKey,
+                      bool asc,
+                      bool alpha,
+                      int offset,
+                      int limit,
+                      RedisArray& arr);
+    
     // Returns the container type associated with key
     IMapCommon::ContainerType getContainerType();
     

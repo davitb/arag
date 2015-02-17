@@ -280,6 +280,7 @@ static shared_ptr<Command> getCommandByName(const string& cmdName)
         sNameToCommand["PEXPIREAT"] = shared_ptr<Command>(new ExpireCommand(ExpireCommand::PEXPIREAT));
         sNameToCommand["PEXPIREAT"]->setCtx(CommandCtx({1}, IMapCommon::NONE));
         sNameToCommand["SCAN"] = shared_ptr<Command>(new ScanCommand());
+        sNameToCommand["SORT"] = shared_ptr<Command>(new SortCommand());
         
         // HyperLogLog Commands
         sNameToCommand["PFADD"] = shared_ptr<Command>(new PFAddCommand());

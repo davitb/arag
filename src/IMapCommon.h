@@ -11,6 +11,8 @@ class IMapCommon
 {
 public:
 
+    typedef std::vector<std::pair<std::string, int>> RedisArray;
+    
     enum TimeBase
     {
         SEC,
@@ -53,6 +55,15 @@ public:
     
     // Renames the key to newkey
     virtual int rename(const std::string& key, const std::string& newKey) = 0;
+    
+    // Return sorted container and store in the specified destKey
+    virtual void sort(const std::string& key,
+                      std::string destKey,
+                      bool asc,
+                      bool alpha,
+                      int offset,
+                      int limit,
+                      RedisArray& arr) {}
 };
 
 };
